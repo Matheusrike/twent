@@ -1,4 +1,5 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
+import Navbar from "@/components/Navbar/navbar-02";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -39,7 +40,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}`}>
-      <body className="font-sans">
+      <body className="font-sans" cz-shortcut-listen="true">
+        <Navbar />
         {children}
       </body>
     </html>
