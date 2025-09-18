@@ -1,5 +1,6 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar/navbar-02";
+import Footer from "@/components/Footer/Footer";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="font-sans" cz-shortcut-listen="true">
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
