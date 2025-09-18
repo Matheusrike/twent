@@ -1,9 +1,35 @@
+import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
+
+// Fonte Principal (Sans) - Moderna e legível
+const notoSansAdlam = Noto_Sans_Adlam({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-sans",
+});
+
+// Fonte Serifada (Secundária) - Clássica e institucional
+const notoSerif = Noto_Serif({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-serif",
+});
+
+// Fonte Monoespaçada - Dados técnicos e tabelas
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "Twent",
   description: "",
+  icons:
+  {
+    icon: "/img/global/dark/iconDark.svg"
+  }
 };
 
 export default function RootLayout({
@@ -12,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}`}>
+      <body className="font-sans">
         {children}
       </body>
     </html>
