@@ -40,8 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}`}>
-      <body className="font-sans" cz-shortcut-listen="true">
+    <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
+      <body className="font-sans " cz-shortcut-listen="true">
         <Navbar />
         {children}
         <Footer />

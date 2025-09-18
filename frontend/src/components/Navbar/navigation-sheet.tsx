@@ -8,11 +8,11 @@ export const NavigationSheet = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="menu" size="menu" >
           <Menu />
         </Button>
       </SheetTrigger>
-      <SheetContent className="px-6 py-3">
+      <SheetContent className="px-6 py-3" side="left">
         <Logo />
         <NavMenu orientation="vertical" className="mt-6 [&>div]:h-full" />
       </SheetContent>
