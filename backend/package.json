@@ -5,7 +5,12 @@
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch src/index.ts"
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"lint": "eslint src/**/*.ts",
+		"lint:fix": "eslint src/**/*.ts --fix",
+		"type-check": "tsc --noEmit"
 	},
 	"keywords": [],
 	"author": "",
@@ -18,8 +23,15 @@
 		"zod": "^4.1.9"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.35.0",
+		"@eslint/json": "^0.13.2",
 		"@types/node": "^24.5.2",
+		"eslint": "^9.35.0",
+		"globals": "^16.4.0",
+		"jiti": "^2.5.1",
+		"prettier": "3.6.2",
 		"tsx": "^4.20.5",
-		"typescript": "^5.9.2"
+		"typescript": "^5.9.2",
+		"typescript-eslint": "^8.44.0"
 	}
 }
