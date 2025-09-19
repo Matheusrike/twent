@@ -6,13 +6,15 @@
 		"target": "es2022",
 		"moduleResolution": "nodenext",
 		"outDir": "./dist",
-		"rootDir": "./src",
+		"rootDir": ".",
 		"strict": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "prisma/client.ts"],
 	"exclude": ["node_modules", "dist"]
 }
