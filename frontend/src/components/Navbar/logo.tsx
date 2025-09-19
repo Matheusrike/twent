@@ -18,3 +18,23 @@ export const Logo = () => (
     />
   </div>
 );
+
+
+export const LogoMenu = () => (
+  <div>
+    <Image
+      src="/img/global/light/horizontalLogoLight.svg"
+      width={220}
+      height={220}
+      alt="Picture of the author"
+      className="dark:hidden"
+    />
+    <Image
+      src="/img/global/dark/horizontalLogoDark.svg"
+      width={220}
+      height={220}
+      alt="Picture of the author"
+      className="dark:flex hidden"
+    />
+  </div>
+);

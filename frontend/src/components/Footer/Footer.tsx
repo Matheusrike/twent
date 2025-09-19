@@ -158,8 +158,8 @@ const footerSections = [
 
 const Footer = () => {
   return (
-    <div className=" flex flex-col dark:bg-black">
-      <div className="grow bg-muted" />
+    <div className=" flex flex-col dark:bg-black bg-background">
+      <div className="grow bg-background" />
       <footer className="border-t">
         <div className="max-w-(--breakpoint-xl) mx-auto">
           <div className="py-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-x-8 gap-y-10 px-6 xl:px-0">
@@ -170,6 +170,15 @@ const Footer = () => {
                 width={200}
                 height={200}
                 alt="Logo Twent"
+                className="dark:hidden"
+              />
+
+              <Image
+                src="/img/global/dark/horizontalLogodark.svg"
+                width={200}
+                height={200}
+                alt="Logo Twent"
+                className="hidden dark:flex"
               />
 
             </div>
