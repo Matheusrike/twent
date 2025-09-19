@@ -7,3 +7,449 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+enum StoreType {
+  HEADQUARTERS
+  BRANCH
+}
+
+enum UserType {
+  CUSTOMER
+  EMPLOYEE
+}
+
+enum LeaveType {
+  VACATION
+  SICK_LEAVE
+  MATERNITY
+  PATERNITY
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum GenderTarget {
+  UNISEX
+  MASCULINE
+  FEMININE
+}
+
+enum MovementType {
+  IN
+  OUT
+  TRANSFER
+  ADJUSTMENT
+}
+
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  PIX
+  TRANSFER
+}
+
+enum SaleStatus {
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+}
+
+model Store {
+  id            String    @id @default(uuid()) @db.Char(36)
+  name          String
+  code          String    @unique
+  type          StoreType @default(BRANCH)
+  email         String
+  phone         String?
+  street        String
+  number        String
+  district      String
+  city          String
+  state         String
+  zip_code      String
+  country       String
+  latitude      Decimal?  @db.Decimal(10, 8)
+  longitude     Decimal?  @db.Decimal(11, 8)
+  opening_hours Json?
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  users                  User[]
+  inventory              Inventory[]
+  cashRegisters          CashRegister[]
+  sales                  Sale[]
+  appointments           Appointment[]
+  financial_transactions FinancialTransaction[]
+  InventoryMovement      InventoryMovement[]
+}
+
+model Supplier {
+  id           String   @id @default(uuid()) @db.Char(36)
+  name         String
+  contact_name String
+  email        String
+  phone        String
+  street       String?
+  number       String?
+  district     String?
+  city         String?
+  state        String?
+  zip_code     String?
+  country      String?
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  financial_transactions FinancialTransaction[]
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Char(36)
+  name        String   @unique
+  description String?
+  created_at  DateTime @default(now())
+
+  user_roles UserRole[]
+}
+
+model User {
+  id                  String    @id @default(uuid()) @db.Char(36)
+  store_id            String?
+  user_type           UserType
+  email               String    @unique
+  password_hash       String
+  first_name          String
+  last_name           String
+  phone               String?
+  document_number     String?   @unique
+  birth_date          DateTime?
+  street              String?
+  number              String?
+  district            String?
+  city                String?
+  state               String?
+  zip_code            String?
+  country             String?
+  reset_token         String?
+  reset_token_expires DateTime?
+  last_login_at       DateTime?
+  is_active           Boolean   @default(true)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  store                  Store?                 @relation(fields: [store_id], references: [id])
+  user_roles             UserRole[]
+  employee               Employee?
+  employee_leaves        EmployeeLeave[]        @relation("ApprovedBy")
+  inventory_movements    InventoryMovement[]
+  products_updated       Product[]              @relation("UpdatedBy")
+  price_changes          ProductPriceHistory[]  @relation("ChangedBy")
+  cash_sessions          CashSession[]
+  sales_created          Sale[]                 @relation("SalesCreatedBy")
+  appointments           Appointment[]
+  financial_transactions FinancialTransaction[]
+  audit_logs             AuditLog[]
+  Sale                   Sale[]
+  CustomerFavorite       CustomerFavorite[]
+}
+
+model UserRole {
+  id         String   @id @default(uuid()) @db.Char(36)
+  user_id    String
+  role_id    String
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@unique([user_id, role_id])
+}
+
+model Employee {
+  id                String    @id @default(uuid()) @db.Char(36)
+  user_id           String    @unique
+  employee_code     String    @unique
+  national_id       String?
+  position          String
+  department        String?
+  salary            Decimal   @db.Decimal(10, 2)
+  currency          String    @default("USD")
+  benefits          Json?
+  hire_date         DateTime
+  termination_date  DateTime?
+  emergency_contact Json?
+  is_active         Boolean   @default(true)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  user   User            @relation(fields: [user_id], references: [id])
+  leaves EmployeeLeave[]
+}
+
+model EmployeeLeave {
+  id          String      @id @default(uuid()) @db.Char(36)
+  employee_id String
+  type        LeaveType
+  start_date  DateTime
+  end_date    DateTime
+  status      LeaveStatus @default(PENDING)
+  notes       String?
+  approved_by String?
+
+  employee   Employee @relation(fields: [employee_id], references: [id])
+  approvedBy User?    @relation("ApprovedBy", fields: [approved_by], references: [id])
+}
+
+model Collection {
+  id              String       @id @default(uuid()) @db.Char(36)
+  name            String       @unique
+  description     String?
+  launch_year     Int?
+  target_gender   GenderTarget @default(UNISEX)
+  price_range_min Decimal?     @db.Decimal(10, 2)
+  price_range_max Decimal?     @db.Decimal(10, 2)
+  image_banner    String?
+  is_active       Boolean      @default(true)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id               String   @id @default(uuid()) @db.Char(36)
+  collection_id    String
+  sku              String   @unique
+  name             String
+  description      String?
+  model_number     String?
+  limited_edition  Boolean  @default(false)
+  production_limit Int?
+  case_material    String?
+  case_diameter    Decimal? @db.Decimal(4, 2)
+  movement_type    String?
+  water_resistance String?
+  price            Decimal  @db.Decimal(10, 2)
+  currency         String   @default("USD")
+  cost_price       Decimal? @db.Decimal(10, 2)
+  images           Json?
+  specifications   Json?
+  is_active        Boolean  @default(true)
+  updated_by       String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  collection          Collection            @relation(fields: [collection_id], references: [id])
+  updatedBy           User?                 @relation("UpdatedBy", fields: [updated_by], references: [id])
+  price_history       ProductPriceHistory[]
+  inventory           Inventory[]
+  sale_items          SaleItem[]
+  favorites           CustomerFavorite[]
+  inventory_movements InventoryMovement[]
+}
+
+model ProductPriceHistory {
+  id         String   @id @default(uuid()) @db.Char(36)
+  product_id String
+  old_price  Decimal  @db.Decimal(10, 2)
+  new_price  Decimal  @db.Decimal(10, 2)
+  changed_by String
+  reason     String?
+  changed_at DateTime @default(now())
+
+  product   Product @relation(fields: [product_id], references: [id])
+  changedBy User    @relation("ChangedBy", fields: [changed_by], references: [id])
+}
+
+model Inventory {
+  id            String   @id @default(uuid()) @db.Char(36)
+  store_id      String
+  product_id    String
+  quantity      Int      @default(0)
+  minimum_stock Int      @default(0)
+  updated_at    DateTime @updatedAt
+
+  store   Store   @relation(fields: [store_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@unique([store_id, product_id])
+}
+
+model InventoryMovement {
+  id             String       @id @default(uuid()) @db.Char(36)
+  store_id       String
+  product_id     String
+  movement_type  MovementType
+  quantity       Int
+  reference_type String?
+  reference_id   String?
+  notes          String?
+  created_by     String
+  created_at     DateTime     @default(now())
+
+  store     Store   @relation(fields: [store_id], references: [id])
+  product   Product @relation(fields: [product_id], references: [id])
+  createdBy User    @relation(fields: [created_by], references: [id])
+}
+
+model CashRegister {
+  id         String   @id @default(uuid()) @db.Char(36)
+  store_id   String
+  name       String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  store    Store         @relation(fields: [store_id], references: [id])
+  sessions CashSession[]
+}
+
+model CashSession {
+  id               String            @id @default(uuid()) @db.Char(36)
+  cash_register_id String
+  user_id          String
+  opening_amount   Decimal           @default(0) @db.Decimal(10, 2)
+  closing_amount   Decimal?          @db.Decimal(10, 2)
+  opened_at        DateTime          @default(now())
+  closed_at        DateTime?
+  status           CashSessionStatus @default(OPEN)
+
+  cashRegister CashRegister @relation(fields: [cash_register_id], references: [id])
+  user         User         @relation(fields: [user_id], references: [id])
+  sales        Sale[]
+}
+
+model Sale {
+  id              String        @id @default(uuid()) @db.Char(36)
+  store_id        String
+  cash_session_id String
+  customer_id     String?
+  sale_number     String        @unique
+  subtotal        Decimal       @db.Decimal(10, 2)
+  discount        Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  payment_method  PaymentMethod
+  status          SaleStatus    @default(COMPLETED)
+  created_by      String
+  created_at      DateTime      @default(now())
+
+  store       Store       @relation(fields: [store_id], references: [id])
+  cashSession CashSession @relation(fields: [cash_session_id], references: [id])
+  customer    User?       @relation(fields: [customer_id], references: [id])
+  createdBy   User        @relation("SalesCreatedBy", fields: [created_by], references: [id])
+  items       SaleItem[]
+}
+
+model SaleItem {
+  id         String  @id @default(uuid()) @db.Char(36)
+  sale_id    String
+  product_id String
+  quantity   Int
+  unit_price Decimal @db.Decimal(10, 2)
+  discount   Decimal @default(0) @db.Decimal(10, 2)
+  subtotal   Decimal @db.Decimal(10, 2)
+
+  sale    Sale    @relation(fields: [sale_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+}
+
+model CustomerFavorite {
+  id          String   @id @default(uuid()) @db.Char(36)
+  customer_id String
+  product_id  String
+  created_at  DateTime @default(now())
+
+  customer User    @relation(fields: [customer_id], references: [id])
+  product  Product @relation(fields: [product_id], references: [id])
+
+  @@unique([customer_id, product_id])
+}
+
+model Appointment {
+  id               String            @id @default(uuid()) @db.Char(36)
+  store_id         String
+  customer_id      String?
+  customer_name    String
+  customer_email   String
+  customer_phone   String
+  appointment_date DateTime
+  notes            String?
+  status           AppointmentStatus @default(SCHEDULED)
+  created_at       DateTime          @default(now())
+
+  store    Store @relation(fields: [store_id], references: [id])
+  customer User? @relation(fields: [customer_id], references: [id])
+}
+
+model FinancialTransaction {
+  id               String          @id @default(uuid()) @db.Char(36)
+  store_id         String
+  supplier_id      String?
+  type             TransactionType
+  category         String
+  amount           Decimal         @db.Decimal(10, 2)
+  currency         String          @default("USD")
+  description      String
+  reference_type   String?
+  reference_id     String?
+  transaction_date DateTime
+  created_by       String
+  created_at       DateTime        @default(now())
+
+  store     Store     @relation(fields: [store_id], references: [id])
+  supplier  Supplier? @relation(fields: [supplier_id], references: [id])
+  createdBy User      @relation(fields: [created_by], references: [id])
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid()) @db.Char(36)
+  key_name    String   @unique
+  key_value   String?
+  description String?
+  created_at  DateTime @default(now())
+}
+
+model AuditLog {
+  id         String      @id @default(uuid()) @db.Char(36)
+  user_id    String?
+  action     AuditAction
+  entity     String
+  entity_id  String
+  old_value  Json?
+  new_value  Json?
+  ip_address String?
+  user_agent String?
+  created_at DateTime    @default(now())
+
+  user User? @relation(fields: [user_id], references: [id])
+}
