@@ -10,29 +10,7 @@ import { Input } from './input';
 
 const Navbar = () => {
 
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-      document.documentElement.classList.add("dark")
-      setIsDark(true)
-    } else {
-      document.documentElement.classList.remove("dark")
-      setIsDark(false)
-    }
-  }, [])
-
-  const toggleDarkMode = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark")
-      localStorage.theme = "light"
-    } else {
-      document.documentElement.classList.add("dark")
-      localStorage.theme = "dark"
-    }
-    setIsDark(!isDark)
-  }
-
+  
   return (
     <div className="bg-muted">
       <nav className="h-16 bg-background relative">
@@ -41,20 +19,9 @@ const Navbar = () => {
           {/* Dark Mode And Search */}
           <div className="flex items-center gap-5">
 
-            {/* Dark Mode */}
+            {/* Language */}
             <div className="flex items-center gap-2">
-              <Button
-                size="headericon"
-                variant="menu"
-                onClick={toggleDarkMode}
-                className="cursor-pointer"
-              >
-                {isDark ? (
-                  <MoonIcon className="h-5 w-5 scale--[-1]" />
-                ) : (
-                  <SunIcon className="h-5 w-5" />
-                )}
-              </Button>
+             
             </div>
 
             {/* search input */}

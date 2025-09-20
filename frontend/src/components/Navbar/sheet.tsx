@@ -6,6 +6,7 @@ import { XIcon } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { cn } from "@/lib/utils"
 import { LogoMenu } from "./logo";
+import SwitchDarkMode from "./switch";
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -70,11 +71,11 @@ function SheetContent({
           boxShadow: "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px"
         }}
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 g transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 ",
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
           side === "right" &&
           "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 sm:max-w-sm",
           side === "left" &&
-          "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 sm:max-w-sm ",
+          "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 sm:max-w-sm",
           side === "top" &&
           "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto -z-10",
           side === "bottom" &&
@@ -83,19 +84,26 @@ function SheetContent({
         )}
         {...props}
       >
-
         <SheetPrimitive.Title>
           <VisuallyHidden>Sheet</VisuallyHidden>
         </SheetPrimitive.Title>
 
-        {children}
 
         {/* Menu Header */}
-        <SheetPrimitive.Close
-          className="absolute top-4 left-0 flex items-center justify-center w-full disabled:pointer-events-none mt-5">
-          <LogoMenu />
-          <XIcon className="text-md hover:text-gray-400 dark:text-white absolute right-10 cursor-pointer" />
-        </SheetPrimitive.Close>
+        <div className="w-full flex items-center justify-between px-5 py-6 relative">
+          <SwitchDarkMode />
+
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <LogoMenu />
+          </div>
+
+          <SheetPrimitive.Close asChild>
+            <button className="cursor-pointer">
+              <XIcon className="text-md hover:text-gray-400 dark:text-white" />
+            </button>
+          </SheetPrimitive.Close>
+        </div>
+        {children}
       </SheetPrimitive.Content>
     </SheetPortal>
   )

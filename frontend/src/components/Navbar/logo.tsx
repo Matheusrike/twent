@@ -23,15 +23,15 @@ export const LogoMenu = () => (
   <div>
     <Image
       src="/img/global/light/iconLight.svg"
-      width={35}
-      height={35}
+      width={40}
+      height={40}
       alt="Picture of the author"
       className="dark:hidden"
     />
     <Image
       src="/img/global/dark/iconDark.svg"
-      width={35}
-      height={35}
+      width={40}
+      height={40}
       alt="Picture of the author"
       className="dark:flex hidden"
     />
