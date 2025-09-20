@@ -13,7 +13,6 @@ const Navbar = () => {
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
-    // Sincroniza o estado com o localStorage ou classe inicial
     if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
       document.documentElement.classList.add("dark")
       setIsDark(true)

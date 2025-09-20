@@ -19,20 +19,19 @@ export const Logo = () => (
   </div>
 );
 
-
 export const LogoMenu = () => (
   <div>
     <Image
-      src="/img/global/light/horizontalLogoLight.svg"
-      width={220}
-      height={220}
+      src="/img/global/light/iconLight.svg"
+      width={35}
+      height={35}
       alt="Picture of the author"
       className="dark:hidden"
     />
     <Image
-      src="/img/global/dark/horizontalLogoDark.svg"
-      width={220}
-      height={220}
+      src="/img/global/dark/iconDark.svg"
+      width={35}
+      height={35}
       alt="Picture of the author"
       className="dark:flex hidden"
     />
