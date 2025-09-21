@@ -1,15 +1,50 @@
-import { fastify } from 'fastify';
-import prisma from '../prisma/client.ts';
+import { configDotenv } from 'dotenv';
+import Fastify from 'fastify';
+import type { FastifyInstance } from 'fastify';
+import cookie from '@fastify/cookie';
+import jwt from '@fastify/jwt';
+import { authorizationPlugin } from './plugins/authorization.plugin.js';
+import { testRoutes } from './test.js';
 
-const app = fastify();
-const PORT = 3000;
+configDotenv({ quiet: true });
 
-console.log(await prisma.user.findMany());
+const app: FastifyInstance = Fastify();
+const port: number = parseInt(process.env.PORT || '3000', 10);
 
-app.listen({ port: 3000 }, (err) => {
-	console.log(`Server running on http://localhost:${PORT}`);
-	if (err) {
-		console.error(err);
+async function buildServer() {
+	// PLUGINS
+	await app.register(cookie, {
+		secret: process.env.COOKIE_SECRET!,
+	});
+
+	await app.register(jwt, {
+		secret: process.env.JWT_SECRET!,
+	});
+
+	await app.register(authorizationPlugin);
+
+	await app.register(testRoutes);
+
+	return app;
+}
+
+// Server start
+buildServer()
+	.then((server) => {
+		server.listen({ port: port }, (err) => {
+			if (!process.env.PORT) {
+				console.warn(
+					'⚠ PORT not specified in .env, defaulting to 3000\n',
+				);
+			}
+			console.log(`Server running on http://localhost:${port}`);
+			if (err) {
+				console.error(err);
+				process.exit(1);
+			}
+		});
+	})
+	.catch((err) => {
+		console.error('Error building server:', err);
 		process.exit(1);
-	}
-});
+	});

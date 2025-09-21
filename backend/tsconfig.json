@@ -1,20 +1,19 @@
 {
-	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"lib": ["es2024"],
-		"module": "nodenext",
 		"target": "es2022",
+		"module": "nodenext",
 		"moduleResolution": "nodenext",
-		"outDir": "./dist",
 		"rootDir": ".",
+		"outDir": "./dist",
 		"strict": true,
 		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"useUnknownInCatchVariables": false,
 		"allowImportingTsExtensions": true,
 		"noEmit": true
 	},
 	"include": ["src/**/*", "prisma/client.ts"],
-	"exclude": ["node_modules", "dist"]
+	"exclude": ["node_modules", "**/*.config.ts"]
 }
