@@ -5,6 +5,7 @@ import type {
 } from '../types/authorization.ts';
 import { getToken } from '../helpers/get-token.helper.js';
 import { ApiResponse, ApiError } from '../utils/api-responses.util.ts';
+import fp from 'fastify-plugin';
 
 function authorization(options: IAuthorizationOptions = {}) {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -44,6 +45,10 @@ function authorization(options: IAuthorizationOptions = {}) {
 	};
 }
 
-export async function authorizationPlugin(fastify: FastifyInstance) {
+async function authorizationPlugin(fastify: FastifyInstance) {
 	fastify.decorate('authorization', authorization);
 }
+
+export default fp(authorizationPlugin, {
+	name: 'authorization',
+});
