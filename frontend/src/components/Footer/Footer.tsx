@@ -63,7 +63,7 @@ const Footer = () => {
               <Link href="/" target="_blank">
                 Todos os os direitos reservados
               </Link>
-              . Twent
+              . TWENT®
             </span>
 
             <div className="flex items-center gap-5 text-muted-foreground">
