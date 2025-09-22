@@ -6,7 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/Navbar/dropdown-language.-sheet";
+} from "@/components/web/Global/Navbar/dropdown-language.-sheet";
 
 // Flag Icons
 import "flag-icons/css/flag-icons.min.css";

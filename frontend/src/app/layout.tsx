@@ -1,7 +1,7 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
-import Navbar from "@/components/Navbar/navbar";
-import Footer from "@/components/Footer/Footer";
-import DarkModeProvider from "./setThemeProvider";
+import Navbar from "@/components/web/Global/Navbar/navbar";
+import Footer from "@/components/web/Global/Footer/Footer";
+import DarkModeProvider from "./themeProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 

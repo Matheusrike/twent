@@ -3,7 +3,7 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from "@/components/Navbar/navigation-menu";
+} from "@/components/web/Global/Navbar/navigation-menu";
 import Link from "next/link";
 import { ComponentProps } from "react";
 import { ChevronRight } from "lucide-react";

@@ -4,17 +4,10 @@
     "url": "/collection"
   },
   {
-    "name": "Novidades",
-    "url": "#"
-  },
-  {
-    "name": "Sobre Nós",
+    "name": "Conheça a Twent",
     "url": "/about"
   },
-  {
-    "name": "Contato",
-    "url": "/contact"
-  },
+ 
   {
     "name": " Área Empresarial",
     "url": "/business"
