@@ -17,6 +17,7 @@ import flagData from './json/languageSelector.json' assert { type: "json" };
 
 export default function DropdownLanguageSelector() {
 
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
