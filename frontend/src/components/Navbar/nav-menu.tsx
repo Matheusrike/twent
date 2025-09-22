@@ -9,7 +9,7 @@ import { ComponentProps } from "react";
 import { ChevronRight } from "lucide-react";
 
 // Navigation links import
-import navigationLinks from './json/navigationLinks.json' assert { type: "json" };
+import navigationLinks from './json/navigationLinksData.json' assert { type: "json" };
 
 export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
   <NavigationMenu {...props}>

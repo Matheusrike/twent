@@ -13,11 +13,9 @@ import "flag-icons/css/flag-icons.min.css";
 // Lucide Icons
 import { Globe } from "lucide-react";
 // Flag data import
-import flagData from './json/languageSelector.json' assert { type: "json" };
+import flagData from './json/languageSelectorData.json' assert { type: "json" };
 
 export default function DropdownLanguageSelector() {
-
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,7 +28,7 @@ export default function DropdownLanguageSelector() {
       <DropdownMenuContent>
         <DropdownMenuLabel>
           {flagData.map((flag, i) => (
-            <Button key={i} variant='default' size='default' >
+            <Button key={i} variant='setLanguageButton' size='default' >
               <span className={flag.flagIcon}></span>
               <h1>{flag.flagName}</h1>
             </Button>

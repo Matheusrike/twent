@@ -15,7 +15,7 @@ export const NavigationSheet = () => {
         <NavMenu orientation="vertical" className=" [&>div]:h-full " />
 
         <div className="w-full text-center text-sm font-semibold">
-          <h1 className="text-black dark:text-white">TWENTY®</h1>
+          <h1 className="text-black dark:text-white">TWENT®</h1>
         </div>
       </SheetContent>
     </Sheet>
