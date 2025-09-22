@@ -18,7 +18,7 @@ function NavigationMenu({
       data-slot="navigation-menu"
       data-viewport={viewport}
       className={cn(
-        "group/navigation-menu relative flex max-w-max flex-1 items-center justify-center w-full",
+        "group/navigation-menu relative flex max-w-max flex-1 items-center justify-center h-full",
         className
       )}
       {...props}
@@ -52,7 +52,7 @@ function NavigationMenuItem({
   return (
     <NavigationMenuPrimitive.Item
       data-slot="navigation-menu-item"
-      className={cn("relative w-full", className)}
+      className={cn("relative w-full h-full", className)}
       {...props}
     />
   )

@@ -1,44 +1,44 @@
 'use client'
-import { Button } from "@/components/ui/button";
 import { Logo } from "./logo";
 import { NavigationSheet } from "./navigation-sheet";
-import { SunIcon, MoonIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import DropdownLanguageSelector from "./dropdownLanguageSelector";
 import { Input } from './input';
 
 
 
 const Navbar = () => {
 
-  
+
   return (
-    <div className="bg-muted">
+    <div className="bg-muted w-full">
       <nav className="h-16 bg-background relative">
-        <div className="h-full flex items-center justify-between w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-full w-full mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-3 items-center">
 
-          {/* Dark Mode And Search */}
+          {/*Menu + Search */}
           <div className="flex items-center gap-5">
-
-            {/* Language */}
-            <div className="flex items-center gap-2">
-             
-            </div>
+            {/* Menu */}
+            <NavigationSheet />
 
             {/* search input */}
-            <Input type='text' placeholder='Pesquisar' />
+            <Input type="text" placeholder="Pesquisar" />
           </div>
 
-          {/* Menu*/}
-          <div className="flex items-center gap-2">
-            <NavigationSheet />
-          </div>
-
-          {/* Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+          {/*  Logo */}
+          <div className="flex justify-center">
+            {/* Logo */}
             <Logo />
           </div>
 
+          {/*  Set Language */}
+          <div className="flex justify-end items-center gap-2">
+            <div className="flex items-center gap-2">
+              {/* Dropdown de País */}
+              <DropdownLanguageSelector />
+            </div>
+          </div>
+
         </div>
+
       </nav>
     </div>
 

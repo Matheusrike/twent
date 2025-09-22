@@ -11,12 +11,12 @@ export const NavigationSheet = () => {
           <Menu />
         </Button>
       </SheetTrigger>
-      <SheetContent className="px-6 py-3 " side="right">
-        <NavMenu orientation="vertical" className=" [&>div]:h-full" />
+      <SheetContent className="px-6 py-3" side="right">
+        <NavMenu orientation="vertical" className=" [&>div]:h-full " />
+
         <div className="w-full text-center text-sm font-semibold">
           <h1 className="text-black dark:text-white">TWENTY®</h1>
         </div>
-
       </SheetContent>
     </Sheet>
   );

@@ -4,17 +4,16 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/Navbar/navigation-menu";
-import SwitchDarkMode from "./switch";
 import Link from "next/link";
 import { ComponentProps } from "react";
 import { ChevronRight } from "lucide-react";
 
 // Navigation links import
-import navigationLinks from './navigationLinks.json' assert { type: "json" };
+import navigationLinks from './json/navigationLinks.json' assert { type: "json" };
 
 export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
   <NavigationMenu {...props}>
-    <NavigationMenuList className="w-full gap-3 space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=vertical]:justify-start dark:text-white">
+    <NavigationMenuList className="h-full gap-3 space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=vertical]:justify-start dark:text-white">
       {/*  Navigation links */}
       <NavigationMenuItem>
         {navigationLinks.map((link, i) => (

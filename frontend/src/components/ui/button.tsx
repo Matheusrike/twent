@@ -21,7 +21,8 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
         menu: "hover:bg-accent hover:text-accent-foreground dark:text-white ",
-        search:"text-black dark:text-white cursor-pointer hidden md:flex"
+        search:"text-black dark:text-white cursor-pointer hidden md:flex",
+        languageButton:'text-black dark:text-white bg-transparent cursor-pointer border-none'
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -30,7 +31,8 @@ const buttonVariants = cva(
         icon: "size-9",
         menu: "h-10 rounded-md px-6 has-[>svg]:px-3",
         headericon: "rounded-full px-6 has-[>svg]:p-2 text-6xl",
-        search:"text-sm p-2"
+        search:"text-sm p-2",
+        languageButton:'text-sm'
       },
     },
     defaultVariants: {

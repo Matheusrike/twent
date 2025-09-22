@@ -41,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
-      <body className="font-sans " cz-shortcut-listen="true">
+      <body className="" cz-shortcut-listen="true">
         <Navbar />
         {children}
         <Footer />
