@@ -12,8 +12,9 @@ export const NavigationSheet = () => {
         </Button>
       </SheetTrigger>
       <SheetContent className="px-6 py-3" side="right">
+        {/* links */}
         <NavMenu orientation="vertical" className=" [&>div]:h-full " />
-
+        {/* menu footer */}
         <div className="w-full text-center text-sm font-semibold">
           <h1 className="text-black dark:text-white">TWENT®</h1>
         </div>

@@ -1,14 +1,22 @@
 [
   {
-    "name": "Collection",
+    "name": "Nossa Coleção",
     "url": "/collection"
   },
   {
-    "name": "About Us",
-    "url": "/exclusives"
+    "name": "Novidades",
+    "url": "#"
   },
   {
-    "name": "Contact",
+    "name": "Sobre Nós",
+    "url": "/about"
+  },
+  {
+    "name": "Contato",
     "url": "/contact"
+  },
+  {
+    "name": " Área Empresarial",
+    "url": "/business"
   }
 ]
