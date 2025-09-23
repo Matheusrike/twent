@@ -7,9 +7,7 @@ export interface IApiResponseOptions<T, E> {
 	errorCode?: string | null;
 }
 
-export interface IApiResponseError<E> {
-	success: false;
-	message: string;
-	errors: E;
-	errorCode?: string;
+export interface IApiErrorOptions {
+	statusCode: number;
+	errorCode: string;
 }

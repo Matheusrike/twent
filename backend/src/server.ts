@@ -5,12 +5,12 @@ import cookie from '@fastify/cookie';
 import jwt from '@fastify/jwt';
 import authorizationPlugin from './plugins/authorization.plugin.ts';
 
+// Basic configs
 configDotenv({ quiet: true });
-
 const app: FastifyInstance = Fastify();
 const port: number = parseInt(process.env.PORT || '3000', 10);
 
-// Plugins
+// Plugins registration
 app.register(cookie, {
 	secret: process.env.COOKIE_SECRET!,
 });

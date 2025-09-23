@@ -2,10 +2,11 @@ import type { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import type {
 	IJwtAuthPayload,
 	IAuthorizationOptions,
-} from '../types/authorization.ts';
+} from '../types/authorization.types.ts';
 import { getToken } from '../helpers/get-token.helper.js';
-import { ApiResponse, ApiError } from '../utils/api-responses.util.ts';
+import { ApiResponse } from '../utils/api-response.util.ts';
 import fp from 'fastify-plugin';
+import { HttpError } from '../utils/errors.util.ts';
 
 function authorization(options: IAuthorizationOptions = {}) {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -14,7 +15,11 @@ function authorization(options: IAuthorizationOptions = {}) {
 
 			const token = getToken(request);
 			if (!token) {
-				throw new ApiError('token não encontrado', 'UNAUTHORIZED', 401);
+				throw new HttpError({
+					message: 'Token de autenticação não encontrado',
+					errorCode: 'TOKEN_NOT_FOUND',
+					statusCode: 401,
+				});
 			}
 
 			const decoded: IJwtAuthPayload =
@@ -23,14 +28,15 @@ function authorization(options: IAuthorizationOptions = {}) {
 
 			// Verifica se há roles requeridas e verifica se o usuário possui elas
 			if (requiredRoles && !requiredRoles.includes(decoded.role)) {
-				throw new ApiError(
-					'acesso negado, você não tem permissão suficiente para realizar essa operação',
-					'FORBIDDEN',
-					403,
-				);
+				throw new HttpError({
+					message:
+						'Acesso negado, você não tem permissão suficiente para realizar essa operação',
+					errorCode: 'FORBIDDEN',
+					statusCode: 403,
+				});
 			}
 		} catch (error) {
-			if (error instanceof ApiError) {
+			if (error instanceof HttpError) {
 				return new ApiResponse({
 					success: false,
 					statusCode: error.statusCode,
