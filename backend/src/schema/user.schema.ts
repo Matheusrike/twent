@@ -1,9 +1,6 @@
 import { z } from 'zod';
+import { UserTypes } from '../types/users.types.ts';
 
-export enum UserType {
-	CUSTOMER = 'CUSTOMER',
-	EMPLOYEE = 'EMPLOYEE',
-}
 
 export const UserSchema = z.object({
 	email: z.email(),
@@ -11,7 +8,7 @@ export const UserSchema = z.object({
 	first_name: z.string(),
 	last_name: z.string(),
 	phone: z.string().optional(),
-	user_type: z.enum(UserType),
+	user_type: z.enum(UserTypes),
 	document_number: z.string().optional(),
 	birth_date: z.date().optional(),
 	street: z.string().optional(),
@@ -22,5 +19,3 @@ export const UserSchema = z.object({
 	zip_code: z.string().optional(),
 	country: z.string().optional(),
 });
-
-export type IUser = z.infer<typeof UserSchema>

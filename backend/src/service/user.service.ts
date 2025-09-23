@@ -1,11 +1,11 @@
 import { validateLocation } from '../helpers/validate-location.helper.ts';
-import { User } from '../model/User.model.ts';
-import { IUser, UserSchema } from '../schema/user.schema.ts';
+import prisma from '../../prisma/client.ts';
+import { UserSchema } from '../schema/user.schema.ts';
 import bcrypt from 'bcryptjs';
-
+import { Iuser } from '../types/users.types.ts';
 
 export class UserService {
-	async create(userData: IUser) {
+	async create(userData: Iuser) {
 		try {
 			const parsed = UserSchema.parse(userData);
 
@@ -28,18 +28,20 @@ export class UserService {
 			) {
 				await validateLocation(parsed);
 			}
-			return await User.create(parsed);
+			return await prisma.user.create({
+				data: parsed,
+			});
 		} catch (error) {
-            // TODO: needs to return appropriate error
+			// TODO: needs to return appropriate error
 			return error;
 		}
 	}
 
 	async getAll() {
 		try {
-			return await User.getAll();
+			return await prisma.user.findMany();
 		} catch (error) {
-            // TODO: needs to return appropriate error
+			// TODO: needs to return appropriate error
 			return error;
 		}
 	}

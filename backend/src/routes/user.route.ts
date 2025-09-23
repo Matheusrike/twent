@@ -1,10 +1,10 @@
 import { FastifyInstance } from "fastify";
 import { UserController } from "../controller/User.controller.ts";
 
-const { create, getAll } = new UserController
+const userController = new UserController()
 
 export async function userRoute(fastify: FastifyInstance) {
-    fastify.get("/users", getAll)
+    fastify.get("/users", userController.getAll)
 
-    fastify.post("/users", create )
+    fastify.post("/users", userController.create )
 }
