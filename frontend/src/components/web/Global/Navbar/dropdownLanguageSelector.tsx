@@ -1,4 +1,4 @@
-import { Button } from "@/components/web/Global/Navbar/button";
+import { Button } from "@/components/web/Global/button";
 import {
   DropdownMenu,
   DropdownMenuContent,

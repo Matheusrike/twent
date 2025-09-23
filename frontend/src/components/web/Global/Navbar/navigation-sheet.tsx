@@ -1,4 +1,4 @@
-import { Button } from "@/components/web/Global/Navbar/button";
+import { Button } from "@/components/web/Global/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/web/Global/Navbar/sheet";
 import { Menu } from "lucide-react";
 import { NavMenu } from "./nav-menu";

@@ -4,9 +4,8 @@ import { Video } from "./video";
 
 const Hero = () => {
   return (
-    <div className="min-h-screen w-full ">
+    <div className=" md:min-h-screen w-full  relative">
       <Video/>
-      
     </div>
   );
 };

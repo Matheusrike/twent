@@ -7,7 +7,7 @@ export function Video() {
       loop
       playsInline
     >
-      <source src="/video/heroVideo.mp4" type="video/mp4" />
+      <source src="/video/home/heroVideo.mp4" type="video/mp4" />
       Seu navegador não suporta vídeos em HTML5.
     </video>
   )
