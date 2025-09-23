@@ -8,8 +8,11 @@ export class UserController {
 	private service: UserService;
 	constructor() {
 		this.service = userService;
+
 		this.create = this.create.bind(this);
 		this.getAll = this.getAll.bind(this);
+		this.update = this.update.bind(this);
+        this.statusUser = this.statusUser.bind(this)
 	}
 
 	async create(request: FastifyRequest, reply: FastifyReply) {
@@ -30,6 +33,31 @@ export class UserController {
 			reply.send(users);
 		} catch (error) {
 			// TODO: needs to return appropriate error
+			return error;
+		}
+	}
+
+	async update(request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const id = '0c3c9290-46ff-491b-8434-8fb60fe1cd29';
+			const parsed = UserSchema.partial().parse(request.body);
+
+			await this.service.update(id, parsed);
+			reply.send({ message: 'Usuário atualizado' });
+		} catch (error) {
+			return error;
+		}
+	}
+
+	async statusUser(request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const id = '0c3c9290-46ff-491b-8434-8fb60fe1cd29';
+			const { is_active } = UserSchema.partial().parse(request.body);
+
+			await this.service.statusUser(id, is_active!);
+
+			reply.send({ message: 'Status mudado' });
+		} catch (error) {
 			return error;
 		}
 	}

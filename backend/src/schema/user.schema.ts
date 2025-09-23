@@ -18,4 +18,5 @@ export const UserSchema = z.object({
 	state: z.string().optional(),
 	zip_code: z.string().optional(),
 	country: z.string().optional(),
+    is_active: z.boolean().optional()
 });

@@ -45,4 +45,39 @@ export class UserService {
 			return error;
 		}
 	}
+
+	async update(id: string, userData: Partial<Iuser>) {
+		try {
+			const parsed = UserSchema.partial().parse(userData);
+
+			if (parsed.password_hash) {
+				parsed.password_hash = await bcrypt.hash(
+					parsed.password_hash,
+					10,
+				);
+			}
+
+			if (parsed.birth_date) {
+				parsed.birth_date = new Date(parsed.birth_date);
+			}
+
+			return await prisma.user.update({
+				where: { id },
+				data: parsed,
+			});
+		} catch (error) {
+			return error;
+		}
+	}
+
+    async statusUser(id: string, newStatus: boolean ) {
+        try {
+            return await prisma.user.update({
+                where: {id: id},
+                data: {is_active: newStatus}
+            })            
+        } catch (error) {
+            return error
+        }
+    }
 }
