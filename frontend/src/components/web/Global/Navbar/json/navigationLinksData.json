@@ -1,5 +1,9 @@
 [
   {
+    "name": "Inicio",
+    "url": "/"
+  },
+  {
     "name": "Nossa Coleção",
     "url": "/collection"
   },

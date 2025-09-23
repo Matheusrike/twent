@@ -7,8 +7,6 @@ import { Input } from './input';
 
 
 const Navbar = () => {
-
-
   return (
     <div className="bg-muted w-full">
       <nav className="h-16 bg-background relative">
