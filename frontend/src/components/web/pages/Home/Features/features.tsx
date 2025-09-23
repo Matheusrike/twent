@@ -5,22 +5,15 @@ import FeatureImage1 from "./image";
 import { Logo, LogoMobile } from "./logo";
 
 
-const featuresData = [
-  {
-    subTittle: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis optio dolorum dolor corporis provident assumenda quas recusandae! Consequatur reiciendis delectus molestiae minima impedit consequuntur, deserunt qui, voluptatum perspiciatis nihil quas.',
-    text1: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis optio dolorum dolor corporis provident assumenda quas recusandae! Consequatur reiciendis delectus molestiae minima impedit consequuntur, deserunt qui, voluptatum perspiciatis nihil quas.',
-    text2: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis optio dolorum dolor corporis provident assumenda quas recusandae! Consequatur reiciendis delectus molestiae minima impedit consequuntur, deserunt qui, voluptatum perspiciatis nihil quas.',
-    button: 'Ver mais'
-  }
-]
+import featuresData from './featuresData.json'
 
 const Features: React.FC = () => {
   return (
-    <div className="min-h-auto md:min-h-screen w-full flex justify-center items-center p-6 md:p-12">
+    <div className="min-h-auto md:min-h-screen w-full flex justify-center items-center p-8 md:p-12">
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
 
         {/* Logo */}
-        <div className="hidden md:flex">
+        <div className="hidden md:flex pt-20">
           <Logo />
         </div>
         {/* Logo Mobile*/}
@@ -29,7 +22,7 @@ const Features: React.FC = () => {
           <LogoMobile />
         </div>
 
-        {/*  container */}
+        {/*  container and info section*/}
         <div className="flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-16 w-full">
 
           {/* Image - desktop */}
@@ -40,17 +33,17 @@ const Features: React.FC = () => {
           </div>
 
           {/* Text */}
-          {featuresData.map((data, i) => (
+          {featuresData.info.map((data, i) => (
             <div
               key={i}
               className="flex-1 flex flex-col text-left items-start pt-10 md:pt-0"
             >
               <span className="uppercase font-medium text-sm text-muted-foreground ">
-                {data.subTittle}
+                {data.text1}
               </span>
 
               <h4 className="my-3 text-2xl font-semibold tracking-tight dark:text-white">
-                {data.text1}
+                {data.text2}
               </h4>
 
               <Button
@@ -66,15 +59,15 @@ const Features: React.FC = () => {
           ))}
         </div>
 
-        {/* Second section */}
+        {/* about section */}
         <div className="mt-8 w-full flex flex-col space-y-20">
-          {featuresData.map((data, i) => (
+          {featuresData.about.map((data, i) => (
             <div
               key={i}
               className="flex flex-col md:flex-row items-center gap-y-6 gap-x-15 md:even:flex-row-reverse w-full "
             >
               {/* Image */}
-              <div className="w-full md:basis-1/2 aspect-[4/2] bg-muted rounded-xl border border-border/50" >
+              <div className="w-full md:basis-1/2 aspect-[4/2] bg-muted rounded-xl  shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)]" >
 
 
               </div>
@@ -91,7 +84,7 @@ const Features: React.FC = () => {
 
                 <Button asChild size="lg" className="mt-6 rounded-full gap-3">
                   <Link href=''>
-                    Learn More
+                   {data.button}
                   </Link>
                 </Button>
               </div>
