@@ -6,17 +6,23 @@ export class User {
 		try {
 			return await prisma.user.findMany();
 		} catch (error) {
+			// TODO: needs to return appropriate error
 			return error;
 		}
 	}
 
 	static async create(userData: IUser) {
-		const parsed = UserSchema.parse(userData);
+		try {
+			const parsed = UserSchema.parse(userData);
 
-		const user = await prisma.user.create({
-			data: parsed,
-		});
+			const user = await prisma.user.create({
+				data: parsed,
+			});
 
-		console.log('Usuário criado:', user);
+			console.log('Usuário criado:', user);
+		} catch (error) {
+			// TODO: needs to return appropriate error
+			return error;
+		}
 	}
 }

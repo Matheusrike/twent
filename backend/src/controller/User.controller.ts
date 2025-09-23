@@ -1,6 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { User } from "../model/User.model.ts";
 import { UserSchema } from "../schema/user.schema.ts";
+import { UserService } from "../service/user.service.ts";
+
+const User = new UserService
 
 export class UserController {
 
@@ -11,6 +13,7 @@ export class UserController {
             await User.create(parsed)
             reply.send({message: "Criado com sucesso"})
         } catch (error) {
+            // TODO: needs to return appropriate error
             return error            
         }
     }
@@ -20,6 +23,7 @@ export class UserController {
             const users = await User.getAll()
             reply.send(users)
         } catch (error) {
+            // TODO: needs to return appropriate error
             return error
         }
     }
