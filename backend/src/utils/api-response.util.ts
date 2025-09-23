@@ -19,13 +19,17 @@ export class ApiResponse<T, E> {
 	}
 
 	send(reply: FastifyReply) {
-		return reply.status(this.statusCode).send({
-			success: this.success,
-			message: this.message,
-			data: this.data,
-			errors: this.errors,
-			errorCode: this.errorCode,
-		});
+		const response = Object.fromEntries(
+			Object.entries({
+				success: this.success,
+				message: this.message,
+				data: this.data,
+				errors: this.errors,
+				errorCode: this.errorCode,
+			}).filter(([, value]) => value !== null),
+		);
+
+		return reply.status(this.statusCode).send(response);
 	}
 
 	static genericError(reply: FastifyReply) {
@@ -35,16 +39,5 @@ export class ApiResponse<T, E> {
 			message: 'Error interno do servidor',
 			errorCode: 'INTERNAL_SERVER_ERROR',
 		}).send(reply);
-	}
-}
-
-export class ApiError extends Error {
-	statusCode: number;
-	errorCode: string;
-
-	constructor(message: string, errorCode: string, statusCode: number) {
-		super(message);
-		this.statusCode = statusCode;
-		this.errorCode = errorCode;
 	}
 }
