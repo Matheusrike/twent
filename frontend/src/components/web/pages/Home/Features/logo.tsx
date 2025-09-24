@@ -29,7 +29,7 @@ export const LogoMobile = () => (
       className="dark:hidden"
     />
     <Image
-      src="/img/global/dark/horizontalLogooDark.svg"
+      src="/img/global/dark/horizontalLogoDark.svg"
       width={280}
       height={280}
       alt="Picture of the author"

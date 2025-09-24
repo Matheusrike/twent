@@ -21,9 +21,29 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
         menu: "hover:bg-accent hover:text-accent-foreground dark:text-white ",
-        search:"text-black dark:text-white cursor-pointer hidden md:flex",
-        languageButton:'text-black dark:text-white bg-transparent cursor-pointer border-none hover:border-none hover:bg-accent hover:text-accent-foreground dark:text-white p-2',
-        setLanguageButton:'bg-transparent hover:bg-accent hover:text-accent-foreground dark:text-white justify-between'
+        search: "text-black dark:text-white cursor-pointer hidden md:flex",
+        languageButton: 'text-black dark:text-white bg-transparent cursor-pointer border-none hover:border-none hover:bg-accent hover:text-accent-foreground dark:text-white p-2',
+        setLanguageButton: 'bg-transparent hover:bg-accent hover:text-accent-foreground dark:text-white justify-between',
+        standartButton: `
+        relative bottom-0 flex justify-center items-center gap-2 
+        border border-border 
+        rounded-xl 
+        text-primary-foreground font-black uppercase 
+        px-8 py-4 z-10 overflow-hidden 
+        ease-in-out duration-700 group 
+        bg-primary 
+        hover:bg-black hover:text-white
+        dark:hover:bg-white dark:hover:text-black
+        active:scale-95 active:duration-0 
+        focus:bg-white focus:text-black 
+        isolation-auto 
+        before:absolute before:w-full before:transition-all before:duration-700 
+        before:hover:w-full before:-left-full before:hover:left-0 
+        before:rounded-full before:bg-white 
+        before:-z-10 before:aspect-square 
+        before:hover:scale-150 before:hover:duration-700
+      `
+      
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -32,9 +52,15 @@ const buttonVariants = cva(
         icon: "size-9",
         menu: "h-10 rounded-md px-6 has-[>svg]:px-3",
         headericon: "rounded-full px-6 has-[>svg]:p-2 text-6xl",
-        search:"text-sm p-2",
-        languageButton:'text-sm',
-        setLanguageButton: ''
+        search: "text-sm p-2",
+        languageButton: 'text-sm',
+        setLanguageButton: '',
+        standartButton: `
+        h-10 rounded-md px-6 has-[>svg]:px-4 
+        w-full mt-10 
+        sm:w-auto sm:mt-0
+      `
+
       },
     },
     defaultVariants: {
