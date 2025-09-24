@@ -19,7 +19,7 @@ const features = [
   },
 ];
 
-const Features06Page = () => {
+const TextCards = () => {
   return (
     <div className="min-h-screen flex container">
       <div className=" w-full py-10 px-6 flex flex-col justify-between">
@@ -62,4 +62,4 @@ const Features06Page = () => {
   );
 };
 
-export default Features06Page;
+export default TextCards;
