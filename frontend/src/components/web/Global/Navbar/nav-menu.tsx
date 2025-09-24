@@ -14,10 +14,10 @@ import navigationLinks from './json/navigationLinksData.json' assert { type: "js
 
 export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
   <NavigationMenu {...props}>
-    <NavigationMenuList className="h-full gap-3 space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=vertical]:justify-start dark:text-white">
+    <NavigationMenuList className="h-full w-full gap-3 space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=vertical]:justify-start dark:text-white">
       {/*  Navigation links */}
       <NavigationMenuItem>
-        {navigationLinks.map((link, i) => (
+        {navigationLinks.navLinks.map((link, i) => (
           <NavigationMenuLink key={i} asChild >
             <SheetClose asChild>
               {/* Link */}
@@ -37,6 +37,8 @@ export const NavMenu = (props: ComponentProps<typeof NavigationMenu>) => (
           </NavigationMenuLink>
         ))}
       </NavigationMenuItem>
+     
+
     </NavigationMenuList>
   </NavigationMenu>
 );

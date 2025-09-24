@@ -43,7 +43,7 @@ const buttonVariants = cva(
         before:-z-10 before:aspect-square 
         before:hover:scale-150 before:hover:duration-700
       `
-      
+
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
