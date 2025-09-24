@@ -3,7 +3,7 @@ export enum UserTypes {
     EMPLOYEE = 'EMPLOYEE',
 }
 
-export interface Iuser {
+export interface IUser {
        email: string,
     password_hash: string,
     first_name: string,

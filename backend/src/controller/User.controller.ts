@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { UserSchema } from '../schema/user.schema.ts';
 import { UserService } from '../service/user.service.ts';
+import { HttpError } from '../utils/errors.util.ts';
 
 const userService = new UserService();
 
@@ -17,13 +18,20 @@ export class UserController {
 
 	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const parsed = UserSchema.parse(request.body);
+			const parsed = UserSchema.safeParse(request.body);
 
-			await this.service.create(parsed);
-			reply.send({ message: 'Criado com sucesso' });
+            if (!parsed.success){
+                return new HttpError({message: "Dados enviados incorretos", statusCode: 400})
+            }
+
+			const response = await this.service.create(parsed.data!);
+			reply.send( response );
 		} catch (error) {
-			// TODO: needs to return appropriate error
-			return error;
+            console.log(error.errorCode);
+            
+			if (error.errorCode == "CONFLICT"){
+                return new HttpError({message: error.message, statusCode: 409 })
+            }
 		}
 	}
 

@@ -1,83 +1,107 @@
 import { validateLocation } from '../helpers/validate-location.helper.ts';
 import prisma from '../../prisma/client.ts';
-import { UserSchema } from '../schema/user.schema.ts';
 import bcrypt from 'bcryptjs';
-import { Iuser } from '../types/users.types.ts';
+import { IUser } from '../types/users.types.ts';
+import { AppError } from '../utils/errors.util.ts';
+import { ApiResponse } from '../utils/api-response.util.ts';
 
 export class UserService {
-	async create(userData: Iuser) {
-		try {
-			const parsed = UserSchema.parse(userData);
+	async create(userData: IUser) {
+		const usedEmail = await prisma.user.findUnique({
+			where: { email: userData.email },
+		});
 
-			const password_hash: string = await bcrypt.hash(
-				parsed.password_hash,
-				10,
-			);
-
-			parsed.password_hash = password_hash;
-
-			if (parsed.birth_date) {
-				parsed.birth_date = new Date(userData.birth_date!);
-			}
-			if (
-				parsed.city ||
-				parsed.country ||
-				parsed.district ||
-				parsed.state ||
-				parsed.street
-			) {
-				await validateLocation(parsed);
-			}
-			return await prisma.user.create({
-				data: parsed,
+		if (usedEmail) {
+			throw new AppError({
+				message: 'Email já em uso',
+				errorCode: 'CONFLICT',
 			});
-		} catch (error) {
-			// TODO: needs to return appropriate error
-			return error;
 		}
+
+		const usedDocument = await prisma.user.findUnique({
+			where: { document_number: userData.document_number },
+		});
+
+		if (usedDocument) {
+			throw new AppError({
+				message: 'Número de documento já registrado',
+				errorCode: 'CONFLICT',
+			});
+		}
+
+		userData.password_hash = await bcrypt.hash(userData.password_hash, 10);
+
+		if (userData.birth_date) {
+			userData.birth_date = new Date(userData.birth_date!);
+		}
+		if (
+			userData.city ||
+			userData.country ||
+			userData.district ||
+			userData.state ||
+			userData.street
+		) {
+			await validateLocation(userData);
+		}
+		const user = await prisma.user.create({
+			data: userData,
+		});
+		return new ApiResponse({
+			statusCode: 201,
+			success: true,
+			message: 'Usuário criado',
+            data: user
+		});
 	}
 
 	async getAll() {
-		try {
-			return await prisma.user.findMany();
-		} catch (error) {
-			// TODO: needs to return appropriate error
-			return error;
+		const users = await prisma.user.findMany();
+
+		if (users.length == 0) {
+			return new AppError({
+				message: 'Nenhum usuário encontrado',
+				errorCode: 'USER_NOT_FOUND',
+			});
 		}
+
+		return new ApiResponse({
+			statusCode: 200,
+			success: true,
+			message: 'Usuários encontrados',
+			data: users,
+		});
 	}
 
-	async update(id: string, userData: Partial<Iuser>) {
+	async update(id: string, userData: Partial<IUser>) {
 		try {
-			const parsed = UserSchema.partial().parse(userData);
-
-			if (parsed.password_hash) {
-				parsed.password_hash = await bcrypt.hash(
-					parsed.password_hash,
+			if (userData.password_hash) {
+				userData.password_hash = await bcrypt.hash(
+					userData.password_hash,
 					10,
 				);
 			}
 
-			if (parsed.birth_date) {
-				parsed.birth_date = new Date(parsed.birth_date);
+			if (userData.birth_date) {
+				userData.birth_date = new Date(userData.birth_date);
 			}
 
 			return await prisma.user.update({
 				where: { id },
-				data: parsed,
+				data: userData,
 			});
 		} catch (error) {
 			return error;
 		}
 	}
 
-    async statusUser(id: string, newStatus: boolean ) {
-        try {
-            return await prisma.user.update({
-                where: {id: id},
-                data: {is_active: newStatus}
-            })            
-        } catch (error) {
-            return error
-        }
-    }
+	async statusUser(id: string, newStatus: boolean) {
+		try {
+			return await prisma.user.update({
+				where: { id: id },
+				data: { is_active: newStatus },
+			});
+		} catch (error) {
+			return error;
+		}
+	}
 }
