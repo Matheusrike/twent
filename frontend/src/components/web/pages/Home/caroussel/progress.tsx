@@ -12,7 +12,7 @@ type CarouselDotsProps = {
 
 export const CarouselDots = ({ api, current, count }: CarouselDotsProps) => {
   return (
-    <div className="absolute left-[50%] top-[95%] md:top-[100%] -translate-x-1/2 flex gap-2 z-50">
+    <div className="absolute left-[50%] top-[5%] -translate-x-1/2 flex gap-2 z-50">
     {Array.from({ length: count }).map((_, index) => (
       <button
         key={index}

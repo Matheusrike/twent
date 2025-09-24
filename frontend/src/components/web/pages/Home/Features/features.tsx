@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/web/Global/button";
-import FeatureImage1 from "./image";
+import FeatureImage1, { FeatureImage2 } from "./image";
 
 // import json
 import featuresData from './featuresData.json'
+
+// import flag icon
+import "flag-icons/css/flag-icons.min.css";
+
 
 const Features: React.FC = () => {
   return (
@@ -11,12 +15,12 @@ const Features: React.FC = () => {
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
 
         {/* info section*/}
-        <div className="flex flex-col md:flex-row items-center md:items-center gap-8 md:gap-16 w-full">
+        <div className="flex flex-col lg:flex-row w-full gap-8 lg:gap-16 justify-between items-start lg:items-center">
 
-          {/* Image  */}
-          <div className="flex max-w-sm rounded-xl relative overflow-hidden 
-            bg-neutral-100  shadow-[4.0px_8.0px_8.0px_rgba(220,_38,_38,_0.48)] border-none
-            md:shadow-[5px_5px_rgba(220,_38,_38,_0.4),_10px_10px_rgba(220,_38,_38,_0.3),_15px_15px_rgba(220,_38,_38,_0.2),_20px_20px_rgba(220,_38,_38,_0.1),_25px_25px_rgba(220,_38,_38,_0.05)]">
+          {/* Image */}
+          <div className="w-full lg:w-1/3   rounded-xl relative overflow-hidden 
+    bg-black shadow-[4.0px_8.0px_8.0px_rgba(220,_38,_38,_0.48)] border-none
+    lg:shadow-[5px_5px_rgba(220,_38,_38,_0.4),_10px_10px_rgba(220,_38,_38,_0.3),_15px_15px_rgba(220,_38,_38,_0.2),_20px_20px_rgba(220,_38,_38,_0.1),_25px_25px_rgba(220,_38,_38,_0.05)]">
             <FeatureImage1 />
           </div>
 
@@ -24,91 +28,71 @@ const Features: React.FC = () => {
           {featuresData.info.map((data, i) => (
             <div
               key={i}
-              className="md:basis-1/2 flex flex-col items-start text-left shrink-0 md:order-1 px-4 md:px-6 lg:px-8"
+              className="w-full lg:w-2/3 flex flex-col items-start text-justify uppercase shrink-0 px-4 md:px-6 lg:px-8"
             >
               {/* text1 */}
-              <span className="text-black font-semibold md:font-bold 
-               text-xs sm:text-sm md:text-base lg:text-md 
-                dark:text-gray-300 
-               uppercase tracking-wider md:tracking-widest 
-               mb-2 md:mb-3 lg:mb-4
-               opacity-80 hover:opacity-100 transition-opacity duration-200">
+              <span className="text-base md:text-base lg:text-md font-semibold md:font-bold dark:text-gray-300 tracking-wider md:tracking-widest mb-2 md:mb-3 lg:mb-4 opacity-80 hover:opacity-100 transition-opacity duration-200">
                 {data.text1}
               </span>
 
               {/* text2 */}
-              <h4 className="font-semibold md:font-bold 
-               text-md sm:text-sm md:text-base lg:text-md 
-               text-muted-foreground dark:text-gray-300 
-               uppercase tracking-wider md:tracking-widest 
-               mb-2 md:mb-3 lg:mb-4
-               opacity-80 hover:opacity-100 transition-opacity duration-200">
+              <p className="text-base md:text-base lg:text-md font-semibold md:font-bold text-muted-foreground dark:text-gray-300 tracking-wider md:tracking-widest mb-2 md:mb-3 lg:mb-4 opacity-80 hover:opacity-100 transition-opacity duration-200">
                 {data.text2}
-              </h4>
+              </p>
 
               {/* button */}
-              <Button
-                asChild
-                size='standartButton'
-                variant="standartButton"
-              >
-                <Link href={data.href}>
-                  {data.button}
-                </Link>
+              <Button asChild size='standartButton' variant="standartButton">
+                <Link href={data.href}>{data.button}</Link>
               </Button>
             </div>
           ))}
         </div>
+
+
 
         {/* about section */}
         <div className="mt-8 w-full flex flex-col space-y-20">
           {featuresData.about.map((data, i) => (
             <div
               key={i}
-              className="flex flex-col md:flex-row items-center gap-y-6 gap-x-15 md:even:flex-row-reverse w-full "
+              className="flex flex-col lg:flex-row items-start gap-y-6 gap-x-15 w-full"
             >
               {/* Image */}
-              <div className="md:order-2 w-full md:basis-1/2 aspect-[4/2] bg-muted rounded-xl  shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)]" >
+              <div className="relative group overflow-hidden w-full md:basis-7/12 lg:basis-1/2 aspect-[4/2] 
+        bg-muted md:bg-black rounded-xl md:mx-auto shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)]">
+                <FeatureImage2 />
 
-
+                {/* info image hover */}
+                <div className="absolute bottom-4 left-4 flex gap-1 font-semibold md:font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-sm">
+                  <span className="fi fi-ch"></span>
+                  <h1>Genebra</h1>
+                </div>
               </div>
 
               {/* Text Content */}
-              <div className="md:basis-1/2 flex flex-col items-start text-left shrink-0 md:order-1 px-4 md:px-6 lg:px-8">
+              <div className="flex flex-col w-full lg:basis-1/2 items-start text-justify md:text-left uppercase shrink-0 px-4 md:px-6 lg:px-8 mt-4 lg:mt-0">
 
                 {/* text 1 */}
-                <h4 className="text-black font-semibold md:font-bold 
-               text-xs sm:text-sm md:text-base lg:text-md 
-                dark:text-gray-300 
-               uppercase tracking-wider md:tracking-widest 
-               mb-2 md:mb-3 lg:mb-4
-               opacity-80 hover:opacity-100 transition-opacity duration-200">
+                <span className="text-base md:text-md lg:text-md font-semibold md:font-bold dark:text-gray-300 tracking-wider md:tracking-widest mb-2 md:mb-3 lg:mb-4 opacity-80 hover:opacity-100 transition-opacity duration-200">
                   {data.text1}
-                </h4>
+                </span>
 
                 {/* text2 */}
-                <p className="font-semibold md:font-bold 
-               text-md sm:text-sm md:text-base lg:text-md 
-               text-muted-foreground dark:text-gray-300 
-               uppercase tracking-wider md:tracking-widest 
-               mb-2 md:mb-3 lg:mb-4
-               opacity-80 hover:opacity-100 transition-opacity duration-200">
+                <p className="text-base md:text-md lg:text-md font-semibold md:font-bold text-muted-foreground dark:text-gray-300 tracking-wider md:tracking-widest mb-2 md:mb-3 lg:mb-4 opacity-80 hover:opacity-100 transition-opacity duration-200">
                   {data.text2}
                 </p>
 
                 {/* button */}
-                <Button asChild
-                  size='standartButton'
-                  variant='standartButton'
-                >
-                  <Link href={data.href}>
-                    {data.button}
-                  </Link>
+                <Button asChild size='standartButton' variant='standartButton'>
+                  <Link href={data.href}>{data.button}</Link>
                 </Button>
               </div>
             </div>
           ))}
         </div>
+
+
+
       </div>
     </div>
   )
