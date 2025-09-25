@@ -1,9 +1,9 @@
-import prisma from '../../prisma/client.ts';
+import prisma from './client.ts';
 import { Prisma } from '@prisma/client/extension';
-import { UserType } from '../../prisma/generated/prisma/index.js';
-import { IStoreProps } from '../types/store.types.ts';
-import { generateStoreCode } from './generate-store-code.util.ts';
-import { hashPassword } from './hash-password.util.ts';
+import { UserType } from './generated/prisma/index.js';
+import { IStoreProps } from '../src/types/store.types.ts';
+import { generateStoreCode } from '../src/utils/generate-store-code.util.ts';
+import { hashPassword } from '../src/utils/hash-password.util.ts';
 import { configDotenv } from 'dotenv';
 
 configDotenv({ quiet: true });

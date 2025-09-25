@@ -8,7 +8,7 @@
 		"dev": "tsx watch src/server.ts",
 		"build": "tsc",
 		"start": "tsc && node dist/server.js",
-		"seed": "tsx src/utils/seed.ts",
+		"seed": "tsx prisma/seed.ts",
 		"lint": "eslint src/**/*.ts",
 		"lint:fix": "eslint src/**/*.ts --fix",
 		"type-check": "tsc --noEmit"
