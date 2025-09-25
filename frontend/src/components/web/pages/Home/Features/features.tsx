@@ -11,7 +11,7 @@ import "flag-icons/css/flag-icons.min.css";
 
 const Features: React.FC = () => {
   return (
-    <div className="md:min-h-screen w-full flex justify-center items-center p-8 md:p-12 md:mt-20">
+    <div className="md:min-h-screen flex justify-center items-center p-8 md:p-12 md:mt-20  container">
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
 
         {/* info section*/}

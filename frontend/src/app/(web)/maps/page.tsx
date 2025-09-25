@@ -1,8 +1,9 @@
+import MapsHero from "@/components/web/pages/maps/hero";
 
 export default function Maps(){
     return(
-      <div className=" flex items-center justify-center h-auto">
-        
+      <div className=" ">
+        <MapsHero/>
         </div>
     )
 }

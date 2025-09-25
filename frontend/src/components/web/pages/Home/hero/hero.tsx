@@ -6,7 +6,7 @@ import { CarouselWithProgress } from "../caroussel/carouselVideo";
 const Hero = () => {
  
   return (
-    <div className="w-full relative">
+    <div className="w-full relative ">
       <CarouselWithProgress  />
     </div>
   );

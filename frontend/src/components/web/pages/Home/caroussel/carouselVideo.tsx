@@ -40,7 +40,7 @@ export const CarouselWithProgress = ({ setApi }: CarouselWithProgressProps) => {
   return (
     <Carousel setApi={(carouselApi) => { setLocalApi(carouselApi); if (setApi) setApi(carouselApi); }} className="w-full h-full">
       <CarouselContent>
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 1 }).map((_, index) => (
           <CarouselItem key={index}>
             <Card className="relative">
               <CardContent className="items-center justify-center">
@@ -50,7 +50,7 @@ export const CarouselWithProgress = ({ setApi }: CarouselWithProgressProps) => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselDots api={api} current={current} count={count} />
+      {/* <CarouselDots api={api} current={current} count={count} /> */}
     </Carousel>
   );
 };

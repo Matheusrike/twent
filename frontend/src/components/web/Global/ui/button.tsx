@@ -23,7 +23,7 @@ const buttonVariants = cva(
         menu: "hover:bg-accent hover:text-accent-foreground dark:text-white ",
         search: "text-black dark:text-white cursor-pointer hidden md:flex",
         languageButton: 'text-black dark:text-white bg-transparent cursor-pointer border-none hover:border-none hover:bg-accent hover:text-accent-foreground dark:text-white p-2',
-        setLanguageButton: 'bg-transparent hover:bg-accent hover:text-accent-foreground dark:text-white justify-between',
+        setLanguageButton: 'bg-transparent hover:bg-accent hover:text-accent-foreground dark:text-white justify-between cursor-pointer',
         standartButton: `
         relative bottom-0 flex justify-center items-center gap-2 
         border border-border 
