@@ -1,7 +1,7 @@
 import { validateLocation } from '../helpers/validate-location.helper.ts';
 import prisma from '../../prisma/client.ts';
 import bcrypt from 'bcryptjs';
-import { IUser } from '../types/users.types.ts';
+import { IGetUserProps, IUser } from '../types/users.types.ts';
 import { AppError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 
@@ -50,25 +50,38 @@ export class UserService {
 			statusCode: 201,
 			success: true,
 			message: 'Usuário criado',
-            data: user
+			data: user,
 		});
 	}
 
 	async getAll() {
 		const users = await prisma.user.findMany();
 
-		if (users.length == 0) {
-			return new AppError({
-				message: 'Nenhum usuário encontrado',
-				errorCode: 'USER_NOT_FOUND',
-			});
-		}
-
 		return new ApiResponse({
 			statusCode: 200,
 			success: true,
 			message: 'Usuários encontrados',
 			data: users,
+		});
+	}
+
+	async get({params: IGetUserProps) {
+
+        //TODO: resolver esta porra
+		const user = await prisma.user.findUnique({ where: params });
+
+		if (user == null) {
+			throw new AppError({
+				message: 'Usuário não encontrado',
+				errorCode: 'NOT_FOUND',
+			});
+		}
+
+        return new ApiResponse({
+			statusCode: 200,
+			success: true,
+			message: 'Usuário encontrado',
+			data: user,
 		});
 	}
 

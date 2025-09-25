@@ -55,7 +55,6 @@ export async function validateLocation(input: LocationInput) {
 		}
 
 		const addr = data[0].address;
-		console.log(addr);
 		return {
 			country: addr.country || null,
 			state: addr.state || null,

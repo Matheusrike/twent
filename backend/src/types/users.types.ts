@@ -20,3 +20,13 @@ export interface IUser {
     zip_code?: string,
     country?: string,
 }
+
+export type IGetUserProps = {
+    id?: string,
+    email?: string,
+    country?: string,
+    street?: string,
+    city?: string,
+    state?: string,
+    user_type?: UserTypes,
+}

@@ -13,34 +13,46 @@ export class UserController {
 		this.create = this.create.bind(this);
 		this.getAll = this.getAll.bind(this);
 		this.update = this.update.bind(this);
-        this.statusUser = this.statusUser.bind(this)
+		this.statusUser = this.statusUser.bind(this);
 	}
 
 	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const parsed = UserSchema.safeParse(request.body);
 
-            if (!parsed.success){
-                return new HttpError({message: "Dados enviados incorretos", statusCode: 400})
-            }
+			if (!parsed.success) {
+				return new HttpError({
+					message: 'Dados enviados incorretos',
+					statusCode: 400,
+				});
+			}
 
 			const response = await this.service.create(parsed.data!);
-			reply.send( response );
+			reply.send(response);
 		} catch (error) {
-            console.log(error.errorCode);
-            
-			if (error.errorCode == "CONFLICT"){
-                return new HttpError({message: error.message, statusCode: 409 })
-            }
+			if (error.errorCode == 'CONFLICT') {
+				return new HttpError({
+					message: error.message,
+					statusCode: 409,
+				});
+			}
 		}
 	}
 
-	async getAll(request: FastifyRequest, reply: FastifyReply) {
+	async getAll(
+		request: FastifyRequest<{ Querystring: { email: string } }>,
+		reply: FastifyReply,
+	) {
 		try {
+            	const { email } = request.query;
+			if (email) {
+				const user = await this.service.getByEmail(email);
+
+				reply.send({ user });
+			}
 			const users = await this.service.getAll();
 			reply.send(users);
 		} catch (error) {
-			// TODO: needs to return appropriate error
 			return error;
 		}
 	}
