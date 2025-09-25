@@ -1,4 +1,5 @@
 'use client'
+
 import Link from "next/link";
 import { Button } from "@/components/web/Global/ui/button";
 import { ArrowLeft, Home } from "lucide-react";
@@ -6,8 +7,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function NotFound() {
-
   const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center ">
       {/* Logo */}
@@ -64,7 +65,7 @@ export default function NotFound() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.back()}
+            onClick={() => router.back()} 
             className="w-full cursor-pointer sm:w-auto flex items-center justify-center text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
