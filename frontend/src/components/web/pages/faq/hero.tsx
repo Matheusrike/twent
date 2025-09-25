@@ -20,7 +20,7 @@ const iconMap: Record<string, React.ComponentType> = {
 
 const FaqHero = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 container">
       <div className="max-w-[--breakpoint-lg]">
         <h2 className="text-4xl md:text-5xl leading-[1.15]! font-semibold tracking-tighter text-center text-black dark:text-white">
           Perguntas Frequentes

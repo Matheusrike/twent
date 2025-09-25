@@ -25,6 +25,10 @@
      {
       "name": "contato",
       "url": "/contact"
+    },
+    {
+      "name": "maps",
+      "url": "/maps"
     }
 
   ]

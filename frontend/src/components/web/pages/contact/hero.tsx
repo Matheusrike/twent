@@ -9,14 +9,14 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 const ContactHero = () => (
-  <div className="min-h-screen flex flex-col items-start md:items-center justify-start md:justify-center px-4 py-12">
+  <div className="min-h-screen flex flex-col items-start md:items-center justify-start md:justify-evenly px-4 py-12 container">
     <div className="text-center">
       {/* text content */}
-      <div className="text-center max-w-2xl mx-auto px-6 mt-10 lg:mt-0">
-        <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-black dark:text-white">
+      <div className="text-center max-w-2xl mx-auto px-6 h-40 lg:h-60">
+        <h2 className="mt-3 text-3xl md:text-5xl font-semibold tracking-tight text-black dark:text-white">
           Fale Conosco
         </h2>
-        <p className="mt-3 text-base sm:text-lg text-muted-foreground leading-relaxed">
+        <p className="mt-3 text-base sm:text-xl text-muted-foreground leading-relaxed">
           Nossa equipe está sempre disponível para ajudar e responder às suas dúvidas.
         </p>
       </div>

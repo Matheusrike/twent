@@ -1,23 +1,23 @@
 [
   {
     "type": "Email",
-    "description": "Our friendly team is here to help.",
+    "description": "Envie uma mensagem para o nosso time.",
     "value": "noreply.twent@gmail.com",
     "link": "mailto:noreply.twent@gmail.com",
     "icon": "MailIcon"
   },
   {
-    "type": "Office",
-    "description": "Come say hello at our office HQ.",
-    "value": "100 Smith Street Collingwood VIC 3066 AU",
-    "link": "https://map.google.com",
+    "type": "Maps",
+    "description": "Venha conhecer nossas boutiques.",
+    "value": "Descobrir boutiques",
+    "link": "/maps",
     "icon": "MapPinIcon"
   },
   {
-    "type": "Phone",
-    "description": "Mon-Fri from 8am to 5pm.",
-    "value": "+1 (555) 000-0000",
-    "link": "tel:+15550000000",
+    "type": "Telefone",
+    "description": "Seg-Sex das 8h as 17h.",
+    "value": "(11) 9999-9999",
+    "link": "tel:++55(11)9999-9999",
     "icon": "PhoneIcon"
   }
 ]
