@@ -1,147 +1,90 @@
-[
+{
+  "menu": [
     {
-        "title": "Product",
-        "links": [
-          {
-            "title": "Overview",
-            "href": "#"
-          },
-          {
-            "title": "Features",
-            "href": "#"
-          },
-          {
-            "title": "Solutions",
-            "href": "#"
-          },
-          {
-            "title": "Tutorials",
-            "href": "#"
-          },
-          {
-            "title": "Pricing",
-            "href": "#"
-          },
-          {
-            "title": "Releases",
-            "href": "#"
-          }
-        ]
-      },
-      {
-        "title": "Company",
-        "links": [
-          {
-            "title": "About us",
-            "href": "#"
-          },
-          {
-            "title": "Careers",
-            "href": "#"
-          },
-          {
-            "title": "Press",
-            "href": "#"
-          },
-          {
-            "title": "News",
-            "href": "#"
-          },
-          {
-            "title": "Media kit",
-            "href": "#"
-          },
-          {
-            "title": "Contact",
-            "href": "#"
-          }
-        ]
-      },
-      {
-        "title": "Resources",
-        "links": [
-          {
-            "title": "Blog",
-            "href": "#"
-          },
-          {
-            "title": "Newsletter",
-            "href": "#"
-          },
-          {
-            "title": "Events",
-            "href": "#"
-          },
-          {
-            "title": "Help centre",
-            "href": "#"
-          },
-          {
-            "title": "Tutorials",
-            "href": "#"
-          },
-          {
-            "title": "Support",
-            "href": "#"
-          }
-        ]
-      },
-      {
-        "title": "Social",
-        "links": [
-          {
-            "title": "Twitter",
-            "href": "#"
-          },
-          {
-            "title": "LinkedIn",
-            "href": "#"
-          },
-          {
-            "title": "Facebook",
-            "href": "#"
-          },
-          {
-            "title": "GitHub",
-            "href": "#"
-          },
-          {
-            "title": "AngelList",
-            "href": "#"
-          },
-          {
-            "title": "Dribbble",
-            "href": "#"
-          }
-        ]
-      },
-      {
-        "title": "Legal",
-        "links": [
-          {
-            "title": "Terms",
-            "href": "#"
-          },
-          {
-            "title": "Privacy",
-            "href": "#"
-          },
-          {
-            "title": "Cookies",
-            "href": "#"
-          },
-          {
-            "title": "Licenses",
-            "href": "#"
-          },
-          {
-            "title": "Settings",
-            "href": "#"
-          },
-          {
-            "title": "Contact",
-            "href": "#"
-          }
-        ]
-      }
-]
+      "label": "Início",
+      "url": "/"
+    },
+    {
+      "label": "Nossa Coleção",
+      "url": "/colletion"
+    },
+    {
+      "label": "Conheça a Twent",
+      "url": "/about"
+    },
+    {
+      "label": "Área Empresarial",
+      "url": "/business"
+    },
+    {
+      "label": "FAQ",
+      "url": "/faq"
+    },
+    {
+      "label": "Contato",
+      "url": "/contact"
+    },
+    {
+      "label": "Maps",
+      "url": "/maps"
+    },
+    {
+      "label": "Políticas",
+      "url": "/policies"
+    }
+  ],
+  "sections": [
+    {
+      "title": "Contato",
+      "items": [
+        {
+          "label": "noreply.twent@gmail.com",
+          "url": "mailto:noreply.twent@gmail.com"
+        },
+        {
+          "label": "tel: +55 11 94323-2348",
+          "url": "tel:+5511943232348"
+        }
+      ]
+    },
+    {
+      "title": "Localização",
+      "items": [
+        {
+          "label": "Conheça nossas boutiques!",
+          "url": "/maps"
+        }
+      ]
+    },
+    {
+      "title": "Nos Encontre",
+      "items": [
+        {
+          "label": "LinkedIn",
+          "url": "#"
+        }
+      ]
+    },
+    {
+      "title": "Desenvolvedores",
+      "items": [
+        {
+          "label": "Gustavo Torelli",
+          "url": "https://github.com/GustavoTorelli"
+        },
+        {
+          "label": "Lucas Soalheiro",
+          "url": "https://github.com/libre917"
+        },
+        {
+          "label": "Lucas Toledo",
+          "url": "https://github.com/ToledoP"
+        },
+        {
+          "label": "Matheus Ramos",
+          "url": "https://github.com/Matheusrike"
+        }
+      ]
+    }
+  ]
+}

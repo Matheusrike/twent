@@ -27,7 +27,7 @@ export const NavigationSheet = () => {
 
         {/* Footer link */}
 
-        <div className="w-full  border-t-[0.5px] border-black dark:border-white p-2 flex  gap-5">
+        <div className="w-full  border-t-[0.5px] border-black dark:border-white p-2 flex justify-center items-center  gap-5">
           {navigationLinks.footerLinks.map((link, i) => (
             <SheetClose key={i} asChild>
               <Link
