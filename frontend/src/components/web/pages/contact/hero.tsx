@@ -53,7 +53,7 @@ const ContactHero = () => {
               <p className="mt-2 text-muted-foreground">{description}</p>
               <Link
                 href={link}
-                target={type === "Office" ? "_blank" : "_self"}
+                target={type === "Email" ? "_blank" : "_self"}
                 className="mt-4 font-medium text-primary dark:text-white hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
               >
                 {value}

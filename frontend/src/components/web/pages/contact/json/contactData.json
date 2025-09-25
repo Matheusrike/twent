@@ -3,7 +3,7 @@
     "type": "Email",
     "description": "Envie uma mensagem para o nosso time.",
     "value": "noreply.twent@gmail.com",
-    "link": "mailto:noreply.twent@gmail.com",
+    "link": "https://mail.google.com/mail/?view=cm&fs=1&to=noreply.twent@gmail.com",
     "icon": "MailIcon"
   },
   {
