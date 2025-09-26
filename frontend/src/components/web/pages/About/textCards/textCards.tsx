@@ -30,7 +30,7 @@ const TextCards = () => {
                 <span className="uppercase font-medium text-sm text-muted-foreground">
                   {feature.category}
                 </span>
-                <h4 className="my-3 text-2xl font-semibold tracking-tight">
+                <h4 className="my-3 text-2xl font-semibold tracking-tight dark:text-white">
                   {feature.title}
                 </h4>
                 <p className="text-base md:text-base lg:text-md font-semibold md:font-bold dark:text-gray-300 tracking-wider md:tracking-widest mb-2 md:mb-3 lg:mb-4 opacity-80 hover:opacity-100 transition-opacity duration-200">
