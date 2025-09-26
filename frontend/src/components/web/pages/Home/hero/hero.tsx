@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/web/Global/ui/button";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -25,7 +26,9 @@ const Hero = () => {
           Descubra nossa coleção exclusiva de relógios de luxo.
         </p>
         <Button variant="standartButtonDark" size="standartButton" className="dark" >
-          Conheça mais
+          <Link href="/collection">
+            Conheça mais
+          </Link>
         </Button>
       </div>
     </div>

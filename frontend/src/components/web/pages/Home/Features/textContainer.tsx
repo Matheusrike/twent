@@ -3,13 +3,13 @@ import { Button } from "@/components/web/Global/ui/button";
 import FeatureImage1, { FeatureImage2 } from "./image";
 
 // import json
-import featuresData from './json/featuresData.json'
+import textContainerData from './json/textContainerData.json'
 
 // import flag icon
 import "flag-icons/css/flag-icons.min.css";
 
 
-const Features: React.FC = () => {
+const TextContainer: React.FC = () => {
   return (
     <div className="md:min-h-screen flex justify-center items-center p-8 md:p-12 md:mt-20  container">
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
@@ -24,7 +24,7 @@ const Features: React.FC = () => {
           </div>
 
           {/* Text Content */}
-          {featuresData.info.map((data, i) => (
+          {textContainerData.info.map((data, i) => (
             <div
               key={i}
               className="w-full lg:w-2/3 flex flex-col items-start shrink-0 px-4 md:px-6 lg:px-8"
@@ -33,7 +33,7 @@ const Features: React.FC = () => {
                 {data.category}
               </span>
 
-              <h4 className="my-3 text-2xl font-semibold tracking-tight">
+              <h4 className="my-3 text-2xl font-semibold tracking-tight  dark:text-white">
                 {data.title}
               </h4>
 
@@ -60,7 +60,7 @@ const Features: React.FC = () => {
 
         {/* about section */}
         <div className="mt-8 w-full flex flex-col space-y-20">
-          {featuresData.about.map((data, i) => (
+          {textContainerData.about.map((data, i) => (
             <div
               key={i}
               className="flex flex-col lg:flex-row items-center gap-y-6 gap-x-15 w-full lg:even:flex-row-reverse"
@@ -86,7 +86,7 @@ const Features: React.FC = () => {
                   {data.category}
                 </span>
 
-                <h4 className="my-3 text-2xl font-semibold tracking-tight">
+                <h4 className="my-3 text-2xl font-semibold tracking-tight dark:text-white">
                   {data.title}
                 </h4>
 
@@ -116,4 +116,4 @@ const Features: React.FC = () => {
 
 }
 
-export default Features;
+export default TextContainer;
