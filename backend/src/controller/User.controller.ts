@@ -40,20 +40,22 @@ export class UserController {
 	}
 
 	async getAll(
-		request: FastifyRequest<{ Querystring: { email: string } }>,
+		request: FastifyRequest<{ Querystring: { [key: string]: string } }>,
 		reply: FastifyReply,
 	) {
 		try {
-            	const { email } = request.query;
-			if (email) {
-				const user = await this.service.getByEmail(email);
-
-				reply.send({ user });
+			const query = request.query;
+			if (query) {
+				const response = await this.service.get(query);
+				reply.send(response);
 			}
 			const users = await this.service.getAll();
 			reply.send(users);
 		} catch (error) {
-			return error;
+			return new HttpError({
+				message: error.message,
+				statusCode: 500,
+			});
 		}
 	}
 
@@ -65,7 +67,10 @@ export class UserController {
 			await this.service.update(id, parsed);
 			reply.send({ message: 'Usuário atualizado' });
 		} catch (error) {
-			return error;
+			return new HttpError({
+				message: error.message,
+				statusCode: 500,
+			});
 		}
 	}
 
@@ -78,7 +83,10 @@ export class UserController {
 
 			reply.send({ message: 'Status mudado' });
 		} catch (error) {
-			return error;
+			return new HttpError({
+				message: error.message,
+				statusCode: 500,
+			});
 		}
 	}
 }

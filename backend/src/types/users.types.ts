@@ -22,6 +22,7 @@ export interface IUser {
 }
 
 export type IGetUserProps = {
+    document_number?: string;
     id?: string,
     email?: string,
     country?: string,

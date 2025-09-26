@@ -11,6 +11,8 @@ export class UserService {
 			where: { email: userData.email },
 		});
 
+
+
 		if (usedEmail) {
 			throw new AppError({
 				message: 'Email já em uso',
@@ -65,19 +67,12 @@ export class UserService {
 		});
 	}
 
-	async get({params: IGetUserProps) {
-
-        //TODO: resolver esta porra
-		const user = await prisma.user.findUnique({ where: params });
-
-		if (user == null) {
-			throw new AppError({
-				message: 'Usuário não encontrado',
-				errorCode: 'NOT_FOUND',
-			});
-		}
-
-        return new ApiResponse({
+	async get(params: IGetUserProps) {
+        const user = await prisma.user.findMany({
+			where: params,
+		});
+        
+		return new ApiResponse({
 			statusCode: 200,
 			success: true,
 			message: 'Usuário encontrado',
