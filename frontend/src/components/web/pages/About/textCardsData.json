@@ -1,0 +1,23 @@
+[
+    {
+        "category": "Marketing and Sales",
+        "title": "Collect and enrich leads your way",
+        "details":
+        "Take control over how and when to follow up with your leads. Store and reference leads in multiple tables and, from there, automatically send them personalized emails.",
+        "tutorialLink": "#" 
+      },
+      {
+        "category": "Project Management",
+        "title": "Streamline your workflows effortlessly",
+        "details":
+          "Organize tasks, deadlines, and team collaboration in one place. Use customizable boards to manage projects efficiently and automate routine updates.",
+        "tutorialLink": "#"
+      },
+      {
+        "category": "Customer Support",
+        "title": "Enhance customer satisfaction",
+        "details":
+          "Track customer inquiries and support tickets seamlessly. Automate responses and follow-ups to ensure timely resolution and improved customer experience.",
+        "tutorialLink": "#"
+      }
+]

@@ -1,32 +1,17 @@
 import { Button } from "@/components/web/Global/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import features from "../textCardsData.json"; 
 
-const features = [
-  {
-    category: "Marketing and Sales",
-    title: "Collect and enrich leads your way",
-    details:
-      "Take control over how and when to follow up with your leads. Store and reference leads in multiple tables and, from there, automatically send them personalized emails.",
-    tutorialLink: ''  
-  },
-  {
-    category: "Project Management",
-    title: "Streamline your workflows effortlessly",
-    details:
-      "Organize tasks, deadlines, and team collaboration in one place. Use customizable boards to manage projects efficiently and automate routine updates.",
-    tutorialLink: "#",
-  },
-];
 
 const TextCards = () => {
   return (
     <div className="min-h-screen flex container">
       <div className=" w-full py-10 px-6 flex flex-col justify-between">
-        <h2 className="text-4xl md:text-[2.75rem] md:leading-[1.2] font-semibold tracking-[-0.03em] sm:max-w-xl text-pretty sm:mx-auto sm:text-center">
+        <h2 className="text-4xl md:text-[2.75rem] md:leading-[1.2] font-semibold tracking-[-0.03em] sm:max-w-xl text-pretty sm:mx-auto sm:text-center dark:text-white">
           Strengthen Your Strategy
         </h2>
-        <p className="mt-2 text-muted-foreground text-lg sm:text-xl sm:text-center">
+        <p className="mt-2 text-muted-foreground text-lg sm:text-xl sm:text-center dark:text-gray">
           Enhance your strategy with intelligent tools designed for success.
         </p>
         <div className=" mt-8 w-full mx-auto space-y-20 flex flex-col">
@@ -44,15 +29,10 @@ const TextCards = () => {
                 <span className="uppercase font-medium text-sm text-muted-foreground">
                   {feature.category}
                 </span>
-                <h4 className="my-3 text-2xl font-semibold tracking-tight">
+                <h4 className="my-3 text-2xl font-semibold tracking-tight dark:text-gray-300">
                   {feature.title}
                 </h4>
-                <p className="text-muted-foreground">{feature.details}</p>
-                <Button asChild size="lg" className="mt-6 rounded-full gap-3">
-                  <Link href={feature.tutorialLink}>
-                    Learn More <ArrowRight />
-                  </Link>
-                </Button>
+                <p className="text-base md:text-base lg:text-md font-semibold md:font-bold dark:text-gray-300 tracking-wider md:tracking-widest mb-2 md:mb-3 lg:mb-4 opacity-80 hover:opacity-100 transition-opacity duration-200">{feature.details}</p>
               </div>
             </div>
           ))}
