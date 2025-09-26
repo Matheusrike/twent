@@ -18,7 +18,7 @@ const Features: React.FC = () => {
         <div className="flex flex-col lg:flex-row w-full gap-8 lg:gap-16 justify-between items-start lg:items-center">
 
           {/* Image */}
-          <div className="w-full lg:w-1/3   rounded-xl relative overflow-hidden 
+          <div className="w-full lg:w-1/3 rounded-xl relative overflow-hidden md:flex md:items-center md:justify-center 
     bg-black shadow-[4.0px_8.0px_8.0px_rgba(220,_38,_38,_0.48)] border-none
     lg:shadow-[5px_5px_rgba(220,_38,_38,_0.4),_10px_10px_rgba(220,_38,_38,_0.3),_15px_15px_rgba(220,_38,_38,_0.2),_20px_20px_rgba(220,_38,_38,_0.1),_25px_25px_rgba(220,_38,_38,_0.05)]">
             <FeatureImage1 />

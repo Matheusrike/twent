@@ -20,13 +20,15 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // header and sidebar buttons
         menu: "hover:bg-accent hover:text-accent-foreground dark:text-white ",
         search: "text-black dark:text-white cursor-pointer hidden md:flex",
         languageButton: 'text-black dark:text-white bg-transparent cursor-pointer border-none hover:border-none hover:bg-accent hover:text-accent-foreground dark:text-white p-2',
         setLanguageButton: 'bg-transparent hover:bg-accent hover:text-accent-foreground dark:text-white justify-between cursor-pointer',
+        // standart button
         standartButton: `
-        relative bottom-0 flex justify-center items-center gap-2 
-        border border-border 
+        relative bottom-0 flex justify-center items-center gap-2 cursor-pointer
+        border-none
         rounded-xl 
         text-primary-foreground font-black uppercase 
         px-8 py-4 z-10 overflow-hidden 
@@ -42,7 +44,28 @@ const buttonVariants = cva(
         before:rounded-full before:bg-white 
         before:-z-10 before:aspect-square 
         before:hover:scale-150 before:hover:duration-700
+      `,
+        // use only when light mode has a black background
+        standartButtonDark: `
+        relative bottom-0 flex justify-center items-center gap-2 cursor-pointer
+        border-none
+        rounded-xl 
+        text-primary-foreground font-black uppercase 
+        px-8 py-4 z-10 overflow-hidden 
+        ease-in-out duration-700 group 
+        bg-primary 
+        hover:bg-white hover:text-black
+      
+        active:scale-95 active:duration-0 
+        isolation-auto 
+        before:absolute before:w-full before:transition-all before:duration-700 
+        before:hover:w-full before:-left-full before:hover:left-0 
+        before:rounded-full before:bg-white 
+        before:-z-10 before:aspect-square 
+        before:hover:scale-150 before:hover:duration-700 
+        dark:before:bg-[var(--dark-hover)]
       `
+
 
       },
       size: {
