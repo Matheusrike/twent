@@ -7,6 +7,15 @@ import {
 } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
+export type IAppConfig = {
+	nodeEnv: string;
+	port: number;
+	databaseUrl: string;
+	cookieSecret: string;
+	jwtSecret: string;
+	adminPassword: string;
+};
+
 export type fastifyTypedInstance = FastifyInstance<
 	RawServerDefault,
 	RawRequestDefaultExpression,
