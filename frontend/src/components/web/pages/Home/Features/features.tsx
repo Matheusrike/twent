@@ -3,7 +3,7 @@ import { Button } from "@/components/web/Global/ui/button";
 import FeatureImage1, { FeatureImage2 } from "./image";
 
 // import json
-import featuresData from './featuresData.json'
+import featuresData from './json/featuresData.json'
 
 // import flag icon
 import "flag-icons/css/flag-icons.min.css";

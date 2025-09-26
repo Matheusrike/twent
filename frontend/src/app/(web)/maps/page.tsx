@@ -1,4 +1,4 @@
-import MapsHero from "@/components/web/pages/maps/hero";
+import MapsHero from "@/components/web/pages/Maps/hero";
 
 export default function Maps(){
     return(
