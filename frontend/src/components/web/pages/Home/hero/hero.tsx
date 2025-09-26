@@ -18,7 +18,7 @@ const Hero = () => {
 
       {/* button and text */}
       <div className="relative z-10 p-6 md:p-12 max-w-lg">
-        <h1 className="text-white text-3xl md:text-7xl font-bold mb-4">
+        <h1 className="text-white text-3xl md:text-6xl font-bold mb-4">
           Explore a excelência
         </h1>
         <p className="text-white/80 text-lg md:text-3xl mb-6">
