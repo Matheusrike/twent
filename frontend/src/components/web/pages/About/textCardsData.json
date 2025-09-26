@@ -14,10 +14,15 @@
         "image": "/img/about/aboutBanner.png"
       },
       {
-        "category": "Customer Support",
-        "title": "Enhance customer satisfaction",
-        "details":
-          "Track customer inquiries and support tickets seamlessly. Automate responses and follow-ups to ensure timely resolution and improved customer experience.",
-        "image": "/img/about/aboutBanner.png"
+        "category": "Filosofia e Valores",
+        "title": "Artesanato e Dedicação",
+        "details": "Cada relógio TWENT® é montado à mão por mestres relojoeiros em nosso ateliê em Genebra. Acreditamos que a verdadeira excelência nasce da paciência e da atenção aos mínimos detalhes. Este compromisso com o artesanato garante que cada peça seja não apenas um instrumento preciso, mas uma obra de arte funcional.",
+        "image": "/img/about/artesao-trabalhando.jpg"
+      },
+      {
+        "category": "Filosofia e Valores",
+        "title": "Sustentabilidade e Legado",
+        "details": "Estamos comprometidos em preservar tanto a arte da relojoaria quanto o nosso planeta. Utilizamos materiais de origem responsável, como ouro reciclado e diamantes de fontes éticas. Nossa visão é criar relógios que durem gerações, construindo um legado de beleza e responsabilidade.",
+        "image": "/img/about/materiais-sustentaveis.jpg"
       }
 ]
