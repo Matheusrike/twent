@@ -2,3 +2,4 @@
 /prisma/generated/prisma
 /.env
 /generated/prisma
+/dist
