@@ -1,115 +1,65 @@
-import { validateLocation } from '../helpers/validate-location.helper.ts';
-import prisma from '../../prisma/client.ts';
-import bcrypt from 'bcryptjs';
-import { IGetUserProps, IUser } from '../types/users.types.ts';
 import { AppError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
+import prisma from '../../prisma/client.ts';
+import { IGetUserProps } from '../types/users.types.ts';
 
 export class UserService {
-	async create(userData: IUser) {
+	async validateUser(email?: string, document_number?: string) {
 		const usedEmail = await prisma.user.findUnique({
-			where: { email: userData.email },
+			where: { email },
 		});
-
-
-
 		if (usedEmail) {
 			throw new AppError({
 				message: 'Email já em uso',
 				errorCode: 'CONFLICT',
 			});
 		}
-
 		const usedDocument = await prisma.user.findUnique({
-			where: { document_number: userData.document_number },
+			where: { document_number },
 		});
-
 		if (usedDocument) {
 			throw new AppError({
 				message: 'Número de documento já registrado',
 				errorCode: 'CONFLICT',
 			});
 		}
-
-		userData.password_hash = await bcrypt.hash(userData.password_hash, 10);
-
-		if (userData.birth_date) {
-			userData.birth_date = new Date(userData.birth_date!);
-		}
-		if (
-			userData.city ||
-			userData.country ||
-			userData.district ||
-			userData.state ||
-			userData.street
-		) {
-			await validateLocation(userData);
-		}
-		const user = await prisma.user.create({
-			data: userData,
-		});
-		return new ApiResponse({
-			statusCode: 201,
-			success: true,
-			message: 'Usuário criado',
-			data: user,
-		});
-	}
-
-	async getAll() {
-		const users = await prisma.user.findMany();
-
-		return new ApiResponse({
-			statusCode: 200,
-			success: true,
-			message: 'Usuários encontrados',
-			data: users,
-		});
+		return true;
 	}
 
 	async get(params: IGetUserProps) {
-        const user = await prisma.user.findMany({
+		const user = await prisma.user.findMany({
 			where: params,
 		});
-        
-		return new ApiResponse({
-			statusCode: 200,
-			success: true,
-			message: 'Usuário encontrado',
-			data: user,
+
+		return user;
+	}
+
+	async getInfo(id: string) {
+		const user = await prisma.user.findUnique({
+			where: { id },
 		});
+
+		if (!user) {
+			throw new AppError({
+				message: 'Usuário não encontrado',
+				errorCode: 'NOT_FOUND',
+			});
+		}
+		return user;
 	}
 
-	async update(id: string, userData: Partial<IUser>) {
-		try {
-			if (userData.password_hash) {
-				userData.password_hash = await bcrypt.hash(
-					userData.password_hash,
-					10,
-				);
-			}
-
-			if (userData.birth_date) {
-				userData.birth_date = new Date(userData.birth_date);
-			}
-
-			return await prisma.user.update({
-				where: { id },
-				data: userData,
+	async changeStatus(id: string, newStatus: boolean) {
+		const user = await this.get({ id });
+		if (!user) {
+			throw new AppError({
+				message: 'Usuário não encontrado',
+				errorCode: 'NOT_FOUND',
 			});
-		} catch (error) {
-			return error;
 		}
-	}
+		await prisma.user.update({
+			where: { id: id },
+			data: { is_active: newStatus },
+		});
 
-	async statusUser(id: string, newStatus: boolean) {
-		try {
-			return await prisma.user.update({
-				where: { id: id },
-				data: { is_active: newStatus },
-			});
-		} catch (error) {
-			return error;
-		}
+		return user;
 	}
 }

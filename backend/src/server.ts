@@ -4,7 +4,7 @@ import type { FastifyInstance } from 'fastify';
 import cookie from '@fastify/cookie';
 import jwt from '@fastify/jwt';
 import authorizationPlugin from './plugins/authorization.plugin.ts';
-import { userRoute } from './routes/user.route.ts';
+import { customerRoute } from './routes/customer.route.ts';
 
 // Basic configs
 configDotenv({ quiet: true });
@@ -21,7 +21,7 @@ app.register(jwt, {
 app.register(authorizationPlugin);
 
 // Routes
-app.register(userRoute)
+app.register(customerRoute)
 
 // Server start
 app.listen({ port: port }, (err) => {
