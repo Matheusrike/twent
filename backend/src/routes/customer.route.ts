@@ -4,7 +4,7 @@ import { CustomerController } from '../controller/Customer.controller.ts';
 const customerController = new CustomerController();
 
 export function customerRoute(fastify: FastifyInstance) {
-	fastify.get('/customer', customerController.getAll);
+	fastify.get('/customer', customerController.get);
 
 	fastify.post('/customer', customerController.create);
 

@@ -36,3 +36,5 @@ export const EmployeePropsSchema = z.object({
 	emergency_contact: z.any().optional(),
 	is_active: z.boolean().optional(),
 });
+
+export const EmployeeSchema = UserSchema.merge(EmployeePropsSchema);

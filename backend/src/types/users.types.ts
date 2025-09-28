@@ -27,16 +27,18 @@ export type TypeGetUserProps = {
     city?: string,
     state?: string,
     user_type?: UserType,
+    cursor?: string,
+    take?: number,
 }
 
-export type TypeEmployeeProps = {
-    national_id?: string,
-    position: string,
-    department?: string,
-    salary: Decimal,
-    currency: string,
-    benefits?: object,
-    termination_date?: Date,
-    emergency_contact?: object,
-    is_active?: boolean,
+export interface IEmployeeProps extends IUser {
+    national_id?: string;
+    position: string;
+    department?: string;
+    salary: Decimal;
+    currency: string;
+    benefits?: object;
+    termination_date?: Date;
+    emergency_contact?: object;
+    is_active?: boolean;
 }

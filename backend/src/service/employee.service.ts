@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../../prisma/client.ts';
 import { validateLocation } from '../helpers/validate-location.helper.ts';
-import { IUser, TypeEmployeeProps } from '../types/users.types.ts';
+import { IEmployeeProps, TypeGetUserProps } from '../types/users.types.ts';
 import { validatePassword } from '../utils/password.util.ts';
 import { UserService } from './user.service.ts';
 import { AppError } from '../utils/errors.util.ts';
@@ -29,14 +29,11 @@ export class EmployeeService extends UserService {
 	}
 
 	async create(
-		employeeData: IUser,
+		employeeData: IEmployeeProps,
 		roleName: string,
-        storeCode: string,
-		employeeProps: TypeEmployeeProps,
+		storeCode: string,
 	) {
-        console.log(employeeData, roleName, storeCode, employeeProps);
-        
-        let response = {};
+		let response = {};
 		await this.validateUser(
 			employeeData.email,
 			employeeData.document_number,
@@ -45,7 +42,7 @@ export class EmployeeService extends UserService {
 		employeeData.password_hash = await validatePassword(
 			employeeData.password_hash,
 		);
-        
+
 		await validateLocation({
 			country: employeeData.country,
 			state: employeeData.state,
@@ -65,24 +62,36 @@ export class EmployeeService extends UserService {
 					errorCode: 'NOT_FOUND',
 				});
 			}
-            const store = await tx.store.findUnique({
-                where: { code: storeCode },
-            });
-            if (!store) {
-                throw new AppError({
-                    message: 'Filial não encontrada',
-                    errorCode: 'NOT_FOUND',
-                });
-            }
+			const store = await tx.store.findUnique({
+				where: { code: storeCode },
+			});
+			if (!store) {
+				throw new AppError({
+					message: 'Filial não encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 			const user = await tx.user.create({
 				data: {
-					...employeeData,
-                    store_id: store.id,
-					is_active: true,
+					email: employeeData.email,
+					password_hash: employeeData.password_hash,
+					first_name: employeeData.first_name,
+					last_name: employeeData.last_name,
+					phone: employeeData.phone,
 					user_type: 'EMPLOYEE',
+					document_number: employeeData.document_number,
+					street: employeeData.street,
+					number: employeeData.number,
+					city: employeeData.city,
+					state: employeeData.state,
+					country: employeeData.country,
+					zip_code: employeeData.zip_code,
+					birth_date: employeeData.birth_date,
+					district: employeeData.district,
+					is_active: true,
+					store_id: store.id,
 				},
 			});
-            response = user;
 
 			const employee_code = await this.generateEmployeeCodeTx(
 				tx,
@@ -92,10 +101,16 @@ export class EmployeeService extends UserService {
 
 			response = await tx.employee.create({
 				data: {
-					...employeeProps,
-					user_id: user.id,
 					employee_code,
+					user_id: user.id,
+					position: employeeData.position,
+					department: employeeData.department,
+					salary: employeeData.salary,
+					currency: employeeData.currency,
+					benefits: employeeData.benefits,
+					emergency_contact: employeeData.emergency_contact,
 					hire_date: new Date(),
+					is_active: true,
 				},
 			});
 			response = await tx.userRole.create({
@@ -104,8 +119,18 @@ export class EmployeeService extends UserService {
 					role_id: role.id,
 				},
 			});
-            return response;
+			return response;
 		});
 		return employee;
+	}
+
+	async get(params: TypeGetUserProps, cursor?: string, take: number = 10) {
+		console.log(params, cursor, take);
+		params.user_type = 'EMPLOYEE';
+		const response = await super.get(params, cursor, take);
+
+		return {
+			...response,
+		};
 	}
 }

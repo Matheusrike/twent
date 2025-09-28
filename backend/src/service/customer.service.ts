@@ -40,24 +40,19 @@ export class CustomerService extends UserService {
 		});
 		return user;
 	}
-	async getAll() {
-		const users = await prisma.user.findMany({
-			where: { user_type: 'CUSTOMER' },
-		});
 
-		return users;
-	}
+	async get(params: TypeGetUserProps, cursor?: string, take: number = 10) {
+		console.log(params, cursor, take);
+		params.user_type = 'CUSTOMER';
+		const response = await super.get(params, cursor, take);
 
-	async get(params: TypeGetUserProps) {
-		const user = await prisma.user.findMany({
-			where: { ...params, user_type: 'CUSTOMER' },
-		});
-
-		return user;
+		return {
+			...response,
+		};
 	}
 
 	async update(id: string, customerData: Partial<IUser>) {
-		const user = await this.get({ id });
+		const user = (await this.get({ id })) as IUser[];
 
 		if (!user) {
 			throw new AppError({

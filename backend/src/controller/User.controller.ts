@@ -3,6 +3,7 @@ import { UserService } from '../service/user.service.ts';
 import { HttpError } from '../utils/errors.util.ts';
 import { TypeGetUserProps } from '../types/users.types.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
+import { UserType } from '../../prisma/generated/prisma/index.js';
 
 const userService = new UserService();
 export class UserController {
@@ -10,9 +11,9 @@ export class UserController {
 	constructor() {
 		this.service = userService;
 
-        this.getInfo = this.getInfo.bind(this);
-        this.get = this.get.bind(this);
-        this.changeStatus = this.changeStatus.bind(this);
+		this.getInfo = this.getInfo.bind(this);
+		this.get = this.get.bind(this);
+		this.changeStatus = this.changeStatus.bind(this);
 	}
 
 	async getInfo(
@@ -31,88 +32,135 @@ export class UserController {
 				}),
 			);
 		} catch (error) {
-			switch(error.errorCode) {
-                case 'NOT_FOUND':
-                    return new HttpError({
-                        message: error.message,
-                        statusCode: 404,
-                    });
-                default:
-                    return new HttpError({
-                        message: error.message,
-                        statusCode: 500,
-                    });
-            }
+			switch (error.errorCode) {
+				case 'NOT_FOUND':
+					return new HttpError({
+						message: error.message,
+						statusCode: 404,
+					});
+				default:
+					return new HttpError({
+						message: error.message,
+						statusCode: 500,
+					});
+			}
 		}
 	}
-
 	async get(
-		request: FastifyRequest<{ Querystring: TypeGetUserProps }>,
+		request: FastifyRequest<{
+			Querystring: {
+				params?: string | string[];
+				cursor?: string;
+				take?: number;
+			};
+		}>,
 		reply: FastifyReply,
 	) {
 		try {
-			const query = request.query;
-			if (Object.keys(query).length > 0) {
-				const response = await this.service.get(query);
-				console.log(response.length);
-				reply.status(200).send(
-					new ApiResponse({
-						statusCode: 200,
-						success: true,
-						message:
-							response.length > 0
-								? 'Usuários encontrados'
-								: 'Nenhum usuário encontrado',
-						data: response,
-					}),
-				);
+			const { params, cursor, take } = request.query;
+
+			const paramsObj: TypeGetUserProps = {};
+
+			if (params) {
+				const paramArray = Array.isArray(params) ? params : [params];
+
+				for (const paramStr of paramArray) {
+					const match = paramStr.match(/\[(.+?)\]:(.+)/);
+					if (!match) continue;
+
+					const key = match[1].trim() as keyof TypeGetUserProps;
+					const value = match[2].trim();
+
+					if (key === 'take') {
+						paramsObj.take = Number(value);
+					} else if (key === 'user_type') {
+						if (
+							Object.values(UserType).includes(value as UserType)
+						) {
+							paramsObj.user_type = value as UserType;
+						} else {
+							throw new Error(
+								`Valor inválido para user_type: ${value}`,
+							);
+						}
+					} else {
+						paramsObj[key] = value;
+					}
+				}
 			}
-			const response = await this.service.get({});
+
+			const response = await this.service.get(paramsObj, cursor, take);
+
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Listando todos o usuários',
+					message:
+						Object.keys(response).length > 2
+							? 'Usuários encontrados'
+							: 'Usuário encontrado',
 					data: response,
 				}),
 			);
 		} catch (error) {
-			return new HttpError({
-				message: error.message,
-				statusCode: 500,
-			});
+			switch (error.errorCode) {
+				case 'BAD_REQUEST':
+					return new HttpError({
+						message: error.message,
+						statusCode: 400,
+					});
+				case 'NOT_FOUND':
+					return new HttpError({
+						message: error.message,
+						statusCode: 404,
+					});
+				default:
+					return new HttpError({
+						message: error.message,
+						statusCode: 500,
+					});
+			}
 		}
 	}
 
 	async changeStatus(
 		request: FastifyRequest<{
 			Params: { id: string };
-			Body: { is_active: boolean };
+			Body: { newStatus: boolean };
 		}>,
 		reply: FastifyReply,
 	) {
 		try {
 			const { id } = request.params;
-			const { is_active } = request.body;
-			const response = await this.service.changeStatus(id, is_active);
+			const { newStatus } = request.body;
+			const response = await this.service.changeStatus(id, newStatus);
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
 					message:
-						is_active == true
+						newStatus == true
 							? 'Usuário:' + id + ' alterado para ativo'
 							: 'Usuário:' + id + ' alterado para inativo',
 					data: response,
 				}),
 			);
 		} catch (error) {
-			switch (error.errorCode) 
-            {
+			switch (error.errorCode) {
 				case 'NOT_FOUND':
 					return new HttpError({
 						message: error.message,
 						statusCode: 404,
+					});
+				case 'UNAUTHORIZED':
+					return new HttpError({
+						message: error.message,
+						statusCode: 401,
+					});
+				case 'BAD_REQUEST':
+					return new HttpError({
+						message: error.message,
+						statusCode: 400,
 					});
 				default:
 					return new HttpError({

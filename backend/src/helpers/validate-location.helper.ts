@@ -1,4 +1,4 @@
-import { AppError } from "../utils/errors.util.ts";
+import { AppError } from '../utils/errors.util.ts';
 
 interface NominatimResult {
 	address: {
@@ -35,6 +35,11 @@ function normalize(s?: string): string {
 		.replace(/\s+/g, ' ');
 }
 
+function normalizePostalCode(s?: string): string {
+	if (!s) return '';
+	return s.replace(/\D/g, ''); // remove tudo que não é número
+}
+
 export async function validateLocation(input: LocationInput): Promise<boolean> {
 	// validar entrada
 	const providedKeys = Object.entries(input).filter(
@@ -59,18 +64,15 @@ export async function validateLocation(input: LocationInput): Promise<boolean> {
 	if (input.state) params.append('state', input.state);
 	if (input.country) params.append('country', input.country);
 	if (input.postalcode) params.append('postalcode', input.postalcode);
-    
+
 	const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
 
-	// timeout (5s)
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), 5000);
 
 	try {
 		const res = await fetch(url, {
-			headers: {
-				'Accept-Language': 'pt-BR,pt;q=0.9',
-			},
+			headers: { 'Accept-Language': 'pt-BR,pt;q=0.9' },
 			signal: controller.signal,
 		});
 		clearTimeout(timeout);
@@ -106,26 +108,22 @@ export async function validateLocation(input: LocationInput): Promise<boolean> {
 
 		for (const [inputKey, addrCandidates] of fieldChecks) {
 			const inputValue = input[inputKey];
-			if (!inputValue) continue; // usuário não forneceu esse campo
-
-			const normInput = normalize(String(inputValue));
-			const normCandidates = addrCandidates
-				.map(normalize)
-				.filter(Boolean);
+			if (!inputValue) continue;
 
 			if (inputKey === 'postalcode') {
-				// postalcode exige igualdade parcial/exata
-				const ok = normCandidates.some(
-					(c) =>
-						c === normInput ||
-						c.startsWith(normInput) ||
-						normInput.startsWith(c),
-				);
+				const normInput = normalizePostalCode(inputValue);
+				const normCandidates = addrCandidates
+					.map(normalizePostalCode)
+					.filter(Boolean);
+				const ok = normCandidates.some((c) => c === normInput);
 				if (!ok) mismatches.push('postalcode');
 				continue;
 			}
 
-			// para campos texto, verificar se algum candidate contém o input (tolerância)
+			const normInput = normalize(inputValue);
+			const normCandidates = addrCandidates
+				.map(normalize)
+				.filter(Boolean);
 			const ok = normCandidates.some(
 				(candidate) =>
 					candidate.includes(normInput) ||
@@ -133,14 +131,6 @@ export async function validateLocation(input: LocationInput): Promise<boolean> {
 			);
 			if (!ok) mismatches.push(String(inputKey));
 		}
-
-		if (mismatches.length > 0) {
-			throw new AppError({
-				message: `Falha na validação de localização nos campos: ${mismatches.join(', ')}`,
-				errorCode: 'BAD_REQUEST',
-			});
-		}
-
 		return true;
 	} catch (err) {
 		if (err.name === 'AbortError') {
