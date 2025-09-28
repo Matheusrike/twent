@@ -10,7 +10,7 @@ interface NominatimResult {
 		suburb?: string;
 		neighbourhood?: string;
 		road?: string;
-		postcode?: string;
+		postalcode?: string;
 	};
 	lat: string;
 	lon: string;
@@ -22,7 +22,7 @@ export interface LocationInput {
 	city?: string;
 	state?: string;
 	country?: string;
-	zip_code?: string;
+	postalcode?: string;
 }
 
 function normalize(s?: string): string {
@@ -58,8 +58,8 @@ export async function validateLocation(input: LocationInput): Promise<boolean> {
 	if (input.city) params.append('city', input.city);
 	if (input.state) params.append('state', input.state);
 	if (input.country) params.append('country', input.country);
-	if (input.zip_code) params.append('postalcode', input.zip_code);
-
+	if (input.postalcode) params.append('postalcode', input.postalcode);
+    
 	const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
 
 	// timeout (5s)
@@ -99,31 +99,33 @@ export async function validateLocation(input: LocationInput): Promise<boolean> {
 			['city', [addr.city ?? '', addr.town ?? '', addr.village ?? '']],
 			['state', [addr.state ?? '']],
 			['country', [addr.country ?? '']],
-			['zip_code', [addr.postcode ?? '']],
+			['postalcode', [addr.postalcode ?? '']],
 		];
 
 		const mismatches: string[] = [];
 
 		for (const [inputKey, addrCandidates] of fieldChecks) {
 			const inputValue = input[inputKey];
-			if (!inputValue) continue; 
+			if (!inputValue) continue; // usuário não forneceu esse campo
 
 			const normInput = normalize(String(inputValue));
 			const normCandidates = addrCandidates
 				.map(normalize)
 				.filter(Boolean);
 
-			if (inputKey === 'zip_code') {
+			if (inputKey === 'postalcode') {
+				// postalcode exige igualdade parcial/exata
 				const ok = normCandidates.some(
 					(c) =>
 						c === normInput ||
 						c.startsWith(normInput) ||
 						normInput.startsWith(c),
 				);
-				if (!ok) mismatches.push('postcode');
+				if (!ok) mismatches.push('postalcode');
 				continue;
 			}
 
+			// para campos texto, verificar se algum candidate contém o input (tolerância)
 			const ok = normCandidates.some(
 				(candidate) =>
 					candidate.includes(normInput) ||

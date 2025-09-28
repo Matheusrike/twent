@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserService } from '../service/user.service.ts';
 import { HttpError } from '../utils/errors.util.ts';
-import { IGetUserProps } from '../types/users.types.ts';
+import { TypeGetUserProps } from '../types/users.types.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 
 const userService = new UserService();
@@ -9,6 +9,10 @@ export class UserController {
 	private service: UserService;
 	constructor() {
 		this.service = userService;
+
+        this.getInfo = this.getInfo.bind(this);
+        this.get = this.get.bind(this);
+        this.changeStatus = this.changeStatus.bind(this);
 	}
 
 	async getInfo(
@@ -27,21 +31,23 @@ export class UserController {
 				}),
 			);
 		} catch (error) {
-			if (error.errorCode == 'NOT_FOUND') {
-				return new HttpError({
-					message: error.message,
-					statusCode: 404,
-				});
-			}
-			return new HttpError({
-				message: error.message,
-				statusCode: 500,
-			});
+			switch(error.errorCode) {
+                case 'NOT_FOUND':
+                    return new HttpError({
+                        message: error.message,
+                        statusCode: 404,
+                    });
+                default:
+                    return new HttpError({
+                        message: error.message,
+                        statusCode: 500,
+                    });
+            }
 		}
 	}
 
 	async get(
-		request: FastifyRequest<{ Querystring: IGetUserProps }>,
+		request: FastifyRequest<{ Querystring: TypeGetUserProps }>,
 		reply: FastifyReply,
 	) {
 		try {
@@ -101,7 +107,8 @@ export class UserController {
 				}),
 			);
 		} catch (error) {
-			switch (error.errorCode) {
+			switch (error.errorCode) 
+            {
 				case 'NOT_FOUND':
 					return new HttpError({
 						message: error.message,

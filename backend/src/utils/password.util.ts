@@ -2,6 +2,12 @@ import bcrypt from 'bcryptjs';
 import { AppError } from './errors.util.ts';
 
 export async function validatePassword(password: string) {
+    if (!password) {
+        throw new AppError({
+            message: 'Senha é obrigatória',
+            errorCode: 'BAD_REQUEST',
+        });
+    }
 	//TODO: Add more password validations
 	if (password.length < 6) {
 		throw new AppError({
