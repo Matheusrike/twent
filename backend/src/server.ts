@@ -1,32 +1,34 @@
-import { configDotenv } from 'dotenv';
-import Fastify from 'fastify';
-import type { FastifyInstance } from 'fastify';
-import cookie from '@fastify/cookie';
-import jwt from '@fastify/jwt';
-import authorizationPlugin from './plugins/authorization.plugin.ts';
+import { createApp } from './app.ts';
+import { loadConfig } from './config/env.ts';
 
-// Basic configs
-configDotenv({ quiet: true });
-const app: FastifyInstance = Fastify();
-const port: number = parseInt(process.env.PORT || '3000', 10);
+async function startServer() {
+	try {
+		const config = loadConfig();
+		const app = await createApp(config);
 
-// Plugins registration
-app.register(cookie, {
-	secret: process.env.COOKIE_SECRET!,
-});
-app.register(jwt, {
-	secret: process.env.JWT_SECRET!,
-});
-app.register(authorizationPlugin);
+		await app.listen({
+			port: config.port,
+			host: '0.0.0.0',
+		});
 
-// Server start
-app.listen({ port: port }, (err) => {
-	if (!process.env.PORT) {
-		console.warn('⚠ PORT not specified in .env, defaulting to 3000\n');
-	}
-	console.log(`Server running on http://localhost:${port}`);
-	if (err) {
-		console.error(err);
+		console.log(`🚀 Server running on http://localhost:${config.port}`);
+		console.log(
+			`📚 API Documentation available at http://localhost:${config.port}/docs`,
+		);
+	} catch (error) {
+		console.error('❌ Error starting server:', error);
 		process.exit(1);
 	}
+}
+
+process.on('SIGINT', () => {
+	console.log('\n🛑 Shutting down server...');
+	process.exit(0);
 });
+
+process.on('SIGTERM', () => {
+	console.log('\n🛑 Shutting down server...');
+	process.exit(0);
+});
+
+startServer();
