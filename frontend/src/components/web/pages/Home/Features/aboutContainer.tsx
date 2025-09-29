@@ -14,6 +14,17 @@ const AboutContainer: React.FC = () => {
     <div className="md:min-h-screen flex justify-center items-center p-8 md:p-12 md:mt-20  container">
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
 
+        {/* tittle */}
+        <div className="max-w-4xl text-left  flex flex-col items-start justify-start self-start">
+          <h1 className="text-5xl md:text-6xl lg:text-6xl font-semibold text-primary mb-6">
+            Conheça nossa história e paixão pelos relógios
+          </h1>
+     
+         
+        </div>
+
+
+
         {/* info section*/}
         <div className="flex flex-col lg:flex-row w-full gap-8 lg:gap-16 justify-between items-start lg:items-center">
           {/* Image */}

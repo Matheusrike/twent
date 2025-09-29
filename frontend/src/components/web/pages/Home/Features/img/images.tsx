@@ -28,3 +28,18 @@ export function AboutImage2() {
 
 // Main Images
 
+
+
+export function MainImage() {
+  return (
+    <Image
+      src="/img/home/mainClock.png"
+      alt="Picture of the author"
+      className="object-cover"
+      fill 
+      priority
+    />
+  );
+}
+
+

@@ -2,6 +2,7 @@ import { Button } from "@/components/web/Global/ui/button";
 import Link from "next/link";
 
 import mainContainerData from './json/mainContainerData.json'
+import { MainImage } from "./img/images";
 
 const MainContainer = () => {
   return (
@@ -12,7 +13,7 @@ const MainContainer = () => {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-screen py-12">
             {/* text Content */}
             <div className="max-w-xl flex flex-col">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-primary mb-8 tracking-tight uppercase">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold  text-primary mb-8 tracking-tight ">
                 Encontre o seu relógio ideal
               </h1>
               <p className="text-slate-700 dark:text-white text-lg md:text-xl mb-10 leading-relaxed font-light">
@@ -35,9 +36,8 @@ const MainContainer = () => {
             </div>
 
             {/* Image Desktop */}
-            <div className="hidden md:block relative aspect-square w-full bg-slate-100 rounded-2xl overflow-hidden">
-
-
+            <div className="hidden md:block justify-center items-center relative aspect-square w-full bg-slate-100 rounded-2xl overflow-hidden  transition-transform duration-300  shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)]">
+              <MainImage />
             </div>
           </div>
         </div>
