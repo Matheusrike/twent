@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/web/Global/ui/button";
-import FeatureImage1, { FeatureImage2 } from "./image";
+import AboutImage1, { AboutImage2 } from "./img/images";
 
 // import json
-import textContainerData from './json/textContainerData.json'
+import aboutContainerData from './json/aboutContainerData.json'
 
 // import flag icon
 import "flag-icons/css/flag-icons.min.css";
 
 
-const TextContainer: React.FC = () => {
+const AboutContainer: React.FC = () => {
   return (
     <div className="md:min-h-screen flex justify-center items-center p-8 md:p-12 md:mt-20  container">
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
@@ -20,11 +20,11 @@ const TextContainer: React.FC = () => {
           <div className="w-full lg:w-1/3 rounded-xl relative overflow-hidden md:flex md:items-center md:justify-center 
     bg-black shadow-[4.0px_8.0px_8.0px_rgba(220,_38,_38,_0.48)] border-none
     lg:shadow-[5px_5px_rgba(220,_38,_38,_0.4),_10px_10px_rgba(220,_38,_38,_0.3),_15px_15px_rgba(220,_38,_38,_0.2),_20px_20px_rgba(220,_38,_38,_0.1),_25px_25px_rgba(220,_38,_38,_0.05)]">
-            <FeatureImage1 />
+            <AboutImage1 />
           </div>
 
           {/* Text Content */}
-          {textContainerData.info.map((data, i) => (
+          {aboutContainerData.info.map((data, i) => (
             <div
               key={i}
               className="w-full lg:w-2/3 flex flex-col items-start shrink-0 px-4 md:px-6 lg:px-8"
@@ -60,7 +60,7 @@ const TextContainer: React.FC = () => {
 
         {/* about section */}
         <div className="mt-8 w-full flex flex-col space-y-20">
-          {textContainerData.about.map((data, i) => (
+          {aboutContainerData.about.map((data, i) => (
             <div
               key={i}
               className="flex flex-col lg:flex-row items-center gap-y-6 gap-x-15 w-full lg:even:flex-row-reverse"
@@ -71,7 +71,7 @@ const TextContainer: React.FC = () => {
         bg-muted md:bg-black rounded-xl md:mx-auto 
         shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_1px_-0.5px_rgba(0,0,0,0.06),0px_3px_3px_-1.5px_rgba(0,0,0,0.06),_0px_6px_6px_-3px_rgba(0,0,0,0.06),0px_12px_12px_-6px_rgba(0,0,0,0.06),0px_24px_24px_-12px_rgba(0,0,0,0.06)]"
               >
-                <FeatureImage2 />
+                <AboutImage2 />
 
                 {/* info image hover */}
                 <div className="absolute bottom-4 left-4 flex gap-1 font-semibold md:font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-sm">
@@ -116,4 +116,4 @@ const TextContainer: React.FC = () => {
 
 }
 
-export default TextContainer;
+export default AboutContainer;

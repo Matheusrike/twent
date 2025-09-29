@@ -1,0 +1,26 @@
+[
+    {
+        "title": "Masculino",
+        "href": "/collection?category=masculino"
+    },
+    {
+        "title": "Feminino",
+        "href": "/collection?category=feminino"
+    },
+    {
+        "title": "Esportivo",
+        "href": "/collection?category=esportivo"
+    },
+    {
+        "title": "Luxo",
+        "href": "/collection?category=luxo"
+    },
+    {
+        "title": "Clássico",
+        "href": "/collection?category=classico"
+    },
+    {
+        "title": "Casual",
+        "href": "/collection?category=casual"
+    }
+]
