@@ -13,18 +13,14 @@
       "url": "/about"
     },
     {
-      "name": " Área Empresarial",
-      "url": "/business"
+      "name": "Portal Empresarial",
+      "url": "/companies"
     }
   ],
   "footerLinks": [
     {
       "name": "faq",
       "url": "/faq"
-    },
-    {
-      "name": "contato",
-      "url": "/contact"
     },
     {
       "name": "maps",

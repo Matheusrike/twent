@@ -13,17 +13,14 @@
       "url": "/about"
     },
     {
-      "label": "Área Empresarial",
-      "url": "/business"
+      "label": "Portal Empresarial",
+      "url": "/companies"
     },
     {
       "label": "FAQ",
       "url": "/faq"
     },
-    {
-      "label": "Contato",
-      "url": "/contact"
-    },
+
     {
       "label": "Maps",
       "url": "/maps"
@@ -53,7 +50,7 @@
       ]
     },
     {
-      "title": "Nos Encontre",
+      "title": "Redes Sociais",
       "items": [
         {
           "label": "LinkedIn",

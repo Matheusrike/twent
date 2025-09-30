@@ -19,7 +19,7 @@ const Hero = () => {
       <div className="absolute inset-0 md:bg-black/10" />
 
       <div className="relative z-10 p-6 md:px-12 max-w-lg md:max-w-2xl">
-        <h1 className="text-white text-3xl md:text-8xl font-bold mb-4 md:uppercase md:leading-tight md:tracking-tight">
+        <h1 className="text-white text-3xl md:text-6xl lg:text-8xl font-bold mb-4 md:uppercase md:leading-tight md:tracking-tight">
           Explore a<br className="hidden md:block" />excelência
         </h1>
         <p className="text-white/80 md:text-white/90 text-lg md:text-base mb-6 md:mb-8 md:max-w-md">

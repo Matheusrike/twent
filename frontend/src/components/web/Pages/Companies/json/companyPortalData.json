@@ -1,0 +1,18 @@
+[
+  {
+    "id": "matriz",
+    "title": "Matriz",
+    "badge": "Principal",
+    "description": "Acesse o portal da empresa matriz para gerenciar operações centralizadas e administrativas",
+    "href": "/login/matriz",
+    "icon": "Building2"
+  },
+  {
+    "id": "filial",
+    "title": "Filial",
+    "badge": "Regional",
+    "description": "Acesse o portal da filial para gerenciar operações locais e regionais da unidade",
+    "href": "/login/filial",
+    "icon": "Building"
+  }
+]
