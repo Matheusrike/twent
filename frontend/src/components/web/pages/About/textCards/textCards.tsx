@@ -2,7 +2,7 @@ import { Button } from "@/components/web/Global/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import textCardsData from "../textCardsData.json";
+import textCardsData from "./textCardsData.json";
 
 const TextCards = () => {
   return (
