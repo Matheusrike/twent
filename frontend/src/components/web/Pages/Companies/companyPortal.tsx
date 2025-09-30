@@ -94,21 +94,21 @@ export function CompanyPortal() {
   const units = companyPortalData as CompanyUnit[]
 
   return (
-    <div className="relative z-10 container mx-auto py-16 px-6 flex flex-col items-center w-full">
+    <div className="mx-auto px-6 lg:px-20 p-5 flex flex-col w-full items-center">
       {/* Header */}
-      <header className="w-full max-w-5xl mb-16">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white mb-8 tracking-tight leading-tight">
+      <header className="w-full max-w-7xl mb-10  text-center lg:text-left">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-primary dark:text-white mb-10 tracking-tight leading-tight">
           {CONTENT.header.title.split(" ")[0]} <br /> 
           {CONTENT.header.title.split(" ")[1]}
         </h1>
-        <p className="text-gray-300 dark:text-white text-lg md:text-xl leading-relaxed font-light max-w-2xl">
+        <p className="text-gray-500 dark:text-white text-lg md:text-xl leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
           {CONTENT.header.subtitle}
         </p>
       </header>
 
       {/* Cards grid */}
       <section 
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl"
+        className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 w-full max-w-7xl"
         aria-label="Unidades disponíveis"
       >
         {units.map((unit) => (
@@ -117,8 +117,8 @@ export function CompanyPortal() {
       </section>
 
       {/* Help section */}
-      <footer className="mt-16 w-full flex justify-center">
-        <p className="text-sm text-white/90 max-w-md text-center leading-relaxed">
+      <footer className="mt-20 w-full flex justify-center">
+        <p className="text-sm text-gray-500 dark:text-white max-w-md text-center leading-relaxed">
           {CONTENT.help}
         </p>
       </footer>

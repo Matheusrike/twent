@@ -42,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
-      <body className="dark:bg-[#0C0C0C]  " cz-shortcut-listen="true">
+      <body className="bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 dark:from-zinc-700 dark:via-zinc-800 dark:to-zinc-900 " cz-shortcut-listen="true">
         <Navbar />
         <DarkModeProvider/>
         {children}
