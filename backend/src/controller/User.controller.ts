@@ -1,9 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserService } from '../service/user.service.ts';
 import { HttpError } from '../utils/errors.util.ts';
-import { TypeGetUserProps } from '../types/users.types.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
-import { UserType } from '../../prisma/generated/prisma/index.js';
+import { TypeGetUserProps } from '../types/users.types.ts';
 
 const userService = new UserService();
 export class UserController {
@@ -46,64 +45,83 @@ export class UserController {
 			}
 		}
 	}
+	/*
+model User {
+  id                  String    @id @default(uuid()) @db.Char(36)
+  store_id            String?
+  user_type           UserType
+  email               String    @unique
+  password_hash       String
+  first_name          String
+  last_name           String
+  phone               String?
+  document_number     String?   @unique
+  birth_date          DateTime?
+  street              String?
+  number              String?
+  district            String?
+  city                String?
+  state               String?
+  zip_code            String?
+  country             String?
+  reset_token         String?
+  reset_token_expires DateTime?
+  last_login_at       DateTime?
+  is_active           Boolean   @default(true)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  store                  Store?                 @relation(fields: [store_id], references: [id])
+  user_roles             UserRole[]
+  employee               Employee?
+  employee_leaves        EmployeeLeave[]        @relation("ApprovedBy")
+  inventory_movements    InventoryMovement[]
+  products_updated       Product[]              @relation("UpdatedBy")
+  price_changes          ProductPriceHistory[]  @relation("ChangedBy")
+  cash_sessions          CashSession[]
+  sales_created          Sale[]                 @relation("SalesCreatedBy")
+  appointments           Appointment[]
+  financial_transactions FinancialTransaction[]
+  audit_logs             AuditLog[]
+  Sale                   Sale[]
+  CustomerFavorite       CustomerFavorite[]
+}*/
 	async get(
 		request: FastifyRequest<{
-			Querystring: {
-				params?: string | string[];
-				cursor?: string;
-				take?: number;
-			};
+			Body: { filters?: TypeGetUserProps };
+			Querystring: { skip?: number; take?: number };
 		}>,
 		reply: FastifyReply,
 	) {
 		try {
-			const { params, cursor, take } = request.query;
-
-			const paramsObj: TypeGetUserProps = {};
-
-			if (params) {
-				const paramArray = Array.isArray(params) ? params : [params];
-
-				for (const paramStr of paramArray) {
-					const match = paramStr.match(/\[(.+?)\]:(.+)/);
-					if (!match) continue;
-
-					const key = match[1].trim() as keyof TypeGetUserProps;
-					const value = match[2].trim();
-
-					if (key === 'take') {
-						paramsObj.take = Number(value);
-					} else if (key === 'user_type') {
-						if (
-							Object.values(UserType).includes(value as UserType)
-						) {
-							paramsObj.user_type = value as UserType;
-						} else {
-							throw new Error(
-								`Valor inválido para user_type: ${value}`,
-							);
-						}
-					} else {
-						paramsObj[key] = value;
-					}
-				}
+			if (!request.body) {
+				const response = await this.service.get();
+				return reply.status(200).send(
+					new ApiResponse({
+						statusCode: 200,
+						success: true,
+						message: 'Informações dos usuários encontradas',
+						data: response,
+					}),
+				);
 			}
 
-			const response = await this.service.get(paramsObj, cursor, take);
+			const { filters = {} } = request.body;
 
-			reply.status(200).send(
+			const { skip = 0, take = 10 } = request.query;
+
+			const response = await this.service.get(filters, skip, take);
+
+			return reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message:
-						Object.keys(response).length > 2
-							? 'Usuários encontrados'
-							: 'Usuário encontrado',
+					message: 'Informações do usuário encontradas',
 					data: response,
 				}),
 			);
 		} catch (error) {
-			switch (error.errorCode) {
+			switch (error?.errorCode) {
 				case 'BAD_REQUEST':
 					return new HttpError({
 						message: error.message,
@@ -115,8 +133,9 @@ export class UserController {
 						statusCode: 404,
 					});
 				default:
+					console.error(error);
 					return new HttpError({
-						message: error.message,
+						message: error?.message ?? 'Erro interno',
 						statusCode: 500,
 					});
 			}

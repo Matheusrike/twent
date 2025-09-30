@@ -4,7 +4,6 @@ import { HttpError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 import { IEmployeeProps, TypeGetUserProps } from '../types/users.types.ts';
 import { EmployeeService } from '../service/employee.service.ts';
-import { UserType } from '../../prisma/generated/prisma/index.js';
 
 const employeeService = new EmployeeService();
 
@@ -92,80 +91,59 @@ export class EmployeeController {
 		}
 	}
 	async get(
-            request: FastifyRequest<{
-                Querystring: {
-                    params?: string | string[];
-                    cursor?: string;
-                    take?: number;
-                };
-            }>,
-            reply: FastifyReply,
-        ) {
-            try {
-                const { params, cursor, take } = request.query;
-    
-                const paramsObj: TypeGetUserProps = {};
-    
-                if (params) {
-                    const paramArray = Array.isArray(params) ? params : [params];
-    
-                    for (const paramStr of paramArray) {
-                        const match = paramStr.match(/\[(.+?)\]:(.+)/);
-                        if (!match) continue;
-    
-                        const key = match[1].trim() as keyof TypeGetUserProps;
-                        const value = match[2].trim();
-    
-                        if (key === 'take') {
-                            paramsObj.take = Number(value);
-                        } else if (key === 'user_type') {
-                            if (
-                                Object.values(UserType).includes(value as UserType)
-                            ) {
-                                paramsObj.user_type = value as UserType;
-                            } else {
-                                throw new Error(
-                                    `Valor inválido para user_type: ${value}`,
-                                );
-                            }
-                        } else {
-                            paramsObj[key] = value;
-                        }
-                    }
-                }
-    
-                const response = await this.service.get(paramsObj, cursor, take);
-    
-                reply.status(200).send(
-                    new ApiResponse({
-                        statusCode: 200,
-                        success: true,
-                        message:
-                            Object.keys(response).length > 2
-                                ? 'Usuários encontrados'
-                                : 'Usuário encontrado',
-                        data: response,
-                    }),
-                );
-            } catch (error) {
-                switch (error.errorCode) {
-                    case 'BAD_REQUEST':
-                        return new HttpError({
-                            message: error.message,
-                            statusCode: 400,
-                        });
-                    case 'NOT_FOUND':
-                        return new HttpError({
-                            message: error.message,
-                            statusCode: 404,
-                        });
-                    default:
-                        return new HttpError({
-                            message: error.message,
-                            statusCode: 500,
-                        });
-                }
-            }
-        }
+		request: FastifyRequest<{
+			Body: { filters?: TypeGetUserProps };
+			Querystring: { skip?: number; take?: number };
+		}>,
+		reply: FastifyReply,
+	) {
+		try {
+			if (!request.body) {
+				const response = await this.service.get();
+				return reply.status(200).send(
+					new ApiResponse({
+						statusCode: 200,
+						success: true,
+						message: 'Informações dos usuários encontradas',
+						data: response,
+					}),
+				);
+			}
+
+			const { filters = {} } = request.body;
+
+			const { skip = 0, take = 10 } = request.query;
+
+			const response = await this.service.get(filters, skip, take);
+
+			return reply.status(200).send(
+				new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Informações do usuário encontradas',
+					data: response,
+				}),
+			);
+		} catch (error) {
+			switch (error?.errorCode) {
+				case 'BAD_REQUEST':
+					return new HttpError({
+						message: error.message,
+						statusCode: 400,
+					});
+				case 'NOT_FOUND':
+					return new HttpError({
+						message: error.message,
+						statusCode: 404,
+					});
+				default:
+					console.error(error);
+					return new HttpError({
+						message: error?.message ?? 'Erro interno',
+						statusCode: 500,
+					});
+			}
+		}
+	}
     
 }

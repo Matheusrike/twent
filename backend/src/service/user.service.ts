@@ -29,25 +29,16 @@ export class UserService {
 		return true;
 	}
 
-	async get(params: TypeGetUserProps, cursor?: string, take: number = 10) {
-		if (
-			params.user_type &&
-			params.user_type !== 'CUSTOMER' &&
-			params.user_type !== 'EMPLOYEE'
-		) {
-			throw new AppError({
-				message: 'Tipo de usuário inválido',
-				errorCode: 'BAD_REQUEST',
-			});
-		}
+	async get(params?: TypeGetUserProps, skip = 0, take = 10, id?: string) {
+		console.log(params);
 
 		let response;
 
-		if (params.user_type === 'EMPLOYEE') {
+		if (params?.user_type == 'EMPLOYEE') {
 			response = await prisma.user.findMany({
-				cursor: cursor ? { id: cursor } : undefined,
-				take: Number(take) + 1,
-				skip: cursor ? 1 : 0,
+				cursor: id ? { id } : undefined,
+				take: Number(take),
+				skip: Number(skip),
 				orderBy: { created_at: 'desc' },
 				where: params,
 				select: {
@@ -56,8 +47,13 @@ export class UserService {
 					first_name: true,
 					last_name: true,
 					user_type: true,
-					created_at: true,
+					city: true,
+					district: true,
+					state: true,
+					street: true,
+					phone: true,
 					is_active: true,
+					created_at: true,
 					employee: {
 						select: {
 							position: true,
@@ -82,17 +78,22 @@ export class UserService {
 			});
 		} else {
 			response = await prisma.user.findMany({
-				cursor: cursor ? { id: cursor } : undefined,
-				take: Number(take) + 1,
-				skip: cursor ? 1 : 0,
-				where: params,
+				cursor: id ? { id } : undefined,
+				take: Number(take),
+				skip: Number(skip),
 				orderBy: { created_at: 'desc' },
+				where: params,
 				select: {
 					id: true,
 					email: true,
 					first_name: true,
 					last_name: true,
 					user_type: true,
+					city: true,
+					district: true,
+					state: true,
+					street: true,
+					phone: true,
 					is_active: true,
 					created_at: true,
 				},
@@ -105,17 +106,17 @@ export class UserService {
 			});
 		}
 
-		const hasNextPage = response.length > take;
+		const hasNextPage = response.length > take!;
 		const data = hasNextPage ? response.slice(0, -1) : response;
 		const nextCursor = hasNextPage ? data[data.length - 1].id : null;
 		const total = await prisma.user.count({ where: params });
 
 		return {
-			reply: response,
+			...response,
 			pagination: {
 				nextCursor,
 				hasNextPage,
-				take,
+				take: take,
 				total,
 			},
 		};
@@ -144,9 +145,9 @@ export class UserService {
 			});
 		}
 
-		console.log(user['reply'][0].user_type);
+		console.log(user.pop()?.is_active);
 
-		if (newStatus === user['reply'][0].is_active) {
+		if (newStatus === user.pop()?.is_active) {
 			throw new AppError({
 				message:
 					newStatus === true
@@ -156,7 +157,7 @@ export class UserService {
 			});
 		}
 
-		if (user['reply'][0].user_type === 'EMPLOYEE') {
+		if (user.pop()?.user_type === 'EMPLOYEE') {
 			const employee = await prisma.$transaction(async (tx) => {
 				const res1 = await tx.user.update({
 					where: { id: id },

@@ -2,6 +2,9 @@ import type { fastifyTypedInstance } from '../types/types.ts';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ApiResponseSchema } from '../schemas/api-response.schema.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
+import { customerRoute } from './customer.route.ts';
+import { employeeRoute } from './employee.route.ts';
+import { userRoute } from './user.route.ts';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.get(
@@ -24,6 +27,7 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// Rotas
-	// exemplo: app.register(authRoutes);
+    app.register(customerRoute, { prefix: '/customer' });
+    app.register(employeeRoute, { prefix: '/employee' });
+    app.register(userRoute, { prefix: '/user' });
 }

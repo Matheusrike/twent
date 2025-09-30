@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client/extension';
 import prisma from '../../prisma/client.ts';
 import { validateLocation } from '../helpers/validate-location.helper.ts';
 import { IEmployeeProps, TypeGetUserProps } from '../types/users.types.ts';
@@ -124,10 +124,13 @@ export class EmployeeService extends UserService {
 		return employee;
 	}
 
-	async get(params: TypeGetUserProps, cursor?: string, take: number = 10) {
-		console.log(params, cursor, take);
-		params.user_type = 'EMPLOYEE';
-		const response = await super.get(params, cursor, take);
+	async get(filters?: TypeGetUserProps, skip = 0, take = 10) {
+        console.log(filters);
+
+        filters = { ...filters, user_type: 'EMPLOYEE' };
+        console.log(filters);
+
+        const response = await super.get(filters, skip, take);
 
 		return {
 			...response,

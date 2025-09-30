@@ -1,11 +1,15 @@
-import { FastifyInstance } from "fastify";
+import type { fastifyTypedInstance } from '../types/types.ts';
 import { UserController } from "../controller/User.controller.ts";
 
-export function userRoute(fastify: FastifyInstance) {
+export function userRoute(fastify: fastifyTypedInstance) {
     const userController = new UserController();
-    fastify.get('/user', userController.get);
+    fastify.get('/', {schema: {
+        tags: ['User']
+    }}, userController.get);
 
-    fastify.get('/user/:id/profile', userController.getInfo);
+    fastify.post('/search', userController.get);
 
-    fastify.put('/user/:id/status', userController.changeStatus);
+    fastify.get('/:id/profile', userController.getInfo);
+
+    fastify.put('/:id/status', userController.changeStatus);
 }

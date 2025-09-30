@@ -41,10 +41,15 @@ export class CustomerService extends UserService {
 		return user;
 	}
 
-	async get(params: TypeGetUserProps, cursor?: string, take: number = 10) {
-		console.log(params, cursor, take);
-		params.user_type = 'CUSTOMER';
-		const response = await super.get(params, cursor, take);
+
+	async get(filters?: TypeGetUserProps, skip = 0, take = 10) {
+        console.log(filters);
+        console.log("ola");
+        
+        filters = { ...filters, user_type: 'CUSTOMER' };
+        console.log(filters);
+
+		const response = await super.get(filters, skip, take);
 
 		return {
 			...response,
@@ -52,7 +57,7 @@ export class CustomerService extends UserService {
 	}
 
 	async update(id: string, customerData: Partial<IUser>) {
-		const user = (await this.get({ id })) as IUser[];
+		const user = await prisma.user.findUnique({ where: { id } });
 
 		if (!user) {
 			throw new AppError({
@@ -85,7 +90,7 @@ export class CustomerService extends UserService {
 		if (customerData.password_hash) {
 			const isValid = await comparePassword(
 				customerData.password_hash,
-				user[0].password_hash,
+				user.password_hash,
 			);
 			if (!isValid) {
 				throw new AppError({
