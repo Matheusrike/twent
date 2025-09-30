@@ -1,4 +1,5 @@
 'use client'
+
 import BannerImage from "./image";
 import * as React from "react";
 

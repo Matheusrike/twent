@@ -17,7 +17,7 @@ const TextCards = () => {
               {/* Image */}
               <div
                 className="relative overflow-hidden w-full md:basis-7/12 lg:basis-1/2 
-                aspect-[4/2] bg-muted rounded-xl border border-border/50 shadow-md"
+                aspect-[4/2] bg-muted rounded-xl border border-border/50 shadow-m"
               >
                 <Image
                   src={feature.image}
