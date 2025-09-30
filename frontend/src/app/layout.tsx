@@ -5,21 +5,21 @@ import DarkModeProvider from "./themeProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 
-// Fonte Principal (Sans) - Moderna e legível
+
 const notoSansAdlam = Noto_Sans_Adlam({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-sans",
 });
 
-// Fonte Serifada (Secundária) - Clássica e institucional
+
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-serif",
 });
 
-// Fonte Monoespaçada - Dados técnicos e tabelas
+
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   }
 };
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -45,7 +47,7 @@ export default function RootLayout({
       <body className="bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 dark:from-zinc-700 dark:via-zinc-800 dark:to-zinc-900 "
       style={{ marginRight: "0px" }}>
         <Navbar />
-        <DarkModeProvider/>
+        <DarkModeProvider />
         {children}
         <Footer />
       </body>

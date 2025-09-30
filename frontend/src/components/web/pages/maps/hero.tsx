@@ -1,46 +1,68 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowUpRight, CirclePlay } from "lucide-react";
-import Link from "next/link";
+"use client";
+
 import React from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import * as L from "leaflet";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import ReactDOMServer from "react-dom/server";
+import { Button } from "../../Global/ui/button";
 
 const MapsHero = () => {
+  const position: [number, number] = [-23.5686379, -46.4789122];
+
+  const customIcon = L.divIcon({
+    className: "custom-div-icon",
+    html: ReactDOMServer.renderToString(
+      <FaMapMarkerAlt size={32} color="#ff0000" />
+    ),
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="max-w-(--breakpoint-xl) w-full mx-auto grid lg:grid-cols-2 gap-12 px-6 py-12 lg:py-0">
-        <div className="my-auto">
-          <Badge
-            variant="secondary"
-            className="rounded-full py-1 border-border"
-            asChild
-          >
-            <Link href="#">
-              Just released v1.0.0 <ArrowUpRight className="ml-1 size-4" />
-            </Link>
-          </Badge>
-          <h1 className="mt-6 max-w-[17ch] text-4xl md:text-5xl lg:text-[2.75rem] xl:text-[3.25rem] font-semibold leading-[1.2]! tracking-tighter">
-            Customized Shadcn UI Blocks & Components
-          </h1>
-          <p className="mt-6 max-w-[60ch] text-lg">
-            Explore a collection of Shadcn UI blocks and components, ready to
-            preview and copy. Streamline your development workflow with
-            easy-to-implement examples.
-          </p>
-          <div className="mt-12 flex items-center gap-4">
-            <Button size="lg" className="rounded-full text-base">
-              Get Started <ArrowUpRight className="h-5! w-5!" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="rounded-full text-base shadow-none"
-            >
-              <CirclePlay className="h-5! w-5!" /> Watch Demo
-            </Button>
-          </div>
+    <div className="w-full h-screen flex relative">
+      {/* side bar */}
+      <div className=" w-1/5 z-20 bg-background lg:flex flex-col hidden">
+        <div>
+
         </div>
-        <div className="w-full aspect-video lg:aspect-auto lg:w-[1000px] lg:h-screen bg-accent rounded-xl lg:rounded-none" />
+
+        <div>
+
+        </div>
+
       </div>
+      {/* map container */}
+      <div className="w-full lg:w-4/5 h-full z-10 relative">
+        <MapContainer
+          center={position}
+          zoom={4.5}
+          scrollWheelZoom={true}
+          className="w-full h-full"
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker position={position} icon={customIcon}>
+            <Popup>
+              <h1 className="font-semibold uppercase text-sm">Casa do soalheiro</h1>
+            </Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+
+      {/*  mobile button */}
+      <Button
+        variant="standartButton"
+        size="mapButton"
+        className="flex md:hidden fixed bottom-10 left-1/2 -translate-x-1/2 z-50"
+      >
+        Lista
+      </Button>
+
+
     </div>
   );
 };

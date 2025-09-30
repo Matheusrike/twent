@@ -4,6 +4,8 @@ import { NavigationSheet } from "./navigation-sheet";
 import DropdownLanguageSelector from "./dropdownLanguageSelector";
 import { Input } from './input';
 import Link from "next/link";
+import { Button } from "../ui/button";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 
 
@@ -18,8 +20,13 @@ const Navbar = () => {
             {/* Menu */}
             <NavigationSheet />
 
-            {/* search input */}
-            <Input type="text" placeholder="Pesquisar" />
+            {/* maps */}
+            <Link href="/maps" className="hidden md:flex">
+              <Button variant="languageButton" size="languageButton">
+                <FaMapMarkerAlt className="text-primary dark:text-white" />
+                <h1>Distribuidores Oficiais</h1> 
+              </Button>
+            </Link>
           </div>
 
           {/*  Logo */}

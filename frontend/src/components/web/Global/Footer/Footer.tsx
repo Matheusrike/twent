@@ -1,8 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "./logo";
 import footerData from "./json/footerData.json";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+  const pathname = usePathname(); 
+  const noFooterRoutes = ["/maps"];
+  const showFooter = !noFooterRoutes.includes(pathname);
+
+  if (!showFooter) return null;
+
   return (
     <footer className="bg-background text-gray-300 pt-12 pb-8">
       <div className="max-w-(--breakpoint-xl) mx-auto px-6 xl:px-0 flex flex-col items-center text-center">
@@ -22,9 +31,15 @@ const Footer = () => {
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 w-full text-left text-black dark:text-white items-stretch h-auto">
           {footerData.sections.map((section, i) => (
             <div key={i} className="space-y-3 h-full flex flex-col">
-              <h3 className="font-bold uppercase text-sm mb-4 ">{section.title}</h3>
+              <h3 className="font-bold uppercase text-sm mb-4 ">
+                {section.title}
+              </h3>
               <div
-                className={`flex-1 ${section.items.length >= 4 ? "lg:grid lg:grid-cols-2 lg:gap-0 gap-2" : "space-y-1"} font-semibold text-muted-foreground`}
+                className={`flex-1 ${
+                  section.items.length >= 4
+                    ? "lg:grid lg:grid-cols-2 lg:gap-0 gap-2"
+                    : "space-y-1"
+                } font-semibold text-muted-foreground`}
               >
                 {section.items.map((item, j) => (
                   <Link
@@ -37,7 +52,6 @@ const Footer = () => {
                   </Link>
                 ))}
               </div>
-
             </div>
           ))}
         </div>

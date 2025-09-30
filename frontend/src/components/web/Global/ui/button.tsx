@@ -64,7 +64,9 @@ const buttonVariants = cva(
         before:-z-10 before:aspect-square 
         before:hover:scale-150 before:hover:duration-700 
         dark:before:bg-[var(--dark-hover)]
-      `
+      `,
+        // map mobile button
+        mapButton: "bg-primary text-white cursor-pointer",
 
 
       },
@@ -82,7 +84,9 @@ const buttonVariants = cva(
         h-10 rounded-md px-6 has-[>svg]:px-4 
         w-full mt-10 
         sm:w-auto sm:mt-0
-      `
+        
+      `,
+      mapButton: "h-8 rounded-md px-6 has-[>svg]:px-3",
 
       },
     },

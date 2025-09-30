@@ -96,7 +96,7 @@ export function CompanyPortal() {
   return (
     <div className="mx-auto px-6 lg:px-20 p-5 flex flex-col w-full items-center">
       {/* Header */}
-      <header className="w-full max-w-7xl mb-10  text-center lg:text-left">
+      <header className="w-full max-w-7xl mb-10  text-center lg:text-left  ">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-primary dark:text-white mb-10 tracking-tight leading-tight">
           {CONTENT.header.title.split(" ")[0]} <br /> 
           {CONTENT.header.title.split(" ")[1]}
