@@ -47,12 +47,14 @@ const valuesCards = () => {
                     value={`item-${index}`}
                     className="group/accordion-item data-[state=open]:border-b-2 data-[state=open]:border-primary dark:border-gray-700"
                   >
-                    <AccordionTrigger className="text-lg [&>svg]:hidden group-first/accordion-item:pt-0">
-                      <div className="flex items-center gap-4 dark:text-white">
+
+                    <AccordionTrigger className="text-lg [&>svg]:hidden group-first/accordion-item:pt-0 hover:no-underline">
+                      <div className="flex items-center gap-4 transition-all duration-200 hover:text-xl dark:text-white">
                         {IconComponent && <IconComponent size={24} />}
                         {title}
                       </div>
                     </AccordionTrigger>
+
                     <AccordionContent className="text-[17px] leading-relaxed text-muted-foreground dark:text-gray-200">
                       {description}
                       <div className="mt-6 mb-2 md:hidden aspect-video w-full bg-muted rounded-xl" />
@@ -64,7 +66,7 @@ const valuesCards = () => {
           </div>
 
           {/* Media */}
-          <div className="relative overflow-hidden w-full md:basis-7/12 lg:basis-1/2 
+          <div className="relative overflow-hidden w-full h-full md:basis-7/12 lg:basis-1/2 
                 aspect-[4/2] bg-muted rounded-xl border border-border/50 shadow-m">
             <img
               src="/img/about/aboutImgValue.png"

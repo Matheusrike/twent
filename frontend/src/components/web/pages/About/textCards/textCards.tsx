@@ -8,11 +8,14 @@ const TextCards = () => {
   return (
     <div className="min-h-screen flex container">
       <div className="w-full py-10 px-6 flex flex-col justify-between">
+            <div>
+              <h2 className="text-5xl md:text-6xl lg:text-6xl font-semibold text-primary mb-8 tracking-tight dark:text-white">Conheça a Twent </h2>
+            </div>
         <div className="mt-8 w-full mx-auto space-y-20 flex flex-col">
           {textCardsData.map((feature, i) => (
             <div
-              key={i}
-              className="flex flex-col lg:flex-row items-center gap-y-6 gap-x-15 w-full lg:even:flex-row-reverse"
+            key={i}
+            className="flex flex-col lg:flex-row items-center gap-y-6 gap-x-15 w-full lg:even:flex-row-reverse"
             >
               {/* Image */}
               <div
