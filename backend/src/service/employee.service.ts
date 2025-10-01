@@ -124,16 +124,58 @@ export class EmployeeService extends UserService {
 		return employee;
 	}
 
-	async get(filters?: TypeGetUserProps, skip = 0, take = 10) {
-        console.log(filters);
+	async get(filters: TypeGetUserProps, skip = 0, take = 10) {
+		filters.user_type = 'EMPLOYEE';
 
-        filters = { ...filters, user_type: 'EMPLOYEE' };
-        console.log(filters);
-
-        const response = await super.get(filters, skip, take);
+		const response = await super.get(filters, skip, take);
 
 		return {
 			...response,
 		};
+	}
+
+    //TODO: make the update work properly
+	async update(id: string, employeeData: Partial<IEmployeeProps>) {
+		const user = await prisma.user.findUnique({ where: { id } });
+
+		if (!user) {
+			throw new AppError({
+				message: 'Usuário não encontrado',
+				errorCode: 'NOT_FOUND',
+			});
+		}
+
+		if (
+			employeeData.country ||
+			employeeData.state ||
+			employeeData.city ||
+			employeeData.street ||
+			employeeData.district ||
+			employeeData.zip_code
+		) {
+			await validateLocation({
+				country: employeeData.country,
+				state: employeeData.state,
+				city: employeeData.city,
+				road: employeeData.street,
+				district: employeeData.district,
+				postalcode: employeeData.zip_code,
+			});
+		}
+
+		await this.validateUser(
+			employeeData.email,
+			employeeData.document_number,
+		);
+		if (employeeData.password_hash) {
+			employeeData.password_hash = await validatePassword(
+				employeeData.password_hash,
+			);
+		}
+
+		await prisma.user.update({
+			where: { id },
+			data: employeeData,
+		});
 	}
 }

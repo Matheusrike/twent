@@ -7,7 +7,5 @@ export function employeeRoute(fastify: FastifyInstance) {
     fastify.post('/', employeeController.create);
 
     fastify.get('/', employeeController.get);
-    
-    fastify.post('/search', employeeController.get);
 }
 

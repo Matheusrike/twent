@@ -66,30 +66,17 @@ export class CustomerController {
 			}
 		}
 	}
-
-	async get(
+async get(
 		request: FastifyRequest<{
-			Body: { filters?: TypeGetUserProps };
-			Querystring: { skip?: number; take?: number };
+			Querystring: TypeGetUserProps;
 		}>,
 		reply: FastifyReply,
 	) {
 		try {
-			if (!request.body) {
-				const response = await this.service.get();
-				return reply.status(200).send(
-					new ApiResponse({
-						statusCode: 200,
-						success: true,
-						message: 'Informações dos usuários encontradas',
-						data: response,
-					}),
-				);
-			}
 
-			const { filters = {} } = request.body;
+			const {skip, take, ...filters} = request.query;
 
-			const { skip = 0, take = 10 } = request.query;
+            console.log(filters, skip, take);
 
 			const response = await this.service.get(filters, skip, take);
 

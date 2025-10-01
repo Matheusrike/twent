@@ -42,12 +42,8 @@ export class CustomerService extends UserService {
 	}
 
 
-	async get(filters?: TypeGetUserProps, skip = 0, take = 10) {
-        console.log(filters);
-        console.log("ola");
-        
-        filters = { ...filters, user_type: 'CUSTOMER' };
-        console.log(filters);
+	async get(filters: TypeGetUserProps, skip = 0, take = 10) {
+        filters.user_type = 'CUSTOMER'
 
 		const response = await super.get(filters, skip, take);
 

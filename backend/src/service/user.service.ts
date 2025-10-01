@@ -29,12 +29,13 @@ export class UserService {
 		return true;
 	}
 
-	async get(params?: TypeGetUserProps, skip = 0, take = 10, id?: string) {
-		console.log(params);
+	async get(params?:TypeGetUserProps, skip = 0, take = 10, id?: string) {
+        console.log(params);
+        
 
 		let response;
 
-		if (params?.user_type == 'EMPLOYEE') {
+		if (params?.user_type === 'EMPLOYEE') {
 			response = await prisma.user.findMany({
 				cursor: id ? { id } : undefined,
 				take: Number(take),
@@ -109,7 +110,7 @@ export class UserService {
 		const hasNextPage = response.length > take!;
 		const data = hasNextPage ? response.slice(0, -1) : response;
 		const nextCursor = hasNextPage ? data[data.length - 1].id : null;
-		const total = await prisma.user.count({ where: params });
+		const total = await prisma.user.count({ where: params});
 
 		return {
 			...response,
@@ -137,7 +138,11 @@ export class UserService {
 	}
 
 	async changeStatus(id: string, newStatus: boolean) {
-		const user = await this.get({ id });
+		const user = await this.get({
+			query: {
+				id,
+			},
+		});
 		if (!user) {
 			throw new AppError({
 				message: 'Usuário não encontrado',

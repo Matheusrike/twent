@@ -1,5 +1,5 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { UserType } from '../../prisma/generated/prisma/index.js';
+import { Prisma, UserType } from '../../prisma/generated/prisma/index.js';
 export interface IUser {
 	email: string;
 	password_hash: string;
@@ -18,7 +18,8 @@ export interface IUser {
 	country?: string;
 }
 
-export type TypeGetUserProps = {
+export type TypeGetUserProps = Prisma.UserWhereInput & {
+	query: {
 		store_id?: string;
 		first_name?: string;
 		last_name?: string;
@@ -32,6 +33,9 @@ export type TypeGetUserProps = {
 		city?: string;
 		state?: string;
 		user_type?: UserType;
+	};
+	skip?: number;
+	take?: number;
 };
 
 export interface IEmployeeProps extends IUser {
