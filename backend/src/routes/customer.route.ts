@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { CustomerController } from '../controller/Customer.controller.ts';
+import { CustomerController } from '../controllers/Customer.controller.ts';
 
 const customerController = new CustomerController();
 
@@ -9,5 +9,4 @@ export function customerRoute(fastify: FastifyInstance) {
 	fastify.post('/', customerController.create);
 
 	fastify.put('/:id', customerController.update);
-
 }

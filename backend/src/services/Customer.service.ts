@@ -2,7 +2,7 @@ import { validateLocation } from '../helpers/validate-location.helper.ts';
 import prisma from '../../prisma/client.ts';
 import { TypeGetUserProps, IUser } from '../types/users.types.ts';
 import { AppError } from '../utils/errors.util.ts';
-import { UserService } from './user.service.ts';
+import { UserService } from './User.service.ts';
 import { comparePassword, validatePassword } from '../utils/password.util.ts';
 
 export class CustomerService extends UserService {
@@ -41,9 +41,8 @@ export class CustomerService extends UserService {
 		return user;
 	}
 
-
 	async get(filters: TypeGetUserProps, skip = 0, take = 10) {
-        filters.user_type = 'CUSTOMER'
+		filters.user_type = 'CUSTOMER';
 
 		const response = await super.get(filters, skip, take);
 

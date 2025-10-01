@@ -3,7 +3,7 @@ import prisma from '../../prisma/client.ts';
 import { validateLocation } from '../helpers/validate-location.helper.ts';
 import { IEmployeeProps, TypeGetUserProps } from '../types/users.types.ts';
 import { validatePassword } from '../utils/password.util.ts';
-import { UserService } from './user.service.ts';
+import { UserService } from './User.service.ts';
 import { AppError } from '../utils/errors.util.ts';
 
 export class EmployeeService extends UserService {
@@ -134,7 +134,7 @@ export class EmployeeService extends UserService {
 		};
 	}
 
-    //TODO: make the update work properly
+	//TODO: make the update work properly
 	async update(id: string, employeeData: Partial<IEmployeeProps>) {
 		const user = await prisma.user.findUnique({ where: { id } });
 
