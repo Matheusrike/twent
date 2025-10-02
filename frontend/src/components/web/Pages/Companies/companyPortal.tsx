@@ -65,7 +65,7 @@ function UnitCard({ unit, isPrimary = false }: UnitCardProps) {
       className="group focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded-2xl block"
       aria-label={`Acessar ${unit.title}`}
     >
-      <Card className="relative overflow-hidden cursor-pointer border border-red-600/30 dark:border-red-500/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 h-full bg-gradient-to-br from-white to-red-50/30 dark:from-gray-900 dark:to-black">
+      <Card className="rounded-2xl  relative overflow-hidden cursor-pointer border border-red-600/30 dark:border-red-500/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 h-full bg-gradient-to-br from-white to-red-50/30 dark:from-gray-900 dark:to-black">
         {/* Subtle gradient overlay */}
         <div
           className="absolute inset-0 bg-gradient-to-br from-red-50/50 dark:from-red-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"
@@ -148,8 +148,6 @@ export function CompanyPortal() {
           <div className="absolute inset-0 bg-black/50" />
 
         </div>
-
-
 
         <div className="relative z-20 max-w-7xl mx-auto px-6 h-full flex items-center">
           <div className="max-w-2xl">

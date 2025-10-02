@@ -93,12 +93,12 @@ const MainContainer: React.FC = () => {
               <div className="group bg-white dark:bg-background border border-gray-200/50 dark:border-white/5 hover:border-primary dark:hover:border-primary transition-all duration-500 overflow-hidden rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1">
                 <div className="relative overflow-hidden">
                   <div className="relative w-full h-80">
-                    <Image
+                    {/* <Image
                       src={collection.image}
                       alt={collection.title}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
+                    /> */}
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">

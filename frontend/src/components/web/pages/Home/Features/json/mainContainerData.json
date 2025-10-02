@@ -31,7 +31,7 @@
         "items": [
             {
                 "id": "1",
-                "image": "/img/collection1.png",
+                "image": "",
                 "badge": "SÉRIE CLÁSSICA",
                 "title": "Heritage Elite",
                 "description": "Inspirado pela sofisticação atemporal, combinando design clássico e precisão impecável.",
@@ -39,7 +39,7 @@
             },
             {
                 "id": "2",
-                "image": "/img/collection2.png",
+                "image": "",
                 "badge": "SÉRIE MODERNA",
                 "title": "Avant-Garde Chrono",
                 "description": "Design contemporâneo e inovação tecnológica, perfeito para quem busca destaque e performance.",
@@ -47,7 +47,7 @@
             },
             {
                 "id": "3",
-                "image": "/img/collection3.png",
+                "image": "",
                 "badge": "SÉRIE LUXO",
                 "title": "Prestige Royale",
                 "description": "Um relógio de luxo que exala elegância e exclusividade, ideal para ocasiões especiais.",
