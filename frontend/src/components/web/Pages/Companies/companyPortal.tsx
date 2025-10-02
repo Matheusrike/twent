@@ -133,16 +133,22 @@ export function CompanyPortal() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[600px] overflow-hidden">
+      <section className="relative h-screen overflow-hidden">
         <div className="absolute inset-0  z-10" />
+        <div className="">
+          <Image
+            src="/img/web/companies/companiesBanner.png"
+            alt="Portal empresarial"
+            fill
+            className="object-cover"
+            priority
+          />
 
-        <Image
-          src="/img/web/companies/companiesBanner.png"
-          alt="Portal empresarial"
-          fill
-          className="absolute inset-0 w-full h-full object-cover"
-          priority
-        />
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/50" />
+
+        </div>
+
 
 
         <div className="relative z-20 max-w-7xl mx-auto px-6 h-full flex items-center">

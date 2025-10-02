@@ -21,12 +21,7 @@ const Navbar = () => {
             <NavigationSheet />
 
             {/* maps */}
-            <Link href="/maps" className="hidden md:flex">
-              <Button variant="languageButton" size="languageButton">
-                <FaMapMarkerAlt className="text-primary dark:text-white" />
-                <h1>Distribuidores Oficiais</h1> 
-              </Button>
-            </Link>
+            
           </div>
 
           {/*  Logo */}

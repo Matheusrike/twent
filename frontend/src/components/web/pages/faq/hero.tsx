@@ -40,10 +40,10 @@ const FaqHero: React.FC = () => {
   const { hero, items } = faqData
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full">
       {/* Hero Section */}
       <section className="relative w-full h-screen overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent z-10" />
+      
         <Image
           src="/img/web/faq/banner.png"
           alt="FAQ Hero"
@@ -53,21 +53,30 @@ const FaqHero: React.FC = () => {
         />
 
 
-        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-20 h-full flex items-center ">
-          <div className="max-w-2xl ">
+        <div className="absolute inset-0 bg-black/50" />
+
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20 h-full flex items-center">
+          <div className="max-w-2xl">
             <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
-              {hero.title.split(' ')[0]} <span className="text-primary">{hero.title.split(' ').slice(1).join(' ')}</span>
+              {hero.title.split(' ')[0]}{" "}
+              <span className="text-primary">
+                {hero.title.split(' ').slice(1).join(" ")}
+              </span>
             </h1>
             <p className="text-xl text-gray-300 mb-8 leading-relaxed">
               {hero.description}
             </p>
             <div className="flex items-center space-x-4">
               <div className="w-16 h-0.5 bg-primary" />
-              <span className="text-primary font-medium tracking-wider">{hero.subtitle}</span>
+              <span className="text-primary font-medium tracking-wider">
+                {hero.subtitle}
+              </span>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* FAQ Grid Section */}
       <section className="py-24 px-6 lg:px-20">
