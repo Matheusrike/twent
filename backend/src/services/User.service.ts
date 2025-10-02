@@ -30,8 +30,6 @@ export class UserService {
 	}
 
 	async get(params?:TypeGetUserProps, skip = 0, take = 10, id?: string) {
-        console.log(params);
-        
 
 		let response;
 
@@ -150,7 +148,6 @@ export class UserService {
 			});
 		}
 
-		console.log(user.pop()?.is_active);
 
 		if (newStatus === user.pop()?.is_active) {
 			throw new AppError({

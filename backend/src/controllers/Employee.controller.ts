@@ -1,8 +1,12 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { EmployeeSchema } from '../schemas/user.schema.ts';
+import { EmployeeSchema, UserSchema } from '../schemas/user.schema.ts';
 import { HttpError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
-import { IEmployeeProps, TypeGetUserProps } from '../types/users.types.ts';
+import {
+	IEmployeeProps,
+	IUser,
+	TypeGetUserProps,
+} from '../types/users.types.ts';
 import { EmployeeService } from '../services/Employee.service.ts';
 
 const employeeService = new EmployeeService();
@@ -14,25 +18,29 @@ export class EmployeeController {
 
 		this.create = this.create.bind(this);
 		this.get = this.get.bind(this);
+		this.update = this.update.bind(this);
 	}
 	async create(
 		request: FastifyRequest<{
-			Body: { employeeData: IEmployeeProps };
+			Body: { userData: IUser; employeeData: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
 		}>,
 		reply: FastifyReply,
 	) {
 		try {
-			const parsedData = EmployeeSchema.safeParse(
+			const parsedUserData = UserSchema.safeParse(request.body.userData);
+
+			const parsedEmployeeData = EmployeeSchema.safeParse(
 				request.body.employeeData,
 			);
 
-			if (!parsedData.success) {
+			if (!parsedUserData.success || !parsedEmployeeData.success) {
 				return new HttpError({
 					message: 'Dados enviados incorretos',
 					statusCode: 400,
 				});
 			}
+
 			const roleName = request.headers['x-role-name'];
 			const storeCode = request.headers['x-store-code'];
 			if (!roleName) {
@@ -47,7 +55,12 @@ export class EmployeeController {
 					statusCode: 400,
 				});
 			}
-			await this.service.create(parsedData.data!, roleName, storeCode);
+			await this.service.create(
+				parsedUserData.data,
+				parsedEmployeeData.data,
+				roleName,
+				storeCode,
+			);
 			reply.status(201).send(
 				new ApiResponse({
 					statusCode: 201,
@@ -99,8 +112,6 @@ export class EmployeeController {
 		try {
 			const { skip, take, ...filters } = request.query;
 
-			console.log(filters, skip, take);
-
 			const response = await this.service.get(filters, skip, take);
 
 			return reply.status(200).send(
@@ -127,6 +138,80 @@ export class EmployeeController {
 					console.error(error);
 					return new HttpError({
 						message: error?.message ?? 'Erro interno',
+						statusCode: 500,
+					});
+			}
+		}
+	}
+
+	async update(
+		request: FastifyRequest<{
+			Params: { id: string };
+			Body: { userData: IUser; employeeData: IEmployeeProps };
+			Headers: { 'x-role-name': string; 'x-store-code': string };
+		}>,
+		reply: FastifyReply,
+	) {
+		try {
+            
+			const id = request.params['id'];
+            
+            
+			const parsedUserData = UserSchema.partial().parse(
+				request.body.userData,
+			);
+            
+			const parsedEmployeeData = EmployeeSchema.partial().parse(
+				request.body.employeeData,
+			);
+            
+
+			const roleName = request.headers['x-role-name'];
+			const storeCode = request.headers['x-store-code'];
+
+			await this.service.update(
+				id,
+				parsedUserData,
+				parsedEmployeeData,
+				roleName,
+				storeCode,
+			);
+			reply.status(200).send({ message: 'Usuário atualizado' });
+		} catch (error) {
+			switch (error.errorCode) {
+				case 'NOT_FOUND':
+					return new HttpError({
+						message: error.message,
+						statusCode: 404,
+					});
+				case 'UNAUTHORIZED':
+					return new HttpError({
+						message: error.message,
+						statusCode: 401,
+					});
+				case 'BAD_REQUEST':
+					return new HttpError({
+						message: error.message,
+						statusCode: 400,
+					});
+				case 'CONFLICT':
+					return new HttpError({
+						message: error.message,
+						statusCode: 409,
+					});
+				case 'BAD_GATEWAY':
+					return new HttpError({
+						message: error.message,
+						statusCode: 502,
+					});
+				case 'GATEWAY_TIMEOUT':
+					return new HttpError({
+						message: error.message,
+						statusCode: 504,
+					});
+				default:
+					return new HttpError({
+						message: error.message,
 						statusCode: 500,
 					});
 			}

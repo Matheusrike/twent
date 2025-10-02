@@ -23,18 +23,15 @@ export const UserSchema = z.object({
 	is_active: z.boolean().optional(),
 });
 
-export const EmployeePropsSchema = z.object({
+export const EmployeeSchema = z.object({
 	national_id: z.string().optional(),
-	position: z.string(),
 	department: z.string().optional(),
 	salary: z
 		.union([z.string(), z.number()])
 		.transform((val) => new Decimal(val)),
-	currency: z.string(),
+	currency: z.string().optional(),
 	benefits: z.any().optional(),
 	termination_date: z.date().optional(),
 	emergency_contact: z.any().optional(),
 	is_active: z.boolean().optional(),
 });
-
-export const EmployeeSchema = UserSchema.merge(EmployeePropsSchema);

@@ -1,7 +1,11 @@
 import { Prisma } from '@prisma/client/extension';
 import prisma from '../../prisma/client.ts';
 import { validateLocation } from '../helpers/validate-location.helper.ts';
-import { IEmployeeProps, TypeGetUserProps } from '../types/users.types.ts';
+import {
+	IEmployeeProps,
+	IUser,
+	TypeGetUserProps,
+} from '../types/users.types.ts';
 import { validatePassword } from '../utils/password.util.ts';
 import { UserService } from './User.service.ts';
 import { AppError } from '../utils/errors.util.ts';
@@ -29,27 +33,23 @@ export class EmployeeService extends UserService {
 	}
 
 	async create(
+		userData: IUser,
 		employeeData: IEmployeeProps,
 		roleName: string,
 		storeCode: string,
 	) {
 		let response = {};
-		await this.validateUser(
-			employeeData.email,
-			employeeData.document_number,
-		);
+		await this.validateUser(userData?.email, userData?.document_number);
 
-		employeeData.password_hash = await validatePassword(
-			employeeData.password_hash,
-		);
+		userData.password_hash = await validatePassword(userData.password_hash);
 
 		await validateLocation({
-			country: employeeData.country,
-			state: employeeData.state,
-			city: employeeData.city,
-			road: employeeData.street,
-			district: employeeData.district,
-			postalcode: employeeData.zip_code,
+			country: userData?.country,
+			state: userData?.state,
+			city: userData?.city,
+			road: userData?.street,
+			district: userData?.district,
+			postalcode: userData?.zip_code,
 		});
 
 		const employee = await prisma.$transaction(async (tx) => {
@@ -73,22 +73,9 @@ export class EmployeeService extends UserService {
 			}
 			const user = await tx.user.create({
 				data: {
-					email: employeeData.email,
-					password_hash: employeeData.password_hash,
-					first_name: employeeData.first_name,
-					last_name: employeeData.last_name,
-					phone: employeeData.phone,
-					user_type: 'EMPLOYEE',
-					document_number: employeeData.document_number,
-					street: employeeData.street,
-					number: employeeData.number,
-					city: employeeData.city,
-					state: employeeData.state,
-					country: employeeData.country,
-					zip_code: employeeData.zip_code,
-					birth_date: employeeData.birth_date,
-					district: employeeData.district,
+					...userData,
 					is_active: true,
+					user_type: 'EMPLOYEE',
 					store_id: store.id,
 				},
 			});
@@ -101,14 +88,11 @@ export class EmployeeService extends UserService {
 
 			response = await tx.employee.create({
 				data: {
-					employee_code,
+					...employeeData,
 					user_id: user.id,
-					position: employeeData.position,
-					department: employeeData.department,
-					salary: employeeData.salary,
-					currency: employeeData.currency,
-					benefits: employeeData.benefits,
-					emergency_contact: employeeData.emergency_contact,
+					position: employeeData.position || '',
+					salary: employeeData.salary || 0.0,
+					employee_code,
 					hire_date: new Date(),
 					is_active: true,
 				},
@@ -134,8 +118,14 @@ export class EmployeeService extends UserService {
 		};
 	}
 
-	//TODO: make the update work properly
-	async update(id: string, employeeData: Partial<IEmployeeProps>) {
+	async update(
+		id: string,
+		userData?: Partial<IUser>,
+		employeeData?: Partial<IEmployeeProps>,
+		roleName?: string,
+		storeCode?: string,
+	) {
+        
 		const user = await prisma.user.findUnique({ where: { id } });
 
 		if (!user) {
@@ -146,36 +136,62 @@ export class EmployeeService extends UserService {
 		}
 
 		if (
-			employeeData.country ||
-			employeeData.state ||
-			employeeData.city ||
-			employeeData.street ||
-			employeeData.district ||
-			employeeData.zip_code
+			userData?.country ||
+			userData?.state ||
+			userData?.city ||
+			userData?.street ||
+			userData?.district ||
+			userData?.zip_code
 		) {
 			await validateLocation({
-				country: employeeData.country,
-				state: employeeData.state,
-				city: employeeData.city,
-				road: employeeData.street,
-				district: employeeData.district,
-				postalcode: employeeData.zip_code,
+				country: userData?.country,
+				state: userData?.state,
+				city: userData?.city,
+				road: userData?.street,
+				district: userData?.district,
+				postalcode: userData?.zip_code,
 			});
 		}
 
-		await this.validateUser(
-			employeeData.email,
-			employeeData.document_number,
-		);
-		if (employeeData.password_hash) {
-			employeeData.password_hash = await validatePassword(
-				employeeData.password_hash,
+		await this.validateUser(userData?.email, userData?.document_number);
+		if (userData?.password_hash) {
+			userData.password_hash = await validatePassword(
+				userData?.password_hash,
 			);
 		}
 
-		await prisma.user.update({
-			where: { id },
-			data: employeeData,
+		await prisma.$transaction(async (tx) => {
+			const role = await tx.role.findUnique({
+				where: { name: roleName },
+			});
+			if (!role) {
+				throw new AppError({
+					message: 'Cargo não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			const store = await tx.store.findUnique({
+				where: { code: storeCode },
+			});
+			if (!store) {
+				throw new AppError({
+					message: 'Filial não encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			const user = await tx.user.update({
+				where: { id },
+				data: {
+					...userData,
+				},
+			});
+			await tx.employee.update({
+				where: { user_id: id },
+				data: {
+					...employeeData,
+				},
+			});
+			return user;
 		});
 	}
 }

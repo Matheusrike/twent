@@ -75,8 +75,6 @@ export class CustomerController {
 		try {
 			const { skip, take, ...filters } = request.query;
 
-			console.log(filters, skip, take);
-
 			const response = await this.service.get(filters, skip, take);
 
 			return reply.status(200).send(
