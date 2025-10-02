@@ -43,8 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
-      <body className="bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 dark:from-zinc-700 dark:via-zinc-800 dark:to-zinc-900 "
+    <html lang="pt-br"  className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
+      <body cz-shortcut-listen="true" className="bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 dark:from-zinc-800 dark:via-zinc-900 dark:to-zinc-950 "
       style={{ marginRight: "0px" }}>
         <Navbar />
         <DarkModeProvider />

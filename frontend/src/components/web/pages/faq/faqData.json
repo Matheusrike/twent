@@ -1,47 +1,54 @@
-[
-  {
-    "icon": "Route",
-    "question": "Onde posso comprar relógios TWENT?",
-    "answer": "Os relógios TWENT estão disponíveis exclusivamente em nossas boutiques físicas ao redor do mundo. As vendas não acontecem online, reforçando a exclusividade da experiência de compra."
+{
+  "hero": {
+    "title": "Perguntas Frequentes",
+    "subtitle": "ENCONTRE RESPOSTAS RÁPIDAS",
+    "description": "Respostas rápidas para perguntas comuns sobre nossos produtos e serviços."
   },
-  {
-    "icon": "Truck",
-    "question": "Vocês fazem entregas?",
-    "answer": "Não realizamos entregas. A aquisição dos relógios acontece apenas em nossas boutiques físicas, onde cada cliente vivencia a experiência premium que a TWENT oferece."
-  },
-  {
-    "icon": "BadgeDollarSign",
-    "question": "Quais formas de pagamento são aceitas?",
-    "answer": "Aceitamos apenas pagamentos presenciais em nossas boutiques físicas. As opções incluem cartões de crédito, débito e transferências bancárias, de acordo com cada país."
-  },
-  {
-    "icon": "Undo2",
-    "question": "Qual é a política de devolução da TWENT?",
-    "answer": "Itens adquiridos em nossas boutiques podem ser devolvidos em até 30 dias, desde que estejam em perfeito estado e com a embalagem original. Procure a boutique onde realizou a compra para mais informações."
-  },
-  {
-    "icon": "ShieldCheck",
-    "question": "O que fazer em caso de defeito ou dano?",
-    "answer": "Caso um produto apresente defeito, entre em contato com a boutique onde a compra foi realizada ou procure a assistência técnica autorizada TWENT. Nossa equipe avaliará o caso e providenciará reparo ou substituição conforme necessário."
-  },
-  {
-    "icon": "UserRoundCheck",
-    "question": "Como posso entrar em contato com a TWENT?",
-    "answer": "Você pode entrar em contato com nosso suporte pelo e-mail: noreply.twent@gmail.com. Também pode visitar uma de nossas boutiques para atendimento personalizado."
-  },
-  {
-    "icon": "Route",
-    "question": "Onde a TWENT foi fundada?",
-    "answer": "A TWENT nasceu em Genebra, Suíça, em 1984, criada pelo relojoeiro Adrien Lambert, que uniu tradição relojoeira com inovação contemporânea."
-  },
-  {
-    "icon": "UserRoundCheck",
-    "question": "Qual é o significado do nome TWENT?",
-    "answer": "O nome TWENT remete à passagem do século XX para o XXI, simbolizando a ponte entre tradição e modernidade que define a essência da marca."
-  },
-  {
-    "icon": "ShieldCheck",
-    "question": "Qual é a identidade visual da marca?",
-    "answer": "O logotipo combina o flamingo estilizado em vermelho intenso , símbolo de elegância e exclusividade, com a tipografia clássica em preto profundo, transmitindo sofisticação e autoridade."
-  }
-]
+  "items": [
+    {
+      "icon": "Route",
+      "question": "Onde posso comprar relógios TWENT?",
+      "answer": "Os relógios TWENT estão disponíveis exclusivamente em nossas boutiques físicas ao redor do mundo. As vendas não acontecem online, reforçando a exclusividade da experiência de compra."
+    },
+    {
+      "icon": "Truck",
+      "question": "Vocês fazem entregas?",
+      "answer": "Não realizamos entregas. A aquisição dos relógios acontece apenas em nossas boutiques físicas, onde cada cliente vivencia a experiência premium que a TWENT oferece."
+    },
+    {
+      "icon": "BadgeDollarSign",
+      "question": "Quais formas de pagamento são aceitas?",
+      "answer": "Aceitamos apenas pagamentos presenciais em nossas boutiques físicas. As opções incluem cartões de crédito, débito e transferências bancárias, de acordo com cada país."
+    },
+    {
+      "icon": "Undo2",
+      "question": "Qual é a política de devolução da TWENT?",
+      "answer": "Itens adquiridos em nossas boutiques podem ser devolvidos em até 30 dias, desde que estejam em perfeito estado e com a embalagem original. Procure a boutique onde realizou a compra para mais informações."
+    },
+    {
+      "icon": "ShieldCheck",
+      "question": "O que fazer em caso de defeito ou dano?",
+      "answer": "Caso um produto apresente defeito, entre em contato com a boutique onde a compra foi realizada ou procure a assistência técnica autorizada TWENT. Nossa equipe avaliará o caso e providenciará reparo ou substituição conforme necessário."
+    },
+    {
+      "icon": "UserRoundCheck",
+      "question": "Como posso entrar em contato com a TWENT?",
+      "answer": "Você pode entrar em contato com nosso suporte pelo e-mail: noreply.twent@gmail.com. Também pode visitar uma de nossas boutiques para atendimento personalizado."
+    },
+    {
+      "icon": "Route",
+      "question": "Onde a TWENT foi fundada?",
+      "answer": "A TWENT nasceu em Genebra, Suíça, em 1984, criada pelo relojoeiro Adrien Lambert, que uniu tradição relojoeira com inovação contemporânea."
+    },
+    {
+      "icon": "UserRoundCheck",
+      "question": "Qual é o significado do nome TWENT?",
+      "answer": "O nome TWENT remete à passagem do século XX para o XXI, simbolizando a ponte entre tradição e modernidade que define a essência da marca."
+    },
+    {
+      "icon": "ShieldCheck",
+      "question": "Qual é a identidade visual da marca?",
+      "answer": "O logotipo combina o flamingo estilizado em vermelho intenso, símbolo de elegância e exclusividade, com a tipografia clássica em preto profundo, transmitindo sofisticação e autoridade."
+    }
+  ]
+}

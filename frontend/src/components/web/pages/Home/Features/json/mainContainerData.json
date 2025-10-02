@@ -1,26 +1,58 @@
-[
-    {
-        "title": "Masculino",
-        "href": "/collection?category=masculino"
-    },
-    {
-        "title": "Feminino",
-        "href": "/collection?category=feminino"
-    },
-    {
-        "title": "Esportivo",
-        "href": "/collection?category=esportivo"
-    },
-    {
-        "title": "Luxo",
-        "href": "/collection?category=luxo"
-    },
-    {
-        "title": "Clássico",
-        "href": "/collection?category=classico"
-    },
-    {
-        "title": "Casual",
-        "href": "/collection?category=casual"
+{
+    "categories": [
+        {
+            "title": "Masculino",
+            "href": "/collection?category=masculino"
+        },
+        {
+            "title": "Feminino",
+            "href": "/collection?category=feminino"
+        },
+        {
+            "title": "Esportivo",
+            "href": "/collection?category=esportivo"
+        },
+        {
+            "title": "Luxo",
+            "href": "/collection?category=luxo"
+        },
+        {
+            "title": "Clássico",
+            "href": "/collection?category=classico"
+        },
+        {
+            "title": "Casual",
+            "href": "/collection?category=casual"
+        }
+    ],
+    "collections": {
+        "title": "Coleções Exclusivas",
+        "subtitle": "Cada relógio incorpora elegância que transcende o tempo...",
+        "items": [
+            {
+                "id": "1",
+                "image": "/img/collection1.png",
+                "badge": "SÉRIE CLÁSSICA",
+                "title": "Heritage Elite",
+                "description": "Inspirado pela sofisticação atemporal, combinando design clássico e precisão impecável.",
+                "href": "/collection/heritage-elite"
+            },
+            {
+                "id": "2",
+                "image": "/img/collection2.png",
+                "badge": "SÉRIE MODERNA",
+                "title": "Avant-Garde Chrono",
+                "description": "Design contemporâneo e inovação tecnológica, perfeito para quem busca destaque e performance.",
+                "href": "/collection/avant-garde-chrono"
+            },
+            {
+                "id": "3",
+                "image": "/img/collection3.png",
+                "badge": "SÉRIE LUXO",
+                "title": "Prestige Royale",
+                "description": "Um relógio de luxo que exala elegância e exclusividade, ideal para ocasiões especiais.",
+                "href": "/collection/prestige-royale"
+            }
+        ]
     }
-]
+}

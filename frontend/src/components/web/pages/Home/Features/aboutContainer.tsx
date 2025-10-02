@@ -25,7 +25,7 @@ const AboutContainer: React.FC = () => {
 
 
 
-        {/* info section*/}
+        {/* about section primary*/}
         <div className="flex flex-col lg:flex-row w-full gap-8 lg:gap-16 justify-between items-start lg:items-center">
           {/* Image */}
           <div className="w-full lg:w-1/3 rounded-xl relative overflow-hidden md:flex md:items-center md:justify-center 
@@ -69,7 +69,7 @@ const AboutContainer: React.FC = () => {
 
 
 
-        {/* about section */}
+        {/* about section second */}
         <div className="mt-8 w-full flex flex-col space-y-20">
           {aboutContainerData.about.map((data, i) => (
             <div

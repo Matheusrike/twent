@@ -1,5 +1,4 @@
 'use client'
-
 import BannerImage from "./image";
 import * as React from "react";
 
@@ -8,7 +7,7 @@ const Hero = () => {
     <div
       className="
         relative w-full min-h-screen flex flex-col items-center justify-center
-        bg-[url('/img/about/aboutBanner.png')]
+        bg-[url('/img/web/about/aboutBanner.png')]
         bg-cover bg-center bg-no-repeat
       "
     >

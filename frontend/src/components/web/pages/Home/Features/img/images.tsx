@@ -5,7 +5,7 @@ import Image from 'next/image'
 export default function AboutImage1() {
   return (
     <Image
-      src="/img/home/handWithClock.jpg"
+      src="/img/web/home/handWithClock.jpg"
       width={500}
       height={0}
       alt="Picture of the author"
@@ -17,7 +17,7 @@ export default function AboutImage1() {
 export function AboutImage2() {
   return (
     <Image
-      src="/img/home/genebra.jpg"
+      src="/img/web/home/genebra.jpg"
       width={500}
       height={0}
       alt="Picture of the author"
