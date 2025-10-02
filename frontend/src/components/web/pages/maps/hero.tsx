@@ -7,6 +7,7 @@ import * as L from "leaflet";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import ReactDOMServer from "react-dom/server";
 import { Button } from "../../Global/ui/button";
+import TestimonialCard from "./mapCards";
 
 const MapsHero = () => {
   const position: [number, number] = [-23.5686379, -46.4789122];
@@ -25,14 +26,17 @@ const MapsHero = () => {
       {/* side bar */}
       <div className=" w-1/5 z-20 bg-background lg:flex flex-col hidden">
         <div>
-
+          <h1 className="text-4xl font-semibold text-primary p-6 border-b border-border/50">
+            Mapa
+          </h1>
         </div>
 
         <div>
-
+          <TestimonialCard />
         </div>
 
       </div>
+
       {/* map container */}
       <div className="w-full lg:w-4/5 h-full z-10 relative">
         <MapContainer

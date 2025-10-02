@@ -37,7 +37,7 @@ const valuesCards = () => {
         </h2>
 
         <div className="mt-6 md:mt-10 w-full mx-auto grid md:grid-cols-2 gap-12">
-          <div className="h-[430px] overflow-y-auto">
+          <div className="h-[430px] overflow-y-hidden">
             <Accordion defaultValue="item-0" type="single" className="w-full h-full">
               {features.map(({ title, description, icon }, index) => {
                 const IconComponent = iconMap[icon];
@@ -57,7 +57,7 @@ const valuesCards = () => {
 
                     <AccordionContent className="text-[17px] leading-relaxed text-muted-foreground dark:text-gray-200">
                       {description}
-                      <div className="mt-6 mb-2 md:hidden aspect-video w-full bg-muted rounded-xl" />
+                      
                     </AccordionContent>
                   </AccordionItem>
                 );
@@ -66,14 +66,13 @@ const valuesCards = () => {
           </div>
 
           {/* Media */}
-          <div className="relative overflow-hidden w-full h-full md:basis-7/12 lg:basis-1/2 
-                aspect-[4/2] bg-muted rounded-xl border border-border/50 shadow-m">
+          <div className="relative overflow-hidden w-full h-full md:basis-7/12 lg:basis-1/2 aspect-[4/2] bg-muted rounded-xl border border-border/50 shadow-m">
             <img
               src="/img/web/about/aboutImgValue.png"
               width={"auto"}
               height={"auto"}
-              alt="Descrição da imagem"
-              className="object-cover rounded-xl w-full h-auto"
+              alt="Imagem de valores"
+              className="object-cover rounded-xl w-full h-full"
             />
           </div>
         </div>
