@@ -45,19 +45,22 @@ export default function MapsHero() {
   }, []);
 
   return (
-    <div className="w-full h-screen flex relative">
-      <div className=" w-1/5 z-20 bg-background lg:flex flex-col hidden">
-        <div>
-          <h1 className="text-4xl font-semibold text-primary p-6 border-b border-border/50">
-            Mapa
+    <div className="w-full h-screen flex  fixed">
+      <div className=" w-1/5 z-20  lg:flex flex-col hidden bg-background">
+
+        <div className="flex justify-center items-center flex-col">
+          <h1 className="text-2xl font-semibold text-black m-4 dark:text-white">
+           Resultados Na Área
           </h1>
         </div>
-        <div>
+
+          {/* Cards */}
+        <div className="h-full w-full">
           <TestimonialCard />
         </div>
       </div>
 
-      <div className="w-full lg:w-4/5 h-full z-10 relative">
+      <div className="w-full lg:w-4/5 h-full">
         <MapContainer center={position} zoom={4.5} scrollWheelZoom className="w-full h-full">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
