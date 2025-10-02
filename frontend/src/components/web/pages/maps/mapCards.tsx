@@ -43,7 +43,7 @@ const TestimonialCard = () => {
       {boutiques.map((boutique, i) => (
         <Card
           key={i}
-          className="bg-gray-100 dark:bg-zinc-950 relative w-full h-full max-w-sm shadow-none gap-0 pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          className="bg-gray-100 dark:bg-zinc-900 relative w-full h-full max-w-sm shadow-none gap-0 pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
           <CardHeader className="py-5">
             <div className="flex items-center gap-3">
