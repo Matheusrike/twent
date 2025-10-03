@@ -5,6 +5,7 @@ import { ApiResponse } from '../utils/api-response.util.ts';
 import { customerRoute } from './customer.route.ts';
 import { employeeRoute } from './employee.route.ts';
 import { userRoute } from './user.route.ts';
+import { storeRoute } from './store.route.ts';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.get(
@@ -30,4 +31,5 @@ export async function registerRoutes(app: fastifyTypedInstance) {
     app.register(customerRoute, { prefix: '/customer' });
     app.register(employeeRoute, { prefix: '/employee' });
     app.register(userRoute, { prefix: '/user' });
+    app.register(storeRoute, { prefix: '/store' });
 }

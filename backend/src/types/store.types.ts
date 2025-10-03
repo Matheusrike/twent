@@ -1,3 +1,5 @@
+import { Decimal } from "@prisma/client/runtime/library";
+
 type StoreType = 'BRANCH' | 'HEADQUARTERS';
 
 interface OpeningHours {
@@ -19,8 +21,8 @@ export interface IStoreProps {
 	state: string;
 	zip_code: string;
 	country: string;
-	latitude?: number;
-	longitude?: number;
-	opening_hours: OpeningHours[];
+	latitude?: Decimal;
+	longitude?: Decimal;
+	opening_hours?: OpeningHours[];
 	is_active?: boolean;
 }
