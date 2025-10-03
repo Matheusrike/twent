@@ -1,4 +1,4 @@
-import prisma from '../../prisma/client.ts';
+import prisma from '@prisma/client';
 import countries from 'i18n-iso-countries';
 
 export async function generateStoreCode(countryInAlpha2: string) {

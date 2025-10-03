@@ -5,9 +5,9 @@ import {
 	serializerCompiler,
 } from 'fastify-type-provider-zod';
 
-import { registerPlugins } from './plugins/index.ts';
-import { registerRoutes } from './routes/index.ts';
-import type { IAppConfig } from './types/types.ts';
+import { registerPlugins } from './plugins/index';
+import { registerRoutes } from './routes/index';
+import type { IAppConfig } from './types/types';
 
 export async function createApp(config: IAppConfig) {
 	const app = Fastify().withTypeProvider<ZodTypeProvider>();
