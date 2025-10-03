@@ -1,6 +1,6 @@
 import { configDotenv } from 'dotenv';
 import { z } from 'zod';
-import { IAppConfig } from '../types/types.ts';
+import { IAppConfig } from '../types/types';
 
 configDotenv({ quiet: true });
 

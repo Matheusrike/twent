@@ -2,9 +2,16 @@ export interface IAuthorizationOptions {
 	requiredRoles?: string[];
 }
 
+export interface IJwtProvider {
+	sign(payload: object, options?: Record<string, unknown>): string;
+}
+
 export interface IJwtAuthPayload {
 	id: string;
-	firstName: string;
+	roles: string[];
+}
+
+export interface ILoginInput {
 	email: string;
-	role: string;
+	password: string;
 }
