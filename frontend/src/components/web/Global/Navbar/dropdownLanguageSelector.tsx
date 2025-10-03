@@ -20,7 +20,7 @@ export default function DropdownLanguageSelector() {
         {/* Select language */}
         <Button variant="languageButton" size='languageButton'>
           <FaGlobeAmericas />
-          <h1>Idioma</h1>
+          <h1 className="hidden md:flex">Idioma</h1>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

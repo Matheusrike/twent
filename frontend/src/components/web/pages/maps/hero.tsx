@@ -4,8 +4,20 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { Button } from "../../Global/ui/button";
 import TestimonialCard from "./mapCards";
 import MapView from "./mapsContainer";
+import MapsLoader from "./mapsLoader";
+import React, { useState, useEffect } from "react";
 
 export default function MapsHero() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="w-full h-screen flex fixed">
       {/* Left sidebar - cards list */}
@@ -25,8 +37,12 @@ export default function MapsHero() {
       </div>
 
       {/* Map container */}
-      <div className="w-full lg:w-4/5 h-full">
-        <MapView />
+      <div className="w-full lg:w-4/5 h-full flex items-center justify-center bg-transparent">
+        {loading ? (
+          <MapsLoader />
+        ) : (
+          <MapView />
+        )}
       </div>
 
       {/* Mobile button */}

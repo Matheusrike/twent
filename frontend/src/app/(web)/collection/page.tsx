@@ -1,5 +1,5 @@
 import FiltersSection from "@/components/web/pages/Collection/filter/filter";
-import CollectionHero from "@/components/web/pages/Collection/hero/hero";
+import CollectionHero from "@/components/web/pages/Collection/pagination/hero";
 
 
 
