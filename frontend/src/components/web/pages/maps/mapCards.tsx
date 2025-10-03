@@ -3,6 +3,7 @@ import { MapPin, Phone, Clock } from "lucide-react";
 import React from "react";
 
 const TestimonialCard = () => {
+  // List of boutique locations
   const boutiques = [
     {
       name: "Boutique São Paulo",
@@ -35,16 +36,16 @@ const TestimonialCard = () => {
       },
     },
     
-    
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 flex-col overflow-y-scroll h-full">
+    <div className="grid grid-cols-1 gap-0 p-0">
       {boutiques.map((boutique, i) => (
         <Card
           key={i}
-          className="bg-gray-100 dark:bg-zinc-900 relative w-full h-full max-w-sm shadow-none gap-0 pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          className="bg-gray-100 dark:bg-zinc-900 relative w-full max-w-sm shadow-none pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
+          {/* Card header  */}
           <CardHeader className="py-5">
             <div className="flex items-center gap-3">
               <div>
@@ -60,17 +61,21 @@ const TestimonialCard = () => {
               </div>
             </div>
           </CardHeader>
+
+          {/* Card content  */}
           <CardContent className="relative space-y-3">
+            {/* Phone number */}
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-muted-foreground dark:text-gray-400" />
-              <a 
-                href={`tel:${boutique.phone.replace(/\D/g, '')}`}
+              <a
+                href={`tel:${boutique.phone.replace(/\D/g, "")}`}
                 className="text-[15px] text-muted-foreground dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200 transition-colors"
               >
                 {boutique.phone}
               </a>
             </div>
-            
+
+            {/* Working hours */}
             <div className="flex items-start gap-2">
               <Clock className="w-4 h-4 text-muted-foreground dark:text-gray-400 mt-0.5 flex-shrink-0" />
               <div className="text-[15px] text-muted-foreground dark:text-gray-400 space-y-1">
@@ -84,7 +89,6 @@ const TestimonialCard = () => {
       ))}
     </div>
   );
-  
 };
 
 export default TestimonialCard;

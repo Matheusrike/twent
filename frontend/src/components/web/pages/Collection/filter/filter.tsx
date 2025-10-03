@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Table2, List, X } from "lucide-react";
 import DropdownMenuWithCheckboxes from "./dropdown/dropdown";
+import SearchInput from "./search";
 
 export default function FiltersSection() {
   const [categories, setCategories] = useState<string[]>([]);
@@ -12,18 +13,23 @@ export default function FiltersSection() {
 
   const handleChange =
     (setter: React.Dispatch<React.SetStateAction<string[]>>) =>
-    (option: string, checked: boolean) => {
-      setter((prev) =>
-        checked ? [...prev, option] : prev.filter((o) => o !== option)
-      );
-    };
+      (option: string, checked: boolean) => {
+        setter((prev) =>
+          checked ? [...prev, option] : prev.filter((o) => o !== option)
+        );
+      };
 
   const activeFilters = [...categories, ...prices, ...brands, ...materials];
 
   return (
-    <section id="filters" className=" py-8 ">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="filters" className=" py-8 container ">
+      <div className="max-w-8xl mx-auto px-6">
         <div className="flex flex-wrap items-center justify-between gap-6">
+          {/* search input */}
+          <div className="flex items-center gap-4 w-full">
+            <SearchInput />
+          </div>
+           
           {/* Dropdowns */}
           <div className="flex flex-wrap gap-4">
             <DropdownMenuWithCheckboxes
@@ -52,34 +58,10 @@ export default function FiltersSection() {
             />
           </div>
 
-          {/* View buttons */}
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600">Sort by:</span>
-            <DropdownMenuWithCheckboxes
-              label="Sort"
-              options={[
-                "Featured",
-                "Price: Low to High",
-                "Price: High to Low",
-                "Newest First",
-                "Best Selling",
-              ]}
-              selected={[]} // sort é single, pode adaptar
-              onChange={() => {}}
-            />
 
-            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-              <button className="px-3 py-2 bg-gold text-white">
-                <Table2 className="w-4 h-4" />
-              </button>
-              <button className="px-3 py-2 bg-white text-gray-600 hover:bg-gray-50">
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* Filtros ativos */}
+        {/* active filter */}
         <div className="flex items-center justify-between mt-6">
           <div className="flex flex-wrap gap-2">
             {activeFilters.map((filter) => (
@@ -101,7 +83,7 @@ export default function FiltersSection() {
             ))}
             {activeFilters.length > 0 && (
               <button
-                className="text-gold hover:text-darkgold text-sm font-medium"
+                className="text-muted-foreground hover:text-gray-400 hover:dark:text-muted text-sm font-medium cursor-pointer"
                 onClick={() => {
                   setCategories([]);
                   setPrices([]);

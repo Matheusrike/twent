@@ -2,12 +2,7 @@
 import { Logo } from "./logo";
 import { NavigationSheet } from "./navigation-sheet";
 import DropdownLanguageSelector from "./dropdownLanguageSelector";
-import { Input } from './input';
 import Link from "next/link";
-import { Button } from "../ui/button";
-import { FaMapMarkerAlt } from "react-icons/fa";
-
-
 
 const Navbar = () => {
   return (
@@ -15,13 +10,10 @@ const Navbar = () => {
       <nav className="h-16 bg-background relative">
         <div className="h-full w-full mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-3 items-center">
 
-          {/*Menu And Search */}
+          {/* Set Language */}
           <div className="flex items-center gap-5">
-            {/* Menu */}
-            <NavigationSheet />
+            <DropdownLanguageSelector />
 
-            {/* maps */}
-            
           </div>
 
           {/*  Logo */}
@@ -31,13 +23,10 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/*  Set Language */}
+          {/*Menu And Search */}
           <div className="flex justify-end items-center gap-2">
-            <div className="flex items-center gap-2">
-              <DropdownLanguageSelector />
-            </div>
+            <NavigationSheet />
           </div>
-
         </div>
       </nav>
     </div>

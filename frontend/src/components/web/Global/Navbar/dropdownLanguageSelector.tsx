@@ -8,8 +8,8 @@ import {
 
 // Flag Icons
 import "flag-icons/css/flag-icons.min.css";
-// Lucide Icons
-import { Globe } from "lucide-react";
+// React Icons
+import { FaGlobeAmericas } from "react-icons/fa";
 // Flag data import
 import flagData from './json/languageSelectorData.json' assert { type: "json" };
 
@@ -19,7 +19,7 @@ export default function DropdownLanguageSelector() {
       <DropdownMenuTrigger asChild>
         {/* Select language */}
         <Button variant="languageButton" size='languageButton'>
-          <Globe />
+          <FaGlobeAmericas />
           <h1>Idioma</h1>
         </Button>
       </DropdownMenuTrigger>

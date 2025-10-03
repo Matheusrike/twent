@@ -43,38 +43,43 @@ const FaqHero: React.FC = () => {
     <div className="min-h-screen w-full">
       {/* Hero Section */}
       <section className="relative w-full h-screen overflow-hidden">
-      
+
         <Image
-          src="/img/web/faq/banner.png"
+          src="/img/web/faq/faqBanner.png"
           alt="FAQ Hero"
           fill
           className="object-cover"
           priority
         />
 
-
         <div className="absolute inset-0 bg-black/50" />
 
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20 h-full flex items-center">
+        {/* Text container aligned to left of screen */}
+        <div className="absolute inset-y-0 left-0 z-10 px-6 lg:px-20 flex items-center h-full">
           <div className="max-w-2xl">
-            <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
+            {/* Title */}
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
               {hero.title.split(' ')[0]}{" "}
               <span className="text-primary">
                 {hero.title.split(' ').slice(1).join(" ")}
               </span>
             </h1>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+
+            {/* Description */}
+            <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
               {hero.description}
             </p>
+
+            {/* Subtitle with line */}
             <div className="flex items-center space-x-4">
               <div className="w-16 h-0.5 bg-primary" />
-              <span className="text-primary font-medium tracking-wider">
+              <span className="text-primary font-medium tracking-wider uppercase">
                 {hero.subtitle}
               </span>
             </div>
           </div>
         </div>
+
       </section>
 
 

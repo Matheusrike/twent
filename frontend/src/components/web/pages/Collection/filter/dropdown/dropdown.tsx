@@ -27,7 +27,7 @@ export default function DropdownMenuWithCheckboxes({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center gap-2 bg-background border border-border text-foreground hover:bg-accent dark:bg-black dark:hover:bg-zinc-700">
           {label}
           <ChevronDown className="w-4 h-4" />
         </Button>
