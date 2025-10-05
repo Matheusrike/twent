@@ -1,16 +1,10 @@
-import { Decimal } from "@prisma/client/runtime/library";
+import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma } from '../../prisma/generated/prisma/index.js';
 
 type StoreType = 'BRANCH' | 'HEADQUARTERS';
 
-interface OpeningHours {
-	day: string;
-	open: string;
-	close: string;
-}
-
 export interface IStoreProps {
 	name: string;
-	code: string;
 	type: StoreType;
 	email: string;
 	phone?: string;
@@ -23,6 +17,6 @@ export interface IStoreProps {
 	country: string;
 	latitude?: Decimal;
 	longitude?: Decimal;
-	opening_hours?: OpeningHours[];
+	opening_hours: Prisma.InputJsonValue; // 👈 agora bate com Prisma
 	is_active?: boolean;
 }

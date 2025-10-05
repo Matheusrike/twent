@@ -3,44 +3,38 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { StoreType } from '../../prisma/generated/prisma/index.js';
 
 const storeType = StoreType;
+
+const openingDays = [
+	'Monday',
+	'Tuesday',
+	'Wednesday',
+	'Thursday',
+	'Friday',
+	'Saturday',
+	'Sunday',
+];
 export const StoreSchema = z.object({
-    name: z
-        .string()
-        .max(100, 'Store name must be less than 100 characters'),
-    code: z
-        .string()
-        .max(100, 'Store code must be less than 100 characters')
-        ,
-    type: z.enum(storeType),
-    email: z    
-        .string()
-        .max(100, 'Store email must be less than 100 characters'),
-    phone: z
-        .string()
-        .max(100, 'Store phone must be less than 100 characters')
-        ,
-    street: z
-        .string()
-        .max(100, 'Store street must be less than 100 characters'),
-    number: z
-        .string()
-        .max(100, 'Store number must be less than 100 characters'),
-    district: z
-        .string()
-        .max(100, 'Store district must be less than 100 characters')
-        ,
-    city: z
-        .string()
-        .max(100, 'Store city must be less than 100 characters'),
-    state: z
-        .string()
-        .max(100, 'Store state must be less than 100 characters'),
-    zip_code: z
-        .string()
-        .max(100, 'Store zip code must be less than 100 characters'),
-    country: z
-        .string()
-        .max(100, 'Store country must be less than 100 characters'),
+	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
+	type: z.enum(storeType),
+	email: z.string().max(100, 'E-mail da loja deve ter menos de 100 caracteres'),
+	phone: z.string().max(100, 'Telefone da loja deve ter menos de 100 caracteres'),
+	street: z
+		.string()
+		.max(100, 'Rua da loja deve ter menos de 100 caracteres'),
+	number: z
+		.string()
+		.max(100, 'Número da loja deve ter menos de 100 caracteres'),
+	district: z
+		.string()
+		.max(100, 'Bairro da loja deve ter menos de 100 caracteres'),
+	city: z.string().max(100, 'Cidade da loja deve ter menos de 100 caracteres'),
+	state: z.string().max(100, 'Estado da loja deve ter menos de 100 caracteres'),
+	zip_code: z
+		.string()
+		.max(100, 'CEP da loja deve ter menos de 100 caracteres'),
+	country: z
+		.string()
+		.max(100, 'País da loja deve ter menos de 100 caracteres'),
 	latitude: z
 		.union([z.string(), z.number()])
 		.transform((val) => new Decimal(val)),
@@ -49,18 +43,17 @@ export const StoreSchema = z.object({
 		.transform((val) => new Decimal(val)),
 	opening_hours: z.array(
 		z.object({
-			day: z
-				.string()
-				.max(100, 'Opening hour day must be less than 100 characters')
-				,
+			day: z.enum(openingDays, {error: 'Dia da semana inválido'}),
 			open: z
 				.string()
-				.max(100, 'Opening hour open must be less than 100 characters')
-				,
+				.max(100, 'Hora de abertura deve ter menos de 100 caracteres'),
 			close: z
 				.string()
-				.max(100, 'Opening hour close must be less than 100 characters')
-				,
+				.max(
+					100,
+					'Hora de fechamento deve ter menos de 100 caracteres',
+				),
 		}),
 	),
 });
+

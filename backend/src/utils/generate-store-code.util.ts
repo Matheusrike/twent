@@ -20,5 +20,3 @@ export async function generateStoreCode(countryInAlpha2: string) {
 
 	return `${alpha3}${nextNumber.toString().padStart(3, '0')}`;
 }
-
-console.log(await generateStoreCode('CH'));

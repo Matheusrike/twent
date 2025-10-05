@@ -6,4 +6,6 @@ export function storeRoute(fastify: FastifyInstance) {
     fastify.get('/', storeController.get);
 
     fastify.post('/', storeController.create);
+
+    fastify.put('/:id', storeController.update);
 }
