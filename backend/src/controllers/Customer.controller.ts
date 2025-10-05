@@ -5,19 +5,10 @@ import { HttpError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 import { TypeGetUserProps } from '../types/users.types.ts';
 
-const customerService = new CustomerService();
-
 export class CustomerController {
-	private service: CustomerService;
-	constructor() {
-		this.service = customerService;
+	private service = new CustomerService();
 
-		this.create = this.create.bind(this);
-		this.get = this.get.bind(this);
-		this.update = this.update.bind(this);
-	}
-
-	async create(request: FastifyRequest, reply: FastifyReply) {
+	create = async (request: FastifyRequest, reply: FastifyReply) => {
 		try {
 			const parsed = UserSchema.safeParse(request.body);
 
@@ -65,13 +56,13 @@ export class CustomerController {
 					});
 			}
 		}
-	}
-	async get(
+	};
+	get = async (
 		request: FastifyRequest<{
 			Querystring: TypeGetUserProps;
 		}>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
 			const { skip, take, ...filters } = request.query;
 
@@ -105,12 +96,12 @@ export class CustomerController {
 					});
 			}
 		}
-	}
+	};
 
-	async update(
+	update = async (
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
 			const id = request.params['id'];
 			const parsed = UserSchema.partial().parse(request.body);
@@ -156,5 +147,5 @@ export class CustomerController {
 					});
 			}
 		}
-	}
+	};
 }

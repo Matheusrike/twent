@@ -9,24 +9,15 @@ import {
 } from '../types/users.types.ts';
 import { EmployeeService } from '../services/Employee.service.ts';
 
-const employeeService = new EmployeeService();
-
 export class EmployeeController {
-	private service: EmployeeService;
-	constructor() {
-		this.service = employeeService;
-
-		this.create = this.create.bind(this);
-		this.get = this.get.bind(this);
-		this.update = this.update.bind(this);
-	}
-	async create(
+	private service = new EmployeeService();
+	create = async (
 		request: FastifyRequest<{
 			Body: { userData: IUser; employeeData: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
 		}>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
 			const parsedUserData = UserSchema.safeParse(request.body.userData);
 
@@ -102,13 +93,13 @@ export class EmployeeController {
 					});
 			}
 		}
-	}
-	async get(
+	};
+	get = async (
 		request: FastifyRequest<{
 			Querystring: TypeGetUserProps;
 		}>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
 			const { skip, take, ...filters } = request.query;
 
@@ -142,29 +133,26 @@ export class EmployeeController {
 					});
 			}
 		}
-	}
+	};
 
-	async update(
+	update = async (
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { userData: IUser; employeeData: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
 		}>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
-            
 			const id = request.params['id'];
-            
-            
+
 			const parsedUserData = UserSchema.partial().parse(
 				request.body.userData,
 			);
-            
+
 			const parsedEmployeeData = EmployeeSchema.partial().parse(
 				request.body.employeeData,
 			);
-            
 
 			const roleName = request.headers['x-role-name'];
 			const storeCode = request.headers['x-store-code'];
@@ -216,5 +204,5 @@ export class EmployeeController {
 					});
 			}
 		}
-	}
+	};
 }
