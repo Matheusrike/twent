@@ -2,7 +2,6 @@ import prisma from './client';
 import { Prisma } from '@prisma/client/extension';
 import { UserType } from '@prisma/generated/enums';
 import { IStoreProps } from '../src/types/store.types';
-import { generateStoreCode } from '../src/utils/generate-store-code.util';
 import { hashPassword } from '../src/utils/hash-password.util';
 import { configDotenv } from 'dotenv';
 
@@ -60,7 +59,7 @@ async function rolesSeed(tx: Prisma.TransactionClient) {
 
 async function headquarterSeed(tx: Prisma.TransactionClient) {
 	const headquarter: IStoreProps = {
-		code: await generateStoreCode('CH'),
+		code: 'CHE001',
 		name: 'Twent Headquarter',
 		type: 'HEADQUARTERS',
 		email: 'office@twent.ch',

@@ -90,8 +90,8 @@ model Store {
   name          String
   code          String    @unique
   type          StoreType @default(BRANCH)
-  email         String
-  phone         String?
+  email         String    @unique
+  phone         String?   @unique
   street        String
   number        String
   district      String
