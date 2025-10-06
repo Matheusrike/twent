@@ -43,9 +43,9 @@ export default function SearchInput() {
           {query && (
             <button
               onClick={handleClear}
-              className="p-1 hover:bg-accent rounded-full transition-colors"
+              className="p-1 hover:bg-accent rounded-full transition-colors cursor-pointer"
             >
-              <X className="text-muted-foreground" size={15} />
+              <X className="text-muted-foreground dark:text-white" size={15} />
             </button>
           )}
         </div>
@@ -62,7 +62,7 @@ export default function SearchInput() {
             {suggestions.map((suggestion, idx) => (
               <button
                 key={idx}
-                className="w-full text-left px-3 py-2 text-foreground hover:bg-accent rounded transition-colors flex items-center gap-3"
+                className="w-full text-left px-3 py-2 text-foreground hover:bg-accent rounded transition-colors flex items-center gap-3 z-50"
                 onClick={() => setQuery(suggestion)}
               >
                 <Search size={16} className="text-muted-foreground" />

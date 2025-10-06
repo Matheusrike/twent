@@ -23,7 +23,7 @@ export default function CollectionCard({
 }: CollectionCardProps) {
   return (
     <Link key={id} href={href}>
-      <div className="group bg-white dark:bg-background border border-gray-200/50 dark:border-white/5 hover:border-primary dark:hover:border-primary transition-all duration-500 overflow-hidden rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1">
+      <div className="group bg-white dark:bg-background border border-gray-200/50 dark:border-white/5 hover:border-primary dark:hover:border-primary transition-all duration-500 overflow-hidden rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 hover:z-40 ">
         
         {/* Image wrapper */}
         <div className="relative overflow-hidden">
