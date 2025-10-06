@@ -3,20 +3,13 @@ import { UserService } from '../services/User.service.ts';
 import { HttpError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 
-const userService = new UserService();
 export class UserController {
-	private service: UserService;
-	constructor() {
-		this.service = userService;
+	private service = new UserService();
 
-		this.getInfo = this.getInfo.bind(this);
-		this.changeStatus = this.changeStatus.bind(this);
-	}
-
-	async getInfo(
+	getInfo = async (
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
 			const { id } = request.params;
 			const response = await this.service.getInfo(id);
@@ -42,14 +35,14 @@ export class UserController {
 					});
 			}
 		}
-	}
-	async changeStatus(
+	};
+	changeStatus = async (
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { newStatus: boolean };
 		}>,
 		reply: FastifyReply,
-	) {
+	) => {
 		try {
 			const { id } = request.params;
 			const { newStatus } = request.body;
@@ -89,5 +82,5 @@ export class UserController {
 					});
 			}
 		}
-	}
+	};
 }

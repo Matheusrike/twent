@@ -1,5 +1,5 @@
-import { createApp } from './app.ts';
-import { loadConfig } from './config/env.ts';
+import { createApp } from './app';
+import { loadConfig } from './config/env';
 
 async function startServer() {
 	try {
