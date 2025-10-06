@@ -1,6 +1,6 @@
 "use client";
 
-import CollectionCard from "../card/card";
+import CollectionCard from "../card/CollectionCard";
 import PaginationWithIcon from "./pagination/pagination";
 
 export default function CollectionHero() {

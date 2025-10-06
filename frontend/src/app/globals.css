@@ -1,6 +1,33 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+:root {
+  --darkBody: linear-gradient(
+    to bottom right,
+    #f3f4f6,
+    #e5e7eb,
+    #d1d5db
+  );
+}
+
+.dark {
+  --darkBody: linear-gradient(
+    to bottom right,
+    #27272a,
+    #27272a,
+    #18181b
+  );
+}
+
+body {
+  background: var(--darkBody);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+  transition: background 0.3s ease;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
