@@ -35,6 +35,26 @@ const TestimonialCard = () => {
         sunday: "Domingo: 12h - 20h",
       },
     },
+    {
+      name: "Boutique Brasília",
+      address: "Brasília Shopping, Piso 2 - Asa Norte, Brasília - DF",
+      phone: "+55 (61) 3234-5678",
+      hours: {
+        weekdays: "Segunda a Sexta: 10h - 22h",
+        saturday: "Sábado: 10h - 22h",
+        sunday: "Domingo: 12h - 20h",
+      },
+    },
+    {
+      name: "Boutique Brasília",
+      address: "Brasília Shopping, Piso 2 - Asa Norte, Brasília - DF",
+      phone: "+55 (61) 3234-5678",
+      hours: {
+        weekdays: "Segunda a Sexta: 10h - 22h",
+        saturday: "Sábado: 10h - 22h",
+        sunday: "Domingo: 12h - 20h",
+      },
+    },
     
     
   ];
@@ -44,7 +64,7 @@ const TestimonialCard = () => {
       {boutiques.map((boutique, i) => (
         <Card
           key={i}
-          className="bg-gray-100 dark:bg-zinc-900 relative w-full max-w-sm shadow-none pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          className="bg-gray-100 dark:bg-zinc-900 relative w-full lg:max-w-sm max-w-full shadow-none pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         >
           {/* Card header  */}
           <CardHeader className="py-5">

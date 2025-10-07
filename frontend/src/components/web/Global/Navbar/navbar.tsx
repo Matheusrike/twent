@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 
 const Navbar = () => {
   return (
-    <div className="bg-muted w-full  z-50">
+    <div className="bg-muted w-full z-50">
       <nav className="h-16 bg-background relative">
         <div className="h-full w-full mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-3 items-center">
           {/* left content */}

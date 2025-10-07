@@ -49,7 +49,7 @@ export default function MapView() {
       scrollWheelZoom
       minZoom={3}
       maxZoom={18}
-      className="w-full h-full"
+      className="w-full h-full z-10 lg:z-0"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
