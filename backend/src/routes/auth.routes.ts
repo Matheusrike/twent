@@ -11,9 +11,11 @@ import {
 import prisma from '@prisma/client';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import type { FastifyRequest, FastifyReply } from 'fastify';
+import { ApiResponse } from '@/utils/api-response.util';
 
 export async function authRoutes(app: fastifyTypedInstance) {
 	const authService = new AuthService(prisma, app.jwt);
+	const authController = new AuthController(authService);
 
 	app.post(
 		'/login',
@@ -33,8 +35,17 @@ export async function authRoutes(app: fastifyTypedInstance) {
 			},
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
-			const authController = new AuthController(authService);
-			return await authController.login(request, reply);
+			try {
+				const response = await authController.login(request, reply);
+				return response;
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
 		},
 	);
 
