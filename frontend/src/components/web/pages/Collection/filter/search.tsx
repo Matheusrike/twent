@@ -53,7 +53,7 @@ export default function SearchInput() {
 
       {/* Suggestions Dropdown */}
       {isFocused && !query && (
-        <div className="absolute w-full mt-2 bg-background border border-border rounded-lg shadow-lg">
+        <div className="absolute w-full mt-2 bg-background border border-border rounded-lg shadow-lg z-50">
           <div className="p-2">
             <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground text-sm">
               <TrendingUp size={16} />

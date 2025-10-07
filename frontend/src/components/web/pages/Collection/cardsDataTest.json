@@ -1,0 +1,86 @@
+{
+    "items": [
+      {
+        "id": "1",
+        "href": "/collection/1",
+        "image": "/img/web/collection/luxury.jpg",
+        "title": "Aurum Prestige",
+        "description": "Exclusive watch inspired by timeless elegance.",
+        "badge": "New",
+        "value": 12500
+      },
+      {
+        "id": "2",
+        "href": "/collection/2",
+        "image": "/img/web/collection/sport.jpg",
+        "title": "Vortex Chrono Sport",
+        "description": "High-performance design made for champions.",
+        "badge": "Hot",
+        "value": 8700
+      },
+      {
+        "id": "3",
+        "href": "/collection/3",
+        "image": "/img/web/collection/classic.jpg",
+        "title": "Heritage Classic 1960",
+        "description": "Iconic piece that never goes out of style.",
+        "badge": "Classic",
+        "value": 6400
+      },
+      {
+        "id": "4",
+        "href": "/collection/4",
+        "image": "/img/web/collection/modern.jpg",
+        "title": "Eclipse Modern",
+        "description": "Sleek and bold timepiece for a new generation.",
+        "badge": "Trend",
+        "value": 7200
+      },
+      {
+        "id": "5",
+        "href": "/collection/5",
+        "image": "/img/web/collection/vintage.jpg",
+        "title": "Legacy Vintage 1945",
+        "description": "Inspired by timeless craftsmanship and heritage.",
+        "badge": "Retro",
+        "value": 9300
+      },
+      {
+        "id": "6",
+        "href": "/collection/6",
+        "image": "/img/web/collection/limited.jpg",
+        "title": "Eminence Limited Edition",
+        "description": "Rare design crafted for true connoisseurs.",
+        "badge": "Limited",
+        "value": 15800
+      },
+      {
+        "id": "7",
+        "href": "/collection/7",
+        "image": "/img/web/collection/automatic.jpg",
+        "title": "Axis Automatic",
+        "description": "Precision engineering powered by motion.",
+        "badge": "Auto",
+        "value": 9800
+      },
+      {
+        "id": "8",
+        "href": "/collection/8",
+        "image": "/img/web/collection/chronograph.jpg",
+        "title": "Tempus Chronograph",
+        "description": "Built for accuracy, speed, and timeless appeal.",
+        "badge": "Pro",
+        "value": 11200
+      },
+      {
+        "id": "9",
+        "href": "/collection/9",
+        "image": "/img/web/collection/royal.jpg",
+        "title": "Imperial Royal",
+        "description": "Luxury and legacy combined in every detail.",
+        "badge": "Elite",
+        "value": 18900
+      }
+    ]
+  }
+  

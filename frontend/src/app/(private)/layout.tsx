@@ -1,7 +1,5 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
-import Navbar from "@/components/web/Global/Navbar/navbar";
-import Footer from "@/components/web/Global/Footer/Footer";
-import DarkModeProvider from "../utils/theme/themeProvider";
+import DarkModeProvider from "@/utils/theme/themeProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -27,14 +25,13 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Site Oficial TWENT®",
+  title: "Portal Empresarial TWENT®",
   description: "",
   icons:
   {
     icon: "/img/global/dark/iconDark.svg"
   }
 };
-
 
 
 export default function RootLayout({
@@ -44,12 +41,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br"  className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
-      <body cz-shortcut-listen="true" 
-      style={{ marginRight: "0px" }}>
-        <Navbar />
+      <body cz-shortcut-listen="true" >
         <DarkModeProvider />
         {children}
-        <Footer />
       </body>
     </html>
   );
