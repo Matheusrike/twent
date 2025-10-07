@@ -5,11 +5,11 @@ import { ApiResponse } from '../utils/api-response.util.ts';
 import { StoreSchema } from '../schemas/store.schema.ts';
 
 export class StoreController {
-	private service = new StoreService();
+	constructor(private storeService: StoreService) {}
 
-	get = async (request: FastifyRequest, reply: FastifyReply) => {
+	async get(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const response = await this.service.get();
+			const response = await this.storeService.get();
 
 			return reply.status(200).send(
 				new ApiResponse({
@@ -33,21 +33,21 @@ export class StoreController {
 					});
 			}
 		}
-	};
+	}
 
-	create = async (request: FastifyRequest, reply: FastifyReply) => {
+	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const parsed = StoreSchema.safeParse(request.body);
 
 			if (!parsed.success) {
-				console.log(parsed.error);
 				return new HttpError({
 					message: parsed.error.issues[0].message,
 					statusCode: 400,
 				});
 			}
 
-			await this.service.create(parsed.data!);
+			await this.storeService.create(parsed.data!);
+
 			reply.status(201).send(
 				new ApiResponse({
 					statusCode: 201,
@@ -74,22 +74,25 @@ export class StoreController {
 					});
 			}
 		}
-	};
+	}
 
-	update = (Request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+	async update(
+		Request: FastifyRequest<{ Params: { id: string } }>,
+		reply: FastifyReply,
+	) {
 		try {
-            const id = Request.params['id'];
-            const parsed = StoreSchema.partial().parse(Request.body);
+			const { id } = Request.params;
+			const parsed = StoreSchema.partial().parse(Request.body);
 
-            this.service.update(id, parsed);
+			this.storeService.update(id, parsed);
 
-            reply.status(200).send(
-                new ApiResponse({
-                    statusCode: 200,
-                    success: true,
-                    message: 'Filial atualizada',
-                })
-            )
+			reply.status(200).send(
+				new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Filial atualizada',
+				}),
+			);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
@@ -109,5 +112,5 @@ export class StoreController {
 					});
 			}
 		}
-	};
+	}
 }

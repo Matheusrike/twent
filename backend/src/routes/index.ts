@@ -36,6 +36,7 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 			await app.register(customerRoute, { prefix: '/customer' });
 			await app.register(employeeRoute, { prefix: '/employee' });
 			await app.register(userRoute, { prefix: '/user' });
+            await app.register(storeRoute, { prefix: '/store' });
 		},
 		{ prefix: '/api' },
 	);

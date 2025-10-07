@@ -1,5 +1,5 @@
 import prisma from '../../prisma/client.ts';
-import { IStoreProps } from '../types/store.types.ts';
+import { IStoreProps, TypeGetStoreProps } from '../types/store.types.ts';
 import { AppError } from '../utils/errors.util.ts';
 import { generateStoreCode } from '../utils/generate-store-code.util.ts';
 
@@ -28,8 +28,8 @@ export class StoreService {
 			}
 		}
 	}
-	async get() {
-		const response = await prisma.store.findMany({});
+	async get(where?: TypeGetStoreProps) {
+		const response = await prisma.store.findMany({ where: where });
 
 		return {
 			...response,
@@ -49,12 +49,26 @@ export class StoreService {
 		return response;
 	}
 
-    async update(id: string, storeData: Partial<IStoreProps>) {
-        await this.validateStore(storeData.email, storeData.street);
-        const response = await prisma.store.update({
-            where: { id },
-            data: storeData
-        });
-        return response;
-    }
+	async update(id: string, storeData: Partial<IStoreProps>) {
+		await this.validateStore(storeData.email, storeData.street);
+
+		if (storeData.opening_hours) {
+			const store = await this.get({ id });
+            if (!store) {
+                throw new AppError({
+                    message: 'Filial nao encontrada',
+                    errorCode: 'NOT_FOUND',
+                });
+            }
+
+            if (store[0].opening_hours) {
+                storeData.opening_hours = store[0].opening_hours
+            }
+		}
+		const response = await prisma.store.update({
+			where: { id },
+			data: storeData,
+		});
+		return response;
+	}
 }
