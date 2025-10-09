@@ -12,7 +12,11 @@ const openingDays = [
 	'Friday',
 	'Saturday',
 	'Sunday',
-];
+] as const;
+
+// Expressão regular para validar formato HH:mm (00:00 - 23:59)
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
 export const StoreSchema = z.object({
 	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
 	type: z.enum(storeType),
@@ -47,25 +51,42 @@ export const StoreSchema = z.object({
 	longitude: z
 		.union([z.string(), z.number()])
 		.transform((val) => new Decimal(val)),
+
 	opening_hours: z
 		.array(
-			z.object({
-				day: z.enum(openingDays, {
-					error: "Dia da semana inválido"
-				}),
-				open: z
-					.string()
-					.max(
-						100,
-						'Hora de abertura deve ter menos de 100 caracteres',
-					),
-				close: z
-					.string()
-					.max(
-						100,
-						'Hora de fechamento deve ter menos de 100 caracteres',
-					),
-			}),
+			z
+				.object({
+					day: z.enum(openingDays, {
+						error: 'Dia da semana inválido',
+					}),
+					open: z
+						.string()
+						.regex(
+							timeRegex,
+							'Horário de abertura deve estar no formato HH:mm (00:00–23:59)',
+						),
+					close: z
+						.string()
+						.regex(
+							timeRegex,
+							'Horário de fechamento deve estar no formato HH:mm (00:00–23:59)',
+						),
+				})
+				.refine(
+					({ open, close }) => {
+						const [openH, openM] = open.split(':').map(Number);
+						const [closeH, closeM] = close.split(':').map(Number);
+						const openTotal = openH * 60 + openM;
+						const closeTotal = closeH * 60 + closeM;
+
+						return openTotal < closeTotal;
+					},
+					{
+						message:
+							'Horário de abertura deve ser menor que o de fechamento',
+						path: ['close'],
+					},
+				),
 		)
 		.refine(
 			(hours) => {

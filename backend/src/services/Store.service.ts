@@ -1,5 +1,9 @@
 import prisma from '../../prisma/client.ts';
-import { IStoreProps, TypeGetStoreProps } from '../types/store.types.ts';
+import {
+	IStoreProps,
+	OpeningHours,
+	TypeGetStoreProps,
+} from '../types/store.types.ts';
 import { AppError } from '../utils/errors.util.ts';
 import { generateStoreCode } from '../utils/generate-store-code.util.ts';
 
@@ -31,9 +35,7 @@ export class StoreService {
 	async get(where?: TypeGetStoreProps) {
 		const response = await prisma.store.findMany({ where: where });
 
-		return {
-			...response,
-		};
+		return response;
 	}
 
 	async create(storeData: IStoreProps) {
@@ -52,23 +54,58 @@ export class StoreService {
 	async update(id: string, storeData: Partial<IStoreProps>) {
 		await this.validateStore(storeData.email, storeData.street);
 
-		if (storeData.opening_hours) {
-			const store = await this.get({ id });
-            if (!store) {
-                throw new AppError({
-                    message: 'Filial nao encontrada',
-                    errorCode: 'NOT_FOUND',
-                });
-            }
+		const store = await this.get({ id });
+		if (!store || store.length === 0) {
+			throw new AppError({
+				message: 'Filial não encontrada',
+				errorCode: 'NOT_FOUND',
+			});
+		}
 
-            if (store[0].opening_hours) {
-                storeData.opening_hours = store[0].opening_hours
-            }
+		const currentData = store[0];
+
+		if (storeData.opening_hours) {
+			const currentOpeningHours = Array.isArray(currentData.opening_hours)
+				? (currentData.opening_hours as OpeningHours[])
+				: [];
+
+			const openingHoursMap: Record<string, OpeningHours> = {};
+
+			for (const item of currentOpeningHours) {
+				if (item?.day) openingHoursMap[item.day] = item;
+			}
+
+			for (const newDay of storeData.opening_hours as OpeningHours[]) {
+				if (newDay?.day) openingHoursMap[newDay.day] = newDay;
+			}
+
+			storeData.opening_hours = Object.values(openingHoursMap);
 		}
 		const response = await prisma.store.update({
 			where: { id },
 			data: storeData,
 		});
+
 		return response;
 	}
+
+    async changeStatus(id: string, newStatus: boolean) {
+        const store = await this.get({id})
+        if (!store || store.length === 0) {
+            throw new AppError({
+                message: 'Filial não encontrada',
+                errorCode: 'NOT_FOUND',
+            })
+        }
+        if(newStatus === store[0].is_active) {
+            throw new AppError({
+                message: newStatus === true
+						? 'Filial já ativa'
+						: 'Filial já inativa',
+                errorCode: 'BAD_REQUEST',
+            })
+        }
+        const response = await prisma.store.update({where: {id}, data: {is_active: newStatus}})
+        return response
+    }
 }

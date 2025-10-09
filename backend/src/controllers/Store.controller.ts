@@ -84,13 +84,57 @@ export class StoreController {
 			const { id } = Request.params;
 			const parsed = StoreSchema.partial().parse(Request.body);
 
-			this.storeService.update(id, parsed);
+			const response = this.storeService.update(id, parsed);
 
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
 					message: 'Filial atualizada',
+					data: response,
+				}),
+			);
+		} catch (error) {
+			switch (error.errorCode) {
+				case 'NOT_FOUND':
+					return new HttpError({
+						message: error.message,
+						statusCode: 404,
+					});
+				case 'BAD_REQUEST':
+					return new HttpError({
+						message: error.message,
+						statusCode: 400,
+					});
+				default:
+					return new HttpError({
+						message: error.message,
+						statusCode: 500,
+					});
+			}
+		}
+	}
+
+	async changeStatus(
+		request: FastifyRequest<{
+			Params: { id: string };
+			Body: { newStatus: boolean };
+		}>,
+		reply: FastifyReply,
+	) {
+		try {
+			const { id } = request.params;
+			const { newStatus } = request.body;
+			const response = await this.storeService.changeStatus(
+				id,
+				newStatus,
+			);
+			reply.status(200).send(
+				new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Status da filial atualizado',
+					data: response,
 				}),
 			);
 		} catch (error) {
