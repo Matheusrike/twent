@@ -1,7 +1,7 @@
 "use client";
 
-import { Logo } from "./logo";
-import { Button } from "@/components/ui/button";
+import { Logo } from "../../../components/private/views/login/logo";
+import { Button } from "@/components/private/global/ui/button";
 import {
   Form,
   FormControl,
@@ -10,12 +10,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/private/views/login/input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useRouter } from "next/navigation"; // ✅ App Router
+import { ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -35,12 +36,41 @@ const Login = () => {
     console.log(data);
   };
 
+  const router = useRouter();
+
   return (
     <div className="h-screen flex items-center justify-center">
-      <div className="w-full h-full grid lg:grid-cols-2 p-4">
-        <div className="max-w-xs m-auto w-full flex flex-col items-center">
-          <Logo  />
-      
+      <div className="w-full h-full grid lg:grid-cols-2">
+        {/* return button */}
+        <div className="absolute top-4 left-4 right-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.back()}
+            className="w-full cursor-pointer sm:w-auto flex items-center justify-center text-muted-foreground hover:text-foreground"
+          >
+
+            <ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
+            Voltar à página anterior
+          </Button>
+        </div>
+
+        <div className="max-w-md m-auto w-full flex flex-col items-center justify-center relative">
+
+          {/* title content */}
+          {/* <div className="flex flex-col justify-start items-start w-full py-15">
+            <h1 className="font-bold text-6xl">Bem-vindo</h1>
+            <h2 className="font-semibold text-2xl text-muted-foreground">
+              Insira seus dados
+            </h2>
+          </div> */}
+
+          {/* logo content */}
+          <div className="py-15 ">
+            <Logo />
+          </div>
+
+          {/* form content */}
           <Form {...form}>
             <form
               className="w-full space-y-4"
@@ -51,14 +81,11 @@ const Login = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="font-semibold text-muted-foreground">
+                      Email
+                    </FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Email"
-                        className="w-full"
-                        {...field}
-                      />
+                      <Input type="email" placeholder="Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -69,21 +96,23 @@ const Login = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="font-semibold text-muted-foreground">
+                      Senha
+                    </FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full"
-                        {...field}
-                      />
+                      <Input type="password" placeholder="Senha" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="mt-4 w-full">
-                Continue with Email
+              <Button
+                variant="standartButton"
+                size="standartButton"
+                type="submit"
+                className="w-full! md:mt-4"
+              >
+                Login
               </Button>
             </form>
           </Form>
@@ -95,17 +124,15 @@ const Login = () => {
             >
               Forgot your password?
             </Link>
-         
           </div>
         </div>
 
+
         {/* banner */}
-        <div className="bg-muted hidden lg:block rounded-lg border">
-          </div>
+        <div className="hidden lg:block rounded-lg bg-muted"></div>
       </div>
     </div>
   );
 };
-
 
 export default Login;
