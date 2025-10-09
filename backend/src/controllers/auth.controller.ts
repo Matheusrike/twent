@@ -2,26 +2,29 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthService } from '@/services/Auth.service';
 import { ApiResponse } from '@/utils/api-response.util';
 import { AppError, HttpError } from '@/utils/errors.util';
+import { ILoginInput } from '@/types/authorization.types';
 
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
 	async login(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const { email, password } = request.body as {
-				email: string;
-				password: string;
-			};
-			const result = await this.authService.login({
+			const { email, password } = request.body as ILoginInput;
+			const token = await this.authService.login({
 				email,
 				password,
 			});
-			return new ApiResponse({
-				message: 'Login successful',
-				data: result,
+
+			const res = {
+				message: 'Login realizado com sucesso',
+				data: { token },
 				success: true,
 				statusCode: 200,
-			}).send(reply);
+			};
+
+			console.log('Login response:', res);
+
+			return new ApiResponse(res).send(reply);
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
@@ -45,6 +48,7 @@ export class AuthController {
 						});
 
 					default:
+						console.error('Unhandled AppError:', error);
 						throw new HttpError({
 							message: error.message,
 							errorCode: error.errorCode,
@@ -52,9 +56,6 @@ export class AuthController {
 						});
 				}
 			}
-
-			console.error(error);
-			return ApiResponse.genericError(reply);
 		}
 	}
 }

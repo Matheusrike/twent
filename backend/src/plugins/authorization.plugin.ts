@@ -27,7 +27,10 @@ function authorization(options: IAuthorizationOptions = {}) {
 			request.user = decoded;
 
 			// Verifica se há roles requeridas e verifica se o usuário possui elas
-			if (requiredRoles && !requiredRoles.includes(decoded.role)) {
+			if (
+				requiredRoles &&
+				!requiredRoles.some((role) => decoded.roles.includes(role))
+			) {
 				throw new HttpError({
 					message:
 						'Acesso negado, você não tem permissão suficiente para realizar essa operação',

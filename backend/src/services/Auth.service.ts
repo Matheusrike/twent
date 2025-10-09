@@ -13,7 +13,7 @@ export class AuthService {
 		private jwtProvider: IJwtProvider,
 	) {}
 
-	async login({ email, password }: ILoginInput): Promise<string> {
+	async login({ email, password }: ILoginInput) {
 		const user = await this.database.user.findFirst({
 			where: { email },
 			select: {
