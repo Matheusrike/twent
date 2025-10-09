@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import cardsDataTest from "@/components/web/pages/Collection/cardsDataTest.json";
+import cardsDataTest from "@/components/web/views/Collection/cardsDataTest.json";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/web/Global/ui/button";
 import Link from "next/link";

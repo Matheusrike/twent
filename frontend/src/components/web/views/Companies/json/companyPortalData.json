@@ -6,7 +6,7 @@
       "description": "Descrição da matriz",
       "badge": "MATRIZ CORPORATIVA",
       "icon": "Building2",
-      "href": "/matriz",
+      "href": "/login",
       "features": [
         "Acesso Administrativo Completo",
         "Catálogo de Coleção Completo",
@@ -21,7 +21,7 @@
       "description": "Descrição da filial",
       "badge": "FILIAL AUTORIZADA",
       "icon": "Building",
-      "href": "/filial",
+      "href": "/login",
       "features": [
         "Acesso à Coleção Regional",
         "Gestão de Inventário Local",

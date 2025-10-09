@@ -1,6 +1,6 @@
-import CollectionBanner from "@/components/web/pages/Collection/banner/banner";
-import FiltersSection from "@/components/web/pages/Collection/filter/filter";
-import CollectionHero from "@/components/web/pages/Collection/hero/hero";
+import CollectionBanner from "@/components/web/views/Collection/banner/banner";
+import FiltersSection from "@/components/web/views/Collection/filter/filter";
+import CollectionHero from "@/components/web/views/Collection/hero/hero";
 
 export default function Collection() {
     return (

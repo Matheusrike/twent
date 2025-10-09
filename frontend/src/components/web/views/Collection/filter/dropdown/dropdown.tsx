@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/web/pages/Collection/filter/dropdown/dropdown-menu";
+} from "@/components/web/views/Collection/filter/dropdown/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
 interface DropdownMenuWithCheckboxesProps {

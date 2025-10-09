@@ -1,6 +1,6 @@
-import Hero from "@/components/web/pages/Home/hero/hero"
-import MainContainer from "@/components/web/pages/Home/Features/mainContainer"
-import AboutContainer from "@/components/web/pages/Home/Features/aboutContainer"
+import Hero from "@/components/web/views/Home/hero/hero"
+import MainContainer from "@/components/web/views/Home/Features/mainContainer"
+import AboutContainer from "@/components/web/views/Home/Features/aboutContainer"
 
 
 export default function Home() {

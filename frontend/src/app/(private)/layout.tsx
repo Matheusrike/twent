@@ -1,7 +1,7 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
 import DarkModeProvider from "@/utils/theme/themeProvider";
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/app/globals.css";
 
 
 const notoSansAdlam = Noto_Sans_Adlam({

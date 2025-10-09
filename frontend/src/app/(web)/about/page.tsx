@@ -1,6 +1,6 @@
-import TextCards from "@/components/web/pages/About/textCards/textCards";
-import Hero from "@/components/web/pages/About/Banner/banner";
-import ValuesCards from "@/components/web/pages/About/valuesCards/valuesCards";
+import TextCards from "@/components/web/views/About/textCards/textCards";
+import Hero from "@/components/web/views/About/Banner/banner";
+import ValuesCards from "@/components/web/views/About/valuesCards/valuesCards";
 
 export default function About() {
     return (

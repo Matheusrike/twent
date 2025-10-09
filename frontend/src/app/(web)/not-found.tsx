@@ -14,7 +14,7 @@ export default function NotFound() {
       {/* Logo */}
       <div className="mb-6">
         <Image
-          src="/img/web/global/light/iconLight.svg"
+          src="/img/global/light/iconLight.svg"
           width={72}
           height={72}
           alt="Logo TWENT"
@@ -22,7 +22,7 @@ export default function NotFound() {
           priority
         />
         <Image
-          src="/img/web/global/dark/iconDark.svg"
+          src="/img/global/dark/iconDark.svg"
           width={72}
           height={72}
           alt="Logo TWENT"
