@@ -5,8 +5,9 @@ import {
 	ICreateCollection,
 	IUpdateCollection,
 } from '@/types/collection.types';
+import { AppError } from '@/utils/errors.util';
 
-class CollectionService {
+export class CollectionService {
 	async create(data: ICreateCollection) {
 		try {
 			this.validatePriceRange(data.price_range_min, data.price_range_max);
@@ -30,7 +31,10 @@ class CollectionService {
 			return collection;
 		} catch (error) {
 			if (error.code === 'P2002') {
-				throw new Error(`Coleção com o nome "${data.name}" já existe!`);
+				throw new AppError({
+					message: `Coleção com o nome "${data.name}" já existe!`,
+					errorCode: 'CONFLICT',
+				});
 			}
 			throw error;
 		}
@@ -45,7 +49,10 @@ class CollectionService {
 		});
 
 		if (!collection) {
-			throw new Error(`Coleção com ID "${id}" não encontrada!`);
+			throw new AppError({
+				message: `Coleção com ID "${id}" não encontrada!`,
+				errorCode: 'NOT_FOUND',
+			});
 		}
 
 		return collection;
@@ -118,7 +125,10 @@ class CollectionService {
 			return collection;
 		} catch (error) {
 			if (error.code === 'P2002') {
-				throw new Error(`Coleção com o nome "${data.name}" já existe!`);
+				throw new AppError({
+					message: `Coleção com o nome "${data.name}" já existe!`,
+					errorCode: 'CONFLICT',
+				});
 			}
 			throw error;
 		}
@@ -145,9 +155,10 @@ class CollectionService {
 		});
 
 		if (collection && collection._count.products > 0) {
-			throw new Error(
-				`Não é possível deletar a coleção "${collection.name}" pois ela possui ${collection._count.products} produto(s) associado(s)!`,
-			);
+			throw new AppError({
+				message: `Não é possível deletar a coleção "${collection.name}" pois ela possui ${collection._count.products} produto(s) associado(s)!`,
+				errorCode: 'CONSTRAINT_VIOLATION',
+			});
 		}
 
 		await prisma.collection.delete({
@@ -171,7 +182,10 @@ class CollectionService {
 		});
 
 		if (!collection) {
-			throw new Error(`Coleção com ID "${id}" não encontrada!`);
+			throw new AppError({
+				message: `Coleção com ID "${id}" não encontrada!`,
+				errorCode: 'NOT_FOUND',
+			});
 		}
 
 		const activeProducts = collection.products.filter((p) => p.is_active);
@@ -197,13 +211,12 @@ class CollectionService {
 			const maxNum = typeof max === 'number' ? max : parseFloat(max);
 
 			if (minNum > maxNum) {
-				throw new Error(
-					'Preço mínimo não pode ser maior que o preço máximo!',
-				);
+				throw new AppError({
+					message:
+						'Preço mínimo não pode ser maior que o preço máximo',
+					errorCode: 'BAD_REQUEST',
+				});
 			}
 		}
 	}
 }
-
-export const collectionService = new CollectionService();
-export default CollectionService;
