@@ -20,7 +20,6 @@ export default function CollectionHero() {
             title={collection.title}
             description={collection.description}
             badge={collection.badge}
-            value={collection.value}
           />
         ))}
       </div>
