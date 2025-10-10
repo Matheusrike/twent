@@ -3,7 +3,7 @@
 import CollectionCard from "../card/CollectionCard";
 import PaginationWithIcon from "./pagination/pagination";
 import cardsDataTest from '../cardsDataTest.json'
-
+import { truncateText } from "@/utils/functions/truncateText";
 export default function CollectionHero() {
   return (
     <section className="py-5 container mx-auto px-6">
@@ -18,7 +18,7 @@ export default function CollectionHero() {
             href={collection.href}
             image={collection.image}
             title={collection.title}
-            description={collection.description}
+            description={truncateText(collection.description, 150)}
             badge={collection.badge}
           />
         ))}

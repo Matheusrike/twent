@@ -95,8 +95,7 @@ export default function CollectionIdHero({ params }: any) {
         <div className="flex flex-col items-start w-full">
           {item.badge && (
             <Badge
-              variant="secondary"
-              className="rounded-full py-1 border-border"
+              className="bg-primary text-white px-3 py-1 text-sm font-semibold uppercase tracking-wide rounded-md shadow-md"
               asChild
             >
               <span>{item.badge}</span>
@@ -155,8 +154,8 @@ export default function CollectionIdHero({ params }: any) {
         </div>
 
         {/* boutiques button */}
-        <div className="mt-8 lg:mt-12 flex flex-col gap-4 w-full pb-6">
-          <Button size="standartButton" variant="standartButton" className="w-full h-auto">
+        <div className="mt-8 lg:mt-12 flex flex-col justify-center items-centergap-4 w-full h-full">
+          <Button size="standartButton" variant="standartButton" className="w-full! h-auto">
             Contactar Uma Boutique
           </Button>
         </div>
