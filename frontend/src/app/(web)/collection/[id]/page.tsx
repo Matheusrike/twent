@@ -21,69 +21,147 @@ export default function CollectionIdHero({ params }: any) {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
-      <div className="flex flex-col md:flex-row w-full h-screen">
-        {/* image*/}
-        <div className="md:w-1/2 h-full relative bg-black">
-          <Image
-            src={item.image}
-            alt={item.title}
-            fill
-            className="object-cover"
-          />
+      <div className="flex flex-col lg:flex-row w-full min-h-screen">
+
+        {/* image desktop */}
+        <div className="hidden lg:flex lg:w-3/5 xl:w-4/5 h-screen sticky top-0 p-4 flex-col gap-4">
+
+          {/* image main */}
+          <div className="relative w-full h-2/3 rounded-2xl overflow-hidden">
+            <Image
+              src="/images/collection/gradient.png"
+              alt="gradient"
+              fill
+              className="object-cover object-center bg-gray-300"
+              priority
+            />
+          </div>
+
+          {/* image container */}
+          <div className="flex gap-4 w-full h-1/3">
+            <div className="relative w-1/2 h-full rounded-2xl overflow-hidden">
+              <Image
+                src="/images/collection/gradient.png"
+                alt="gradient"
+                fill
+                className="object-cover object-center bg-gray-300"
+                priority
+              />
+            </div>
+            <div className="relative w-1/2 h-full rounded-2xl overflow-hidden">
+              <Image
+                src="/images/collection/gradient.png"
+                alt="gradient"
+                fill
+                className="object-cover object-center bg-gray-300"
+                priority
+              />
+            </div>
+          </div>
         </div>
 
-        {/* data content */}
-        <div className="md:w-1/2 h-full flex flex-col  items-center px-12 py-15">
+        {/* image mobile */}
+        <div className="lg:hidden w-full px-4 pt-4 pb-2 flex flex-col gap-4">
+          {/* Image 1 */}
+          <div className="relative w-full h-[300px] sm:h-[400px]">
+            <Image
+              src="/images/collection/gradient.png"
+              alt="gradient"
+              fill
+              className="object-cover object-center bg-gray-300 rounded-2xl"
+              priority
+            />
+          </div>
+    
+      </div>
 
-          {/* return to previous */}
-          <div className="w-full h-auto flex justify-end-safe items-end-safe">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.back()}
-              className="w-full cursor-pointer sm:w-auto flex items-center justify-center text-muted-foreground hover:text-foreground"
+      {/* data content */}
+      <div className="w-full lg:w-2/5 xl:w-1/2 flex flex-col px-6 py-8 lg:px-12 lg:py-15 lg:overflow-y-auto">
+
+        {/* return to previous */}
+        <div className="hidden lg:flex w-full mb-6 justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.back()}
+            className="cursor-pointer flex items-center text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
+            Voltar à página anterior
+          </Button>
+        </div>
+
+        {/* info content */}
+        <div className="flex flex-col items-start w-full">
+          {item.badge && (
+            <Badge
+              variant="secondary"
+              className="rounded-full py-1 border-border"
+              asChild
             >
-              <ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
-              Voltar à página anterior
-            </Button>
-          </div>
-
-
-          {/* info content */}
-          <div className="flex flex-col items-start md:min-w-3xl ">
-            {item.badge && (
-              <Badge
-                variant="secondary"
-                className="rounded-full py-1 border-border"
-                asChild
-              >
-                <span>{item.badge}</span>
-              </Badge>
-            )}
-            <h1 className="mt-6 max-w-[17ch] text-4xl md:text-5xl lg:text-[2.75rem] xl:text-[3.25rem] font-semibold leading-[1.2]! tracking-tighter">
-              {item.title}
-            </h1>
-            <p className="mt-6 max-w-[60ch] text-lg text-gray-600 dark:text-gray-300">
-              {item.description}
+              <span>{item.badge}</span>
+            </Badge>
+          )}
+          <h1 className="mt-6 max-w-[17ch] text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-semibold leading-tight tracking-tighter">
+            {item.title}
+          </h1>
+          {item.value && (
+            <p className="text-2xl sm:text-3xl font-bold text-primary mt-4">
+              {formatCurrency(item.value)}
             </p>
-            {item.value && (
-              <p className="text-2xl font-semibold text-primary mt-4">
-                {formatCurrency(item.value)}
-              </p>
-            )}
-          </div>
+          )}
 
-          {/* boutiques button */}
-          <div className="mt-12 flex items-start justify-self-start gap-4 md:min-w-3xl">
-            <Button size="standartButton" variant="standartButton" className="w-full">
-              Get Started
-            </Button>
+          {/* Description */}
+          <p className="mt-6 text-base sm:text-lg text-gray-600 dark:text-gray-300">
+            {item.description}
+          </p>
 
+          {/* Technical specifications */}
+          <div className="mt-8 w-full space-y-4">
+            <h2 className="text-lg sm:text-xl font-semibold">Especificações</h2>
+            <div className="space-y-3 text-sm">
+              {item.reference && (
+                <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Referência</span>
+                  <span className="font-medium">{item.reference}</span>
+                </div>
+              )}
+              {item.material && (
+                <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Material</span>
+                  <span className="font-medium">{item.material}</span>
+                </div>
+              )}
+              {item.movement && (
+                <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Movimento</span>
+                  <span className="font-medium">{item.movement}</span>
+                </div>
+              )}
+              {item.diameter && (
+                <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Diâmetro</span>
+                  <span className="font-medium">{item.diameter}</span>
+                </div>
+              )}
+              {item.waterResistance && (
+                <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <span className="text-gray-600 dark:text-gray-400">Resistência à água</span>
+                  <span className="font-medium">{item.waterResistance}</span>
+                </div>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* boutiques button */}
+        <div className="mt-8 lg:mt-12 flex flex-col gap-4 w-full pb-6">
+          <Button size="standartButton" variant="standartButton" className="w-full h-auto">
+            Contactar Uma Boutique
+          </Button>
         </div>
       </div>
     </div>
+    </div >
   );
-
-
 }
