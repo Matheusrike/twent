@@ -1,5 +1,5 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { Prisma } from '../../prisma/generated/prisma/index.js';
+import { Prisma } from '@prisma/generated/client';
 
 type StoreType = 'BRANCH' | 'HEADQUARTERS';
 
@@ -24,19 +24,23 @@ export interface IStoreProps {
 }
 
 export type TypeGetStoreProps = Prisma.StoreWhereInput & {
-	id?: string;
-	name?: string;
-	type?: StoreType;
-	email?: string;
-	phone?: string;
-	street?: string;
-	number?: string;
-	district?: string;
-	city?: string;
-	state?: string;
-	country?: string;
-	latitude?: Decimal;
-	longitude?: Decimal;
-	opening_hours?: Prisma.InputJsonValue;
-	is_active?: boolean;
+	query: {
+		id?: string;
+		name?: string;
+		type?: StoreType;
+		email?: string;
+		phone?: string;
+		street?: string;
+		number?: string;
+		district?: string;
+		city?: string;
+		state?: string;
+		country?: string;
+		latitude?: Decimal;
+		longitude?: Decimal;
+		opening_hours?: Prisma.InputJsonValue;
+		is_active?: boolean;
+	};
+	skip?: number;
+	take?: number;
 };

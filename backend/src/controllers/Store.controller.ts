@@ -3,13 +3,15 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { HttpError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 import { StoreSchema } from '../schemas/store.schema.ts';
+import { TypeGetStoreProps } from '@/types/store.types.ts';
 
 export class StoreController {
 	constructor(private storeService: StoreService) {}
 
 	async get(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const response = await this.storeService.get();
+            const { skip, take, ...filters } = request.query as TypeGetStoreProps;
+			const response = await this.storeService.get(filters, Number(skip), Number(take));
 
 			return reply.status(200).send(
 				new ApiResponse({
@@ -84,7 +86,7 @@ export class StoreController {
 			const { id } = Request.params;
 			const parsed = StoreSchema.partial().parse(Request.body);
 
-			const response = this.storeService.update(id, parsed);
+			const response = await this.storeService.update(id, parsed);
 
 			reply.status(200).send(
 				new ApiResponse({

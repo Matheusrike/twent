@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Decimal } from '@prisma/client/runtime/library';
-import { StoreType } from '../../prisma/generated/prisma/index.js';
+import { StoreType } from '@prisma/generated/enums';
 
 const storeType = StoreType;
 

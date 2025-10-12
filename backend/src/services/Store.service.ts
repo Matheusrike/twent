@@ -32,8 +32,10 @@ export class StoreService {
 			}
 		}
 	}
-	async get(where?: TypeGetStoreProps) {
-		const response = await prisma.store.findMany({ where: where });
+
+	async get(where?: TypeGetStoreProps, skip = 0, take = 10) {
+
+		const response = await prisma.store.findMany({ skip, take, where });
 
 		return response;
 	}
@@ -54,13 +56,16 @@ export class StoreService {
 	async update(id: string, storeData: Partial<IStoreProps>) {
 		await this.validateStore(storeData.email, storeData.street);
 
-		const store = await this.get({ id });
+		const store = await this.get({ id } as TypeGetStoreProps);
+        
 		if (!store || store.length === 0) {
 			throw new AppError({
 				message: 'Filial não encontrada',
 				errorCode: 'NOT_FOUND',
 			});
 		}
+
+        
 
 		const currentData = store[0];
 
@@ -89,23 +94,27 @@ export class StoreService {
 		return response;
 	}
 
-    async changeStatus(id: string, newStatus: boolean) {
-        const store = await this.get({id})
-        if (!store || store.length === 0) {
-            throw new AppError({
-                message: 'Filial não encontrada',
-                errorCode: 'NOT_FOUND',
-            })
-        }
-        if(newStatus === store[0].is_active) {
-            throw new AppError({
-                message: newStatus === true
+	async changeStatus(id: string, newStatus: boolean) {
+		const store = await this.get({ id } as TypeGetStoreProps);
+		if (!store || store.length === 0) {
+			throw new AppError({
+				message: 'Filial não encontrada',
+				errorCode: 'NOT_FOUND',
+			});
+		}
+		if (newStatus === store[0].is_active) {
+			throw new AppError({
+				message:
+					newStatus === true
 						? 'Filial já ativa'
 						: 'Filial já inativa',
-                errorCode: 'BAD_REQUEST',
-            })
-        }
-        const response = await prisma.store.update({where: {id}, data: {is_active: newStatus}})
-        return response
-    }
+				errorCode: 'BAD_REQUEST',
+			});
+		}
+		const response = await prisma.store.update({
+			where: { id },
+			data: { is_active: newStatus },
+		});
+		return response;
+	}
 }
