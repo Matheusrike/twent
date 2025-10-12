@@ -1,12 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { CustomerController } from '../controllers/Customer.controller.ts';
-
-const customerController = new CustomerController();
+import { CustomerService } from '@/services/Customer.service.ts';
 
 export function customerRoute(fastify: FastifyInstance) {
-	fastify.get('/', customerController.get);
+	const customerService = new CustomerService();
+	const customerController = new CustomerController(customerService);
 
-	fastify.post('/', customerController.create);
+	fastify.get('/', customerController.get.bind(customerController));
 
-	fastify.put('/:id', customerController.update);
+	fastify.post('/', customerController.create.bind(customerController));
+
+	fastify.put('/:id', customerController.update.bind(customerController));
 }

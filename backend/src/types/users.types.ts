@@ -1,5 +1,5 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { Prisma, UserType } from '../../prisma/generated/prisma/index.js';
+import { Prisma, UserType } from  '@prisma/generated/client';
 
 export interface IUser {
 	email: string;

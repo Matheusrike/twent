@@ -4,7 +4,7 @@ import { HttpError } from '../utils/errors.util.ts';
 import { ApiResponse } from '../utils/api-response.util.ts';
 
 export class UserController {
-	private service = new UserService();
+	constructor(private userService: UserService) {}
 
 	async getInfo (
 		request: FastifyRequest<{ Params: { id: string } }>,
@@ -12,7 +12,7 @@ export class UserController {
 	) {
 		try {
 			const { id } = request.params;
-			const response = await this.service.getInfo(id);
+			const response = await this.userService.getInfo(id);
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
@@ -46,7 +46,7 @@ export class UserController {
 		try {
 			const { id } = request.params;
 			const { newStatus } = request.body;
-			const response = await this.service.changeStatus(id, newStatus);
+			const response = await this.userService.changeStatus(id, newStatus);
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,

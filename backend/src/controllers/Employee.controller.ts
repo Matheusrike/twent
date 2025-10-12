@@ -10,7 +10,7 @@ import {
 import { EmployeeService } from '../services/Employee.service.ts';
 
 export class EmployeeController {
-	private service = new EmployeeService();
+	constructor(private employeeService: EmployeeService) {}
 	async create (
 		request: FastifyRequest<{
 			Body: { userData: IUser; employeeData: IEmployeeProps };
@@ -46,7 +46,7 @@ export class EmployeeController {
 					statusCode: 400,
 				});
 			}
-			await this.service.create(
+			await this.employeeService.create(
 				parsedUserData.data,
 				parsedEmployeeData.data,
 				roleName,
@@ -56,7 +56,7 @@ export class EmployeeController {
 				new ApiResponse({
 					statusCode: 201,
 					success: true,
-					message: 'Funcionário criado',
+					message: 'Funcionário cadastrado com sucesso ',
 				}),
 			);
 		} catch (error) {
@@ -101,13 +101,13 @@ export class EmployeeController {
 		try {
 			const { skip, take, ...filters } = request.query as TypeGetUserProps;
 
-			const response = await this.service.get(filters, skip, take);
+			const response = await this.employeeService.get(filters, skip, take);
 
 			return reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Informações do usuário encontradas',
+					message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
 					data: response,
 				}),
 			);
@@ -155,14 +155,14 @@ export class EmployeeController {
 			const roleName = request.headers['x-role-name'];
 			const storeCode = request.headers['x-store-code'];
 
-			await this.service.update(
+			await this.employeeService.update(
 				id,
 				parsedUserData,
 				parsedEmployeeData,
 				roleName,
 				storeCode,
 			);
-			reply.status(200).send({ message: 'Usuário atualizado' });
+			reply.status(200).send({ message: 'Infomação(ões) do funcionário atualizada(s)' });
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':

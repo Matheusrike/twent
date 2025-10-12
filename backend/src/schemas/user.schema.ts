@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserType } from '../../prisma/generated/prisma/index.js';
+import { UserType } from '@prisma/generated/enums';
 import { Decimal } from '@prisma/client/runtime/library';
 
 const UserTypes: UserType[] = ['CUSTOMER', 'EMPLOYEE'];
