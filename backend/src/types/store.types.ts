@@ -6,6 +6,7 @@ type StoreType = 'BRANCH' | 'HEADQUARTERS';
 export type OpeningHours = { day: string; open: string; close: string };
 
 export interface IStoreProps {
+    code: string;
 	name: string;
 	type: StoreType;
 	email: string;

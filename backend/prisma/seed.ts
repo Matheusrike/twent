@@ -4,6 +4,7 @@ import { UserType } from '@prisma/generated/enums';
 import { IStoreProps } from '../src/types/store.types';
 import { hashPassword } from '../src/utils/hash-password.util';
 import { configDotenv } from 'dotenv';
+import { Decimal } from '@prisma/client/runtime/library';
 
 configDotenv({ quiet: true });
 
@@ -71,8 +72,8 @@ async function headquarterSeed(tx: Prisma.TransactionClient) {
 		state: 'Genebra',
 		zip_code: '1204',
 		country: 'Suíça',
-		latitude: 46.2044,
-		longitude: 6.1432,
+		latitude: new Decimal(46.2044),
+		longitude: new Decimal(6.1432),
 		opening_hours: [
 			{
 				day: 'Monday',

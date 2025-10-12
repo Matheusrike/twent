@@ -8,6 +8,7 @@ import { customerRoute } from './customer.route.ts';
 import { employeeRoute } from './employee.route.ts';
 import { userRoute } from './user.route.ts';
 import { storeRoute } from './store.route.ts';
+import authorizationPlugin from '@/plugins/authorization.plugin.ts';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
@@ -31,7 +32,8 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 					}).send(reply);
 				},
 			);
-
+            await app.register(authorizationPlugin);
+            
 			await app.register(authRoutes, { prefix: '/auth' });
 			await app.register(customerRoute, { prefix: '/customer' });
 			await app.register(employeeRoute, { prefix: '/employee' });

@@ -113,9 +113,8 @@ export class EmployeeService extends UserService {
 
 		const response = await super.get(filters, skip, take);
 
-		return {
-			...response,
-		};
+		return response
+	
 	}
 
 	async update(

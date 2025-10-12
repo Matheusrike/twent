@@ -34,8 +34,8 @@ function authorization(options: IAuthorizationOptions = {}) {
 				throw new HttpError({
 					message:
 						'Acesso negado, você não tem permissão suficiente para realizar essa operação',
-					errorCode: 'FORBIDDEN',
-					statusCode: 403,
+					errorCode: 'UNAUTHORIZED',
+					statusCode: 401,
 				});
 			}
 		} catch (error) {

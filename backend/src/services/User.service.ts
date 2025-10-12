@@ -29,8 +29,7 @@ export class UserService {
 		return true;
 	}
 
-	async get(params?:TypeGetUserProps, skip = 0, take = 10, id?: string) {
-
+	async get(params?: TypeGetUserProps, skip = 0, take = 10, id?: string) {
 		let response;
 
 		if (params?.user_type === 'EMPLOYEE') {
@@ -105,20 +104,7 @@ export class UserService {
 			});
 		}
 
-		const hasNextPage = response.length > take!;
-		const data = hasNextPage ? response.slice(0, -1) : response;
-		const nextCursor = hasNextPage ? data[data.length - 1].id : null;
-		const total = await prisma.user.count({ where: params});
-
-		return {
-			...response,
-			pagination: {
-				nextCursor,
-				hasNextPage,
-				take: take,
-				total,
-			},
-		};
+		return response;
 	}
 
 	async getInfo(id: string) {
@@ -135,12 +121,10 @@ export class UserService {
 		return user;
 	}
 
-	async changeStatus(id: string, newStatus: boolean) {
-		const user = await this.get({
-			query: {
-				id,
-			},
-		});
+	async changeStatus(id: string, newStatus: boolean, role_name: string) {
+        //TODO: precisa validar qual gerente pode alterar o status
+
+		const user = await this.get({ id } as TypeGetUserProps);
 		if (!user) {
 			throw new AppError({
 				message: 'Usuário não encontrado',
@@ -148,8 +132,7 @@ export class UserService {
 			});
 		}
 
-
-		if (newStatus === user.pop()?.is_active) {
+		if (newStatus === user[0].is_active) {
 			throw new AppError({
 				message:
 					newStatus === true
@@ -158,8 +141,9 @@ export class UserService {
 				errorCode: 'BAD_REQUEST',
 			});
 		}
+        console.log(role_name)
 
-		if (user.pop()?.user_type === 'EMPLOYEE') {
+		if (user[0].user_type === 'EMPLOYEE') {
 			const employee = await prisma.$transaction(async (tx) => {
 				const res1 = await tx.user.update({
 					where: { id: id },

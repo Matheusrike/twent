@@ -46,9 +46,7 @@ export class CustomerService extends UserService {
 
 		const response = await super.get(filters, skip, take);
 
-		return {
-			...response,
-		};
+		return response;
 	}
 
 	async update(id: string, customerData: Partial<IUser>) {

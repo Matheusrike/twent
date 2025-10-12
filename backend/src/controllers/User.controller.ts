@@ -6,12 +6,10 @@ import { ApiResponse } from '../utils/api-response.util.ts';
 export class UserController {
 	constructor(private userService: UserService) {}
 
-	async getInfo (
-		request: FastifyRequest<{ Params: { id: string } }>,
-		reply: FastifyReply,
-	) {
+	async getInfo(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const { id } = request.params;
+			const { id } = request.user as { id: string };
+
 			const response = await this.userService.getInfo(id);
 			reply.status(200).send(
 				new ApiResponse({
@@ -35,8 +33,8 @@ export class UserController {
 					});
 			}
 		}
-	};
-	async changeStatus (
+	}
+	async changeStatus(
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { newStatus: boolean };
@@ -44,9 +42,10 @@ export class UserController {
 		reply: FastifyReply,
 	) {
 		try {
+            const {role_name} = request.user as { role_name: string };
 			const { id } = request.params;
 			const { newStatus } = request.body;
-			const response = await this.userService.changeStatus(id, newStatus);
+			const response = await this.userService.changeStatus(id, newStatus, role_name);
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
@@ -82,5 +81,5 @@ export class UserController {
 					});
 			}
 		}
-	};
+	}
 }
