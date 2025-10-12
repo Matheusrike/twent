@@ -11,13 +11,13 @@ import { EmployeeService } from '../services/Employee.service.ts';
 
 export class EmployeeController {
 	private service = new EmployeeService();
-	create = async (
+	async create (
 		request: FastifyRequest<{
 			Body: { userData: IUser; employeeData: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
 		}>,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
 			const parsedUserData = UserSchema.safeParse(request.body.userData);
 
@@ -94,14 +94,12 @@ export class EmployeeController {
 			}
 		}
 	};
-	get = async (
-		request: FastifyRequest<{
-			Querystring: TypeGetUserProps;
-		}>,
+	async get (
+		request: FastifyRequest,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
-			const { skip, take, ...filters } = request.query;
+			const { skip, take, ...filters } = request.query as TypeGetUserProps;
 
 			const response = await this.service.get(filters, skip, take);
 
@@ -135,14 +133,14 @@ export class EmployeeController {
 		}
 	};
 
-	update = async (
+	async update (
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { userData: IUser; employeeData: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
 		}>,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
 			const id = request.params['id'];
 

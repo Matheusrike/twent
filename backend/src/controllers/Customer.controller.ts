@@ -8,7 +8,7 @@ import { TypeGetUserProps } from '../types/users.types.ts';
 export class CustomerController {
 	private service = new CustomerService();
 
-	create = async (request: FastifyRequest, reply: FastifyReply) => {
+	async create  (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const parsed = UserSchema.safeParse(request.body);
 
@@ -57,14 +57,12 @@ export class CustomerController {
 			}
 		}
 	};
-	get = async (
-		request: FastifyRequest<{
-			Querystring: TypeGetUserProps;
-		}>,
+	async get  (
+		request: FastifyRequest,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
-			const { skip, take, ...filters } = request.query;
+			const { skip, take, ...filters } = request.query as TypeGetUserProps;
 
 			const response = await this.service.get(filters, skip, take);
 
@@ -98,10 +96,10 @@ export class CustomerController {
 		}
 	};
 
-	update = async (
+	async update  (
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
 			const id = request.params['id'];
 			const parsed = UserSchema.partial().parse(request.body);

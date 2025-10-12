@@ -6,10 +6,10 @@ import { ApiResponse } from '../utils/api-response.util.ts';
 export class UserController {
 	private service = new UserService();
 
-	getInfo = async (
+	async getInfo (
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
 			const { id } = request.params;
 			const response = await this.service.getInfo(id);
@@ -36,13 +36,13 @@ export class UserController {
 			}
 		}
 	};
-	changeStatus = async (
+	async changeStatus (
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { newStatus: boolean };
 		}>,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
 			const { id } = request.params;
 			const { newStatus } = request.body;
