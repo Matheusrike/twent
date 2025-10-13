@@ -15,16 +15,26 @@ export class AuthController {
 				password,
 			});
 
-			const res = {
+			if (process.env.NODE_ENV === 'dev') {
+				return new ApiResponse({
+					message: 'Login realizado com sucesso',
+					data: { token },
+					success: true,
+					statusCode: 200,
+				}).send(reply);
+			}
+
+			reply.setCookie('token', token, {
+				httpOnly: true,
+				sameSite: 'lax',
+				maxAge: 60 * 60 * 24 * 7,
+			});
+
+			return new ApiResponse({
 				message: 'Login realizado com sucesso',
-				data: { token },
 				success: true,
 				statusCode: 200,
-			};
-
-			console.log('Login response:', res);
-
-			return new ApiResponse(res).send(reply);
+			});
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
@@ -57,5 +67,14 @@ export class AuthController {
 				}
 			}
 		}
+	}
+
+	async logout(request: FastifyRequest, reply: FastifyReply) {
+		reply.clearCookie('token');
+		return new ApiResponse({
+			message: 'Logout realizado com sucesso',
+			success: true,
+			statusCode: 200,
+		});
 	}
 }

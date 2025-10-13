@@ -15,6 +15,7 @@ export async function registerPlugins(
 	// Plugins principais
 	await app.register(cookie, {
 		secret: config.cookieSecret,
+		hook: 'onRequest',
 	});
 
 	await app.register(jwt, {
