@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { AppError } from './errors.util.ts';
+import { AppError } from './errors.util';
 
 export async function validatePassword(password: string) {
     if (!password) {

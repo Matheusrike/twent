@@ -14,18 +14,18 @@ const openingDays = [
 	'Sunday',
 ] as const;
 
-// Expressão regular para validar formato HH:mm (00:00 - 23:59)
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export const StoreSchema = z.object({
 	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
+    code: z.string(),
 	type: z.enum(storeType),
 	email: z
 		.string()
 		.max(100, 'E-mail da loja deve ter menos de 100 caracteres'),
 	phone: z
 		.string()
-		.max(100, 'Telefone da loja deve ter menos de 100 caracteres'),
+		.max(15, 'Telefone da loja deve ter menos de 15 caracteres'),
 	street: z.string().max(100, 'Rua da loja deve ter menos de 100 caracteres'),
 	number: z
 		.string()
@@ -41,7 +41,7 @@ export const StoreSchema = z.object({
 		.max(100, 'Estado da loja deve ter menos de 100 caracteres'),
 	zip_code: z
 		.string()
-		.max(100, 'CEP da loja deve ter menos de 100 caracteres'),
+		.max(50, 'zip_code da loja deve ter menos de 50 caracteres'),
 	country: z
 		.string()
 		.max(100, 'País da loja deve ter menos de 100 caracteres'),

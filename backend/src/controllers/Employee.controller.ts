@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { EmployeeSchema, UserSchema } from '../schemas/user.schema.ts';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
+import { EmployeeSchema, UserSchema } from '@/schemas/user.schema';
+import { HttpError } from '@/utils/errors.util';
+import { ApiResponse } from '@/utils/api-response.util';
 import {
 	IEmployeeProps,
 	IUser,
 	TypeGetUserProps,
-} from '../types/users.types.ts';
-import { EmployeeService } from '../services/Employee.service.ts';
+} from '@/types/users.types';
+import { EmployeeService } from '@/services/Employee.service';
 
 export class EmployeeController {
 	constructor(private employeeService: EmployeeService) {}

@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { EmployeeController } from '../controllers/Employee.controller.ts';
-import { EmployeeService } from '@/services/Employee.service.ts';
+import { EmployeeController } from '@/controllers/Employee.controller';
+import { EmployeeService } from '@/services/Employee.service';
 
 export function employeeRoute(fastify: FastifyInstance) {
     const employeeService = new EmployeeService();

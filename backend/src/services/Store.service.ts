@@ -1,11 +1,11 @@
-import prisma from '../../prisma/client.ts';
+import prisma from '@prisma/client';
 import {
 	IStoreProps,
 	OpeningHours,
 	TypeGetStoreProps,
-} from '../types/store.types.ts';
-import { AppError } from '../utils/errors.util.ts';
-import { generateStoreCode } from '../utils/generate-store-code.util.ts';
+} from '@/types/store.types';
+import { AppError } from '@/utils/errors.util';
+import { generateStoreCode } from '@/utils/generate-store-code.util';
 
 export class StoreService {
 	private async validateStore(email?: string, street?: string) {

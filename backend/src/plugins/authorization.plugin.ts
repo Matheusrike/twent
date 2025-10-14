@@ -2,11 +2,11 @@ import type { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import type {
 	IJwtAuthPayload,
 	IAuthorizationOptions,
-} from '../types/authorization.types';
-import { getToken } from '../helpers/get-token.helper';
-import { ApiResponse } from '../utils/api-response.util';
+} from '@/types/authorization.types';
+import { getToken } from '@/helpers/get-token.helper';
+import { ApiResponse } from '@/utils/api-response.util';
 import fp from 'fastify-plugin';
-import { HttpError } from '../utils/errors.util';
+import { HttpError } from '@/utils/errors.util';
 
 function authorization(options: IAuthorizationOptions = {}) {
 	return async (request: FastifyRequest, reply: FastifyReply) => {

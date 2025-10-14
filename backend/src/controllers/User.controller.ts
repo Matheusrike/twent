@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { UserService } from '../services/User.service.ts';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
+import { UserService } from '@/services/User.service';
+import { HttpError } from '@/utils/errors.util';
+import { ApiResponse } from '@/utils/api-response.util';
 
 export class UserController {
 	constructor(private userService: UserService) {}
@@ -9,7 +9,6 @@ export class UserController {
 	async getInfo(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const { id } = request.user as { id: string };
-
 			const response = await this.userService.getInfo(id);
 			reply.status(200).send(
 				new ApiResponse({
@@ -42,10 +41,15 @@ export class UserController {
 		reply: FastifyReply,
 	) {
 		try {
-            const {role_name} = request.user as { role_name: string };
+            console.log(request.user);
+            
 			const { id } = request.params;
 			const { newStatus } = request.body;
-			const response = await this.userService.changeStatus(id, newStatus, role_name);
+			const response = await this.userService.changeStatus(
+				id,
+				newStatus,
+
+			);
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,

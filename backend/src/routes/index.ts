@@ -1,14 +1,14 @@
-import type { fastifyTypedInstance } from '../types/types';
+import type { fastifyTypedInstance } from '@/types/types';
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { ApiResponseSchema } from '../schemas/api-response.schema';
-import { ApiResponse } from '../utils/api-response.util';
+import { ApiResponseSchema } from '@/schemas/api-response.schema';
+import { ApiResponse } from '@/utils/api-response.util';
 
 import { authRoutes } from '@/routes/auth.routes';
-import { customerRoute } from './customer.route.ts';
-import { employeeRoute } from './employee.route.ts';
-import { userRoute } from './user.route.ts';
-import { storeRoute } from './store.route.ts';
-import authorizationPlugin from '@/plugins/authorization.plugin.ts';
+import { customerRoute } from './customer.route';
+import { employeeRoute } from './employee.route';
+import { userRoute } from './user.route';
+import { storeRoute } from './store.route';
+import authorizationPlugin from '@/plugins/authorization.plugin';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(

@@ -1,14 +1,14 @@
 import { Prisma } from '@prisma/client/extension';
-import prisma from '../../prisma/client.ts';
-import { validateLocation } from '../helpers/validate-location.helper.ts';
+import prisma from '@prisma/client';
+import { validateLocation } from '@/helpers/validate-location.helper';
 import {
 	IEmployeeProps,
 	IUser,
 	TypeGetUserProps,
-} from '../types/users.types.ts';
-import { validatePassword } from '../utils/password.util.ts';
-import { UserService } from './User.service.ts';
-import { AppError } from '../utils/errors.util.ts';
+} from '@/types/users.types';
+import { validatePassword } from '@/utils/password.util';
+import { UserService } from './User.service';
+import { AppError } from '@/utils/errors.util';
 
 export class EmployeeService extends UserService {
 	private async generateEmployeeCodeTx(

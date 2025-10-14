@@ -1,6 +1,6 @@
-import { AppError } from '../utils/errors.util.ts';
-import prisma from '../../prisma/client.ts';
-import { TypeGetUserProps } from '../types/users.types.ts';
+import { AppError } from '@/utils/errors.util';
+import prisma from '@prisma/client';
+import { TypeGetUserProps } from '@/types/users.types';
 
 export class UserService {
 	async validateUser(email?: string, document_number?: string) {
@@ -108,6 +108,7 @@ export class UserService {
 	}
 
 	async getInfo(id: string) {
+        
 		const user = await prisma.user.findUnique({
 			where: { id },
 		});
@@ -121,8 +122,7 @@ export class UserService {
 		return user;
 	}
 
-	async changeStatus(id: string, newStatus: boolean, role_name: string) {
-        //TODO: precisa validar qual gerente pode alterar o status
+	async changeStatus(id: string, newStatus: boolean) {
 
 		const user = await this.get({ id } as TypeGetUserProps);
 		if (!user) {
@@ -140,8 +140,7 @@ export class UserService {
 						: 'Usuário já inativo',
 				errorCode: 'BAD_REQUEST',
 			});
-		}
-        console.log(role_name)
+		} 
 
 		if (user[0].user_type === 'EMPLOYEE') {
 			const employee = await prisma.$transaction(async (tx) => {

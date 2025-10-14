@@ -1,9 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserSchema } from '../schemas/user.schema.ts';
-import { CustomerService } from '../services/Customer.service.ts';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
-import { TypeGetUserProps } from '../types/users.types.ts';
+import { UserSchema } from '@/schemas/user.schema';
+import { CustomerService } from '@/services/Customer.service';
+import { HttpError } from '@/utils/errors.util';
+import { ApiResponse } from '@/utils/api-response.util';
+import { TypeGetUserProps } from '@/types/users.types';
 
 export class CustomerController {
 	constructor(private customerService: CustomerService) {}

@@ -1,9 +1,9 @@
-import { StoreService } from '../services/Store.service.ts';
+import { StoreService } from '@/services/Store.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
-import { StoreSchema } from '../schemas/store.schema.ts';
-import { TypeGetStoreProps } from '@/types/store.types.ts';
+import { HttpError } from '@/utils/errors.util';
+import { ApiResponse } from '@/utils/api-response.util';
+import { StoreSchema } from '@/schemas/store.schema';
+import { TypeGetStoreProps } from '@/types/store.types';
 
 export class StoreController {
 	constructor(private storeService: StoreService) {}
