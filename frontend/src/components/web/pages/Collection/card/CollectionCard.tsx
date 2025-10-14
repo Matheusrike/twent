@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/utils/functions/formatCurrency";
 
+
 interface CollectionCardProps {
   id: string;
   href: string;
@@ -74,8 +75,6 @@ export default function CollectionCard({
           <p className="text-gray-600 dark:text-gray-300 font-semibold mb-4">
             {description}
           </p>
-
-
 
           <div className="flex items-center justify-between">
             <button className="text-primary dark:text-primary hover:text-primary/80 dark:hover:text-primary/80 transition-colors">
