@@ -1,9 +1,14 @@
-// DarkModeProvider.tsx (Client Component)
 'use client';
 import { useEffect } from "react";
 
 export default function DarkModeProvider() {
   useEffect(() => {
+    const isManager = document.body.dataset.layout === "manager";
+    if (isManager) {
+      document.documentElement.classList.remove("dark");
+      return;
+    }
+
     const darkMode =
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) &&
@@ -11,5 +16,5 @@ export default function DarkModeProvider() {
     document.documentElement.classList.toggle("dark", darkMode);
   }, []);
 
-  return null; 
+  return null;
 }

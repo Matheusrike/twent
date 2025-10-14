@@ -1,5 +1,4 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
-import DarkModeProvider from "@/utils/theme/themeProvider";
 import type { Metadata } from "next";
 import "@/app/globals.css";
 
@@ -41,8 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br"  className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}  bg-white`}>
-      <body cz-shortcut-listen="true" >
-        <DarkModeProvider />
+      <body cz-shortcut-listen="true"  data-layout="manager">
         {children}
       </body>
     </html>
