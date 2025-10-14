@@ -1,5 +1,5 @@
 import prisma from '@prisma/client';
-import { Prisma } from '@prisma/generated/client';
+import { Prisma, PrismaClient } from '@prisma/generated/client';
 import {
 	ICollectionFilters,
 	ICreateCollection,
@@ -8,11 +8,13 @@ import {
 import { AppError } from '@/utils/errors.util';
 
 export class CollectionService {
+	constructor(private database: PrismaClient) {}
+
 	async create(data: ICreateCollection) {
 		try {
 			this.validatePriceRange(data.price_range_min, data.price_range_max);
 
-			const collection = await prisma.collection.create({
+			const collection = await this.database.collection.create({
 				data: {
 					name: data.name,
 					description: data.description,
@@ -41,7 +43,7 @@ export class CollectionService {
 	}
 
 	async findById(id: string) {
-		const collection = await prisma.collection.findUnique({
+		const collection = await this.database.collection.findUnique({
 			where: { id },
 			include: {
 				products: true,

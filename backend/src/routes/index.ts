@@ -7,6 +7,7 @@ import { authRoutes } from '@/routes/auth.routes';
 import { customerRoute } from './customer.route.ts';
 import { employeeRoute } from './employee.route.ts';
 import { userRoute } from './user.route.ts';
+import { collectionRoutes } from './collection.route.ts';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
@@ -35,6 +36,7 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 			await app.register(customerRoute, { prefix: '/customer' });
 			await app.register(employeeRoute, { prefix: '/employee' });
 			await app.register(userRoute, { prefix: '/user' });
+			await app.register(collectionRoutes, { prefix: '/collection' });
 		},
 		{ prefix: '/api' },
 	);
