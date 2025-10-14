@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { Logo } from "../../../components/private/views/login/logo";
 import { Button } from "@/components/private/global/ui/button";
 import {
@@ -42,7 +42,7 @@ const Login = () => {
     <div className="h-screen flex items-center justify-center">
       <div className="w-full h-full grid lg:grid-cols-2">
         {/* return button */}
-        <div className="absolute top-4 left-4 right-4">
+        <div className="absolute top-4 left-4 right-4 ">
           <Button
             variant="ghost"
             size="sm"
@@ -55,22 +55,14 @@ const Login = () => {
           </Button>
         </div>
 
-        <div className="max-w-md m-auto w-full flex flex-col items-center justify-center relative">
-
-          {/* title content */}
-          {/* <div className="flex flex-col justify-start items-start w-full py-15">
-            <h1 className="font-bold text-6xl">Bem-vindo</h1>
-            <h2 className="font-semibold text-2xl text-muted-foreground">
-              Insira seus dados
-            </h2>
-          </div> */}
+        <div className="max-w-md m-auto w-full h-150 flex flex-col items-center justify-between relative ">
 
           {/* logo content */}
           <div className="py-15 ">
             <Logo />
           </div>
 
-          {/* form content */}
+          {/* login form */}
           <Form {...form}>
             <form
               className="w-full space-y-4"
@@ -122,14 +114,23 @@ const Login = () => {
               href="#"
               className="text-sm block underline text-muted-foreground text-center"
             >
-              Forgot your password?
+              Esqueceu a senha?
             </Link>
           </div>
         </div>
 
 
+
+
         {/* banner */}
-        <div className="hidden lg:block rounded-lg bg-muted"></div>
+        <div className="hidden lg:block  w-full h-full relative">
+          <Image
+            src="/img/private/login/bannerLogin.png"
+            alt="Banner Login"
+            fill
+            className="object-cover "
+          />
+        </div>
       </div>
     </div>
   );
