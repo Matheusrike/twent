@@ -9,7 +9,7 @@ import fp from 'fastify-plugin';
 import { HttpError } from '@/utils/errors.util';
 
 function authorization(options: IAuthorizationOptions = {}) {
-	return async (request: FastifyRequest, reply: FastifyReply) => {
+	return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
 		try {
 			const { requiredRoles } = options;
 
@@ -22,11 +22,10 @@ function authorization(options: IAuthorizationOptions = {}) {
 				});
 			}
 
-			const decoded: IJwtAuthPayload =
-				await request.server.jwt.verify(token);
+			const decoded = await request.server.jwt.verify<IJwtAuthPayload>(token);
 			request.user = decoded;
 
-			// Verifica se há roles requeridas e verifica se o usuário possui elas
+			// Verifica roles
 			if (
 				requiredRoles &&
 				!requiredRoles.some((role) => decoded.roles.includes(role))
@@ -40,16 +39,28 @@ function authorization(options: IAuthorizationOptions = {}) {
 			}
 		} catch (error) {
 			if (error instanceof HttpError) {
-				return new ApiResponse({
+				new ApiResponse({
 					success: false,
 					statusCode: error.statusCode,
 					message: error.message,
 					errorCode: error.errorCode,
 				}).send(reply);
+				return;
 			}
 
-			console.error(error);
-			return ApiResponse.genericError(reply);
+			if (error.code === 'FAST_JWT_EXPIRED') {
+				new ApiResponse({
+					success: false,
+					statusCode: 401,
+					message: 'Token de autenticação expirado',
+					errorCode: 'FAST_JWT_EXPIRED',
+				}).send(reply);
+				return;
+			}
+
+			console.error('Authorization Error:', error);
+			ApiResponse.genericError(reply);
+			return;
 		}
 	};
 }

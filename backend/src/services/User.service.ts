@@ -86,11 +86,15 @@ export class UserService {
 					email: true,
 					first_name: true,
 					last_name: true,
+                    birth_date: true,
 					user_type: true,
+                    document_number: true,
 					city: true,
+                    number: true,
 					district: true,
 					state: true,
 					street: true,
+                    country: true,
 					phone: true,
 					is_active: true,
 					created_at: true,
@@ -116,7 +120,7 @@ export class UserService {
 		if (!user) {
 			throw new AppError({
 				message: 'Usuário não encontrado',
-				errorCode: 'NOT_FOUND',
+				errorCode: 'USER_NOT_FOUND',
 			});
 		}
 		return user;

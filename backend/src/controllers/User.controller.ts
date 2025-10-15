@@ -1,14 +1,19 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserService } from '@/services/User.service';
-import { HttpError } from '@/utils/errors.util';
+import { AppError, HttpError } from '@/utils/errors.util';
 import { ApiResponse } from '@/utils/api-response.util';
 
 export class UserController {
 	constructor(private userService: UserService) {}
 
-	async getInfo(request: FastifyRequest, reply: FastifyReply) {
+	async getInfo(
+		request: FastifyRequest<{ Querystring: { id: string } }>,
+		reply: FastifyReply,
+	) {
 		try {
-			const { id } = request.user as { id: string };
+			// se tiver querystring, usa o id do querystring, senao usa o id do token
+			const id = request.query.id || (request.user as { id: string }).id;
+
 			const response = await this.userService.getInfo(id);
 			reply.status(200).send(
 				new ApiResponse({
@@ -19,17 +24,21 @@ export class UserController {
 				}),
 			);
 		} catch (error) {
-			switch (error.errorCode) {
-				case 'NOT_FOUND':
-					return new HttpError({
-						message: error.message,
-						statusCode: 404,
-					});
-				default:
-					return new HttpError({
-						message: error.message,
-						statusCode: 500,
-					});
+			if (error instanceof AppError) {
+				switch (error.errorCode) {
+					case 'USER_NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						throw new HttpError({
+							message: 'Erro interno do servidor',
+							errorCode: 'INTERNAL_SERVER_ERROR',
+							statusCode: 500,
+						});
+				}
 			}
 		}
 	}
@@ -41,15 +50,11 @@ export class UserController {
 		reply: FastifyReply,
 	) {
 		try {
-            console.log(request.user);
-            
+			console.log(request.user);
+
 			const { id } = request.params;
 			const { newStatus } = request.body;
-			const response = await this.userService.changeStatus(
-				id,
-				newStatus,
-
-			);
+			const response = await this.userService.changeStatus(id, newStatus);
 			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
