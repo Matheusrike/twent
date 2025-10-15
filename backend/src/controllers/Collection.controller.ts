@@ -39,4 +39,45 @@ export class CollectionController {
 			}
 		}
 	}
+
+	async uploadBanner(request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const { collectionId } = request.params as { collectionId: string };
+			const bannerImage = await request.saveRequestFiles({
+				limits: { fileSize: 8 * 1024 * 1024 },
+			});
+			const imagePath = bannerImage[0].filepath;
+
+			const uploadedCollection =
+				await this.collectionService.uploadBanner(
+					collectionId,
+					imagePath,
+				);
+
+			return new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Banner da coleção atualizado com sucesso',
+				data: uploadedCollection,
+			}).send(reply);
+		} catch (error) {
+			if (error instanceof AppError) {
+				switch (error.errorCode) {
+					case 'CONFLICT':
+						throw new HttpError({
+							errorCode: error.errorCode,
+							message: error.message,
+							statusCode: 409,
+						});
+					default:
+						console.error('Unhandled AppError:', error);
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
+			}
+		}
+	}
 }

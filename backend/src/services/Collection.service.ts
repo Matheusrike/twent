@@ -6,6 +6,7 @@ import {
 	IUpdateCollection,
 } from '@/types/collection.types';
 import { AppError } from '@/utils/errors.util';
+import { uploadToCloudinary } from '@/utils/cloudinary.util';
 
 export class CollectionService {
 	constructor(private database: PrismaClient) {}
@@ -22,7 +23,6 @@ export class CollectionService {
 					target_gender: data.target_gender || 'UNISEX',
 					price_range_min: data.price_range_min,
 					price_range_max: data.price_range_max,
-					image_banner: data.image_banner,
 					is_active: data.is_active ?? true,
 				},
 				include: {
@@ -36,6 +36,30 @@ export class CollectionService {
 				throw new AppError({
 					message: `Coleção com o nome "${data.name}" já existe!`,
 					errorCode: 'CONFLICT',
+				});
+			}
+			throw error;
+		}
+	}
+
+	async uploadBanner(id: string, filePath: string) {
+		try {
+			const { publicId } = await uploadToCloudinary({
+				filePath,
+				folder: 'collections',
+			});
+
+			return await this.database.collection.update({
+				where: { id },
+				data: {
+					image_banner: publicId,
+				},
+			});
+		} catch (error) {
+			if (error.code === 'P2025') {
+				throw new AppError({
+					message: `Coleção com ID "${id}" nao encontrada!`,
+					errorCode: 'NOT_FOUND',
 				});
 			}
 			throw error;
@@ -102,8 +126,6 @@ export class CollectionService {
 
 	async update(id: string, data: IUpdateCollection) {
 		try {
-			await this.findById(id);
-
 			if (
 				data.price_range_min !== undefined ||
 				data.price_range_max !== undefined
@@ -126,11 +148,18 @@ export class CollectionService {
 
 			return collection;
 		} catch (error) {
-			if (error.code === 'P2002') {
-				throw new AppError({
-					message: `Coleção com o nome "${data.name}" já existe!`,
-					errorCode: 'CONFLICT',
-				});
+			switch (error.code) {
+				case 'P2025':
+					throw new AppError({
+						message: `Coleção com ID "${id}" nao encontrada!`,
+						errorCode: 'NOT_FOUND',
+					});
+
+				case 'P2002':
+					throw new AppError({
+						message: `Coleção com o nome "${data.name}" já existe!`,
+						errorCode: 'CONFLICT',
+					});
 			}
 			throw error;
 		}

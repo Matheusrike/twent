@@ -11,6 +11,14 @@ const envSchema = z.object({
 	COOKIE_SECRET: z.string().min(1, 'Cookie secret is required'),
 	JWT_SECRET: z.string().min(1, 'JWT secret is required'),
 	ADMIN_PASSWORD: z.string().min(1, 'Admin password is required'),
+
+	CLOUDINARY_CLOUD_NAME: z
+		.string()
+		.min(1, 'Cloudinary cloud name is required'),
+	CLOUDINARY_API_KEY: z.string().min(1, 'Cloudinary API key is required'),
+	CLOUDINARY_API_SECRET: z
+		.string()
+		.min(1, 'Cloudinary API secret is required'),
 });
 
 export function loadConfig(): IAppConfig {
@@ -37,5 +45,8 @@ export function loadConfig(): IAppConfig {
 		cookieSecret: env.COOKIE_SECRET,
 		jwtSecret: env.JWT_SECRET,
 		adminPassword: env.ADMIN_PASSWORD,
+		cloudinaryCloudName: env.CLOUDINARY_CLOUD_NAME,
+		cloudinaryApiKey: env.CLOUDINARY_API_KEY,
+		cloudinaryApiSecret: env.CLOUDINARY_API_SECRET,
 	};
 }
