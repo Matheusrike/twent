@@ -98,13 +98,13 @@ export default function CollectionIdHero({ params }: any) {
             {item.badge && (
               <Badge
                 variant="secondary"
-                className="rounded-full py-1 border-border"
+                className="rounded-full py-1 border-border dark:border-white/40 text-sm bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200"
                 asChild
               >
                 <span>{item.badge}</span>
               </Badge>
             )}
-            <h1 className="mt-6 max-w-[17ch] text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-semibold leading-tight tracking-tighter">
+            <h1 className="mt-6 max-w-[17ch] text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-semibold leading-tight tracking-tighter dark:text-white">
               {item.title}
             </h1>
             {item.value && (
@@ -114,41 +114,41 @@ export default function CollectionIdHero({ params }: any) {
             )}
 
             {/* Description */}
-            <p className="mt-6 text-base sm:text-lg text-gray-600 dark:text-gray-300">
+            <p className="mt-6 text-base sm:text-lg text-gray-600 dark:text-gray-200">
               {item.description}
             </p>
 
             {/* Technical specifications */}
             <div className="mt-8 w-full space-y-4">
-              <h2 className="text-lg sm:text-xl font-semibold">Especificações</h2>
+              <h2 className="text-lg sm:text-xl font-semibold dark:text-white">Especificações</h2>
               <div className="space-y-3 text-sm">
                 {item.reference && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Referência</span>
+                    <span className="text-gray-600 dark:text-gray-200">Referência</span>
                     <span className="font-medium">{item.reference}</span>
                   </div>
                 )}
                 {item.material && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Material</span>
+                    <span className="text-gray-600 dark:text-gray-200">Material</span>
                     <span className="font-medium">{item.material}</span>
                   </div>
                 )}
                 {item.movement && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Movimento</span>
+                    <span className="text-gray-600 dark:text-gray-200">Movimento</span>
                     <span className="font-medium">{item.movement}</span>
                   </div>
                 )}
                 {item.diameter && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Diâmetro</span>
+                    <span className="text-gray-600 dark:text-gray-200">Diâmetro</span>
                     <span className="font-medium">{item.diameter}</span>
                   </div>
                 )}
                 {item.waterResistance && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Resistência à água</span>
+                    <span className="text-gray-600 dark:text-gray-200">Resistência à água</span>
                     <span className="font-medium">{item.waterResistance}</span>
                   </div>
                 )}

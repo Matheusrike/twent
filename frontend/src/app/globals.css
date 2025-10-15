@@ -28,6 +28,15 @@ body {
   transition: background 0.3s ease;
 }
 
+.sidebarLG{
+  background: var(--darkBody);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+  transition: background 0.3s ease;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
