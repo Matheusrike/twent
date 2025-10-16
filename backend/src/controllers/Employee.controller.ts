@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { EmployeeSchema, UserSchema } from '@/schemas/user.schema';
+import { UserSchema } from '@/schemas/user.schema';
+import { EmployeeSchema } from '@/schemas/employee.schema';
 import { HttpError } from '@/utils/errors.util';
 import { ApiResponse } from '@/utils/api-response.util';
 import {

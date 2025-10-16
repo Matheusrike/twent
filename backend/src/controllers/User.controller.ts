@@ -78,10 +78,10 @@ export class UserController {
 						message: error.message,
 						statusCode: 401,
 					});
-				case 'BAD_REQUEST':
+				case 'CONFLICT':
 					return new HttpError({
 						message: error.message,
-						statusCode: 400,
+						statusCode: 409,
 					});
 				default:
 					return new HttpError({

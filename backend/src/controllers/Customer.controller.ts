@@ -76,11 +76,6 @@ export class CustomerController {
 			);
 		} catch (error) {
 			switch (error?.errorCode) {
-				case 'BAD_REQUEST':
-					return new HttpError({
-						message: error.message,
-						statusCode: 400,
-					});
 				case 'NOT_FOUND':
 					return new HttpError({
 						message: error.message,

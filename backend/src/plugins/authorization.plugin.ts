@@ -9,7 +9,10 @@ import fp from 'fastify-plugin';
 import { HttpError } from '@/utils/errors.util';
 
 function authorization(options: IAuthorizationOptions = {}) {
-	return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+	return async (
+		request: FastifyRequest,
+		reply: FastifyReply,
+	): Promise<void> => {
 		try {
 			const { requiredRoles } = options;
 
@@ -22,7 +25,8 @@ function authorization(options: IAuthorizationOptions = {}) {
 				});
 			}
 
-			const decoded = await request.server.jwt.verify<IJwtAuthPayload>(token);
+			const decoded =
+				await request.server.jwt.verify<IJwtAuthPayload>(token);
 			request.user = decoded;
 
 			// Verifica roles
@@ -30,7 +34,8 @@ function authorization(options: IAuthorizationOptions = {}) {
 				requiredRoles &&
 				!requiredRoles.some((role) => decoded.roles.includes(role))
 			) {
-				throw new HttpError({
+				throw new ApiResponse({
+					success: false,
 					message:
 						'Acesso negado, você não tem permissão suficiente para realizar essa operação',
 					errorCode: 'UNAUTHORIZED',
