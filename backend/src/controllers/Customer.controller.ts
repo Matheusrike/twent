@@ -6,9 +6,9 @@ import { ApiResponse } from '../utils/api-response.util.ts';
 import { TypeGetUserProps } from '../types/users.types.ts';
 
 export class CustomerController {
-	private service = new CustomerService();
+	constructor(private customerService: CustomerService) {}
 
-	create = async (request: FastifyRequest, reply: FastifyReply) => {
+	async create  (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const parsed = UserSchema.safeParse(request.body);
 
@@ -19,12 +19,12 @@ export class CustomerController {
 				});
 			}
 
-			await this.service.create(parsed.data!);
+			await this.customerService.create(parsed.data!);
 			reply.status(201).send(
 				new ApiResponse({
 					statusCode: 201,
 					success: true,
-					message: 'Usuário criado',
+					message: 'Usuário cadastrado',
 				}),
 			);
 		} catch (error) {
@@ -57,22 +57,20 @@ export class CustomerController {
 			}
 		}
 	};
-	get = async (
-		request: FastifyRequest<{
-			Querystring: TypeGetUserProps;
-		}>,
+	async get  (
+		request: FastifyRequest,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
-			const { skip, take, ...filters } = request.query;
+			const { skip, take, ...filters } = request.query as TypeGetUserProps;
 
-			const response = await this.service.get(filters, skip, take);
+			const response = await this.customerService.get(filters, skip, take);
 
 			return reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Informações do usuário encontradas',
+					message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
 					data: response,
 				}),
 			);
@@ -98,16 +96,16 @@ export class CustomerController {
 		}
 	};
 
-	update = async (
+	async update  (
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
-	) => {
+	) {
 		try {
 			const id = request.params['id'];
 			const parsed = UserSchema.partial().parse(request.body);
 
-			await this.service.update(id, parsed);
-			reply.status(200).send({ message: 'Usuário atualizado' });
+			await this.customerService.update(id, parsed);
+			reply.status(200).send({ message: 'Informação(ões) do usuário atualizada(s)' });
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':

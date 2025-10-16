@@ -1,14 +1,12 @@
+import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/generated/client';
+
 type StoreType = 'BRANCH' | 'HEADQUARTERS';
 
-interface OpeningHours {
-	day: string;
-	open: string;
-	close: string;
-}
+export type OpeningHours = { day: string; open: string; close: string };
 
 export interface IStoreProps {
 	name: string;
-	code: string;
 	type: StoreType;
 	email: string;
 	phone?: string;
@@ -19,8 +17,30 @@ export interface IStoreProps {
 	state: string;
 	zip_code: string;
 	country: string;
-	latitude?: number;
-	longitude?: number;
-	opening_hours: OpeningHours[];
+	latitude?: Decimal;
+	longitude?: Decimal;
+	opening_hours: Prisma.InputJsonValue;
 	is_active?: boolean;
 }
+
+export type TypeGetStoreProps = Prisma.StoreWhereInput & {
+	query: {
+		id?: string;
+		name?: string;
+		type?: StoreType;
+		email?: string;
+		phone?: string;
+		street?: string;
+		number?: string;
+		district?: string;
+		city?: string;
+		state?: string;
+		country?: string;
+		latitude?: Decimal;
+		longitude?: Decimal;
+		opening_hours?: Prisma.InputJsonValue;
+		is_active?: boolean;
+	};
+	skip?: number;
+	take?: number;
+};

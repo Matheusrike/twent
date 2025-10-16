@@ -16,18 +16,23 @@ export const loginBodySchema = z.object({
 });
 
 // Responses Schemas
+
+// Login Responses
 export const LoginSuccessResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Login realizado com sucesso'] }),
-	data: z.object({
-		token: z.string().meta({
-			description:
-				'Token JWT para autenticação. Obs: Enviado apenas em ambiente de desenvolvimento.',
-			examples: [
-				'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
-			],
-		}),
-	}),
+	data: z
+		.object({
+			token: z.string().meta({
+				description:
+					'Token JWT para autenticação. Obs: Enviado apenas em ambiente de desenvolvimento.',
+				examples: [
+					'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
+				],
+			}),
+		})
+		.optional()
+		.nullish(),
 }).meta({
 	description: `Resposta para login bem-sucedido (200).`,
 });
@@ -54,4 +59,12 @@ export const InvalidPasswordResponseSchema = ApiResponseSchema.extend({
 	errorCode: z.string().meta({ examples: ['INVALID_PASSWORD'] }),
 }).meta({
 	description: 'Resposta para senha inválida (401).',
+});
+
+// Logout Responses
+export const LogoutSuccessResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true),
+	message: z.string().meta({ examples: ['Logout realizado com sucesso'] }),
+}).meta({
+	description: 'Resposta para logout bem-sucedido (200).',
 });
