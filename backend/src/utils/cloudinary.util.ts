@@ -8,10 +8,10 @@ interface cloudinaryResult {
 
 export async function uploadToCloudinary({
 	filePath,
-	folder = 'twent',
+	folder,
 }: {
 	filePath: string;
-	folder?: string;
+	folder: string;
 }): Promise<cloudinaryResult> {
 	try {
 		const result = await cloudinary.uploader.upload(filePath, {

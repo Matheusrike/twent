@@ -1,24 +1,18 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import { CollectionService } from '@/services/Collection.service';
-import { ApiResponse } from '@/utils/api-response.util';
 import { AppError, HttpError } from '@/utils/errors.util';
 import { ICreateCollection } from '@/types/collection.types';
 
 export class CollectionController {
 	constructor(private collectionService: CollectionService) {}
 
-	async create(request: FastifyRequest, reply: FastifyReply) {
+	async create(request: FastifyRequest) {
 		try {
 			const collection = await this.collectionService.create(
 				request.body as ICreateCollection,
 			);
 
-			return new ApiResponse({
-				statusCode: 201,
-				success: true,
-				message: 'Coleção criada com sucesso',
-				data: collection,
-			}).send(reply);
+			return collection;
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
@@ -26,6 +20,7 @@ export class CollectionController {
 						throw new HttpError({
 							errorCode: error.errorCode,
 							message: error.message,
+
 							statusCode: 409,
 						});
 					default:
@@ -40,7 +35,7 @@ export class CollectionController {
 		}
 	}
 
-	async uploadBanner(request: FastifyRequest, reply: FastifyReply) {
+	async uploadBanner(request: FastifyRequest) {
 		try {
 			const { collectionId } = request.params as { collectionId: string };
 			const bannerImage = await request.saveRequestFiles({
@@ -54,12 +49,7 @@ export class CollectionController {
 					imagePath,
 				);
 
-			return new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Banner da coleção atualizado com sucesso',
-				data: uploadedCollection,
-			}).send(reply);
+			return uploadedCollection;
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {

@@ -18,26 +18,48 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				body: CreateCollectionSchema,
 			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
-				const collection = await collectionController.create(
-					request,
-					reply,
-				);
+				const collection = await collectionController.create(request);
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
 					message: 'Coleção criada com sucesso',
 					data: collection,
-				});
+				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					statusCode: error.statusCode,
 					success: false,
 					message: error.message,
 					errorCode: error.errorCode,
-				});
+				}).send(reply);
+			}
+		},
+	);
+
+	app.patch(
+		'/upload-banner/:id',
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				console.log(request);
+				const uploadedCollection =
+					await collectionController.uploadBanner(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Banner da coleção atualizado com sucesso',
+					data: uploadedCollection,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
 			}
 		},
 	);
