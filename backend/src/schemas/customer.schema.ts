@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ApiResponseSchema } from './api-response.schema';
 
 export const CustomerQueystringSchema = z.object({
 	name: z.string().optional(),
@@ -16,7 +17,7 @@ export const CustomerQueystringSchema = z.object({
 	is_active: z.boolean().optional(),
 });
 
-export const CustomerGetResponseSchema = z.object({
+export const CustomerGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z
 		.string()
@@ -36,9 +37,9 @@ export const CustomerGetResponseSchema = z.object({
 			district: z.string().nullable(),
 			city: z.string().nullable(),
 			state: z.string().nullable(),
-			zip_code: z.string().nullable(),
 			country: z.string().nullable(),
 			is_active: z.boolean().nullable(),
+            created_at: z.date().nullable(),
 		}),
 	),
 });

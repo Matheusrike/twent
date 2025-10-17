@@ -69,22 +69,22 @@ export class UserController {
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 404,
 					});
 				case 'UNAUTHORIZED':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 401,
 					});
 				case 'CONFLICT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 409,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
 					});

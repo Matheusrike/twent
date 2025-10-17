@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { CustomerController } from '@/controllers/Customer.controller';
 import { CustomerService } from '@/services/Customer.service';
 import {
@@ -13,8 +13,10 @@ import {
 import { UserNotFoundResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import { UserSchema } from '@/schemas/user.schema';
+import { ApiResponse } from '@/utils/api-response.util';
+import { fastifyTypedInstance } from '@/types/types';
 
-export function customerRoute(fastify: FastifyInstance) {
+export function customerRoute(fastify: fastifyTypedInstance) {
 	const customerService = new CustomerService();
 	const customerController = new CustomerController(customerService);
 
@@ -42,8 +44,23 @@ export function customerRoute(fastify: FastifyInstance) {
 					'EMPLOYEE_BRANCH',
 				],
 			}),
+        },
+     	async (
+			request: FastifyRequest,
+			reply: FastifyReply,
+		) => {
+			try {
+				const reponse = await customerController.get(request, reply);
+				return reponse;
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
 		},
-		customerController.get.bind(customerController),
 	);
 
 	fastify.post(
@@ -72,8 +89,52 @@ export function customerRoute(fastify: FastifyInstance) {
 				],
 			}),
 		},
-		customerController.create.bind(customerController),
+		async (
+            request: FastifyRequest,
+            reply: FastifyReply,
+        ) => {
+            try {
+                const reponse = await customerController.create(request, reply);
+                return reponse;
+            } catch (error) {
+                return new ApiResponse({
+                    success: false,
+                    statusCode: error.statusCode,
+                    message: error.message,
+                    errorCode: error.errorCode
+                }).send(reply);
+            }
+        }
 	);
 
-	fastify.put('/:id', customerController.update.bind(customerController));
+	fastify.put<{Params: {id: string}}>(
+        '/:id', 
+        {
+            schema: {
+               tags: ['Customer'],
+               summary: 'Atualiza as informações de um cliente',
+               body:  UserSchema.partial(),
+            },
+            preHandler: fastify.authorization({
+                    requiredRoles: ['ADMIN']
+                
+            }),
+        }, 
+        async (
+        request: FastifyRequest<{Params: {id: string}}>,
+        reply: FastifyReply,
+        ) => { 
+            try {
+                const response = await customerController.update(request, reply);
+                return response
+            } catch (error) {
+                return new ApiResponse({
+                    success: false,
+                    statusCode: error.statusCode,
+                    message: error.message,
+                    errorCode: error.errorCode
+                }).send(reply)
+            }
+        }
+    );
 }

@@ -8,13 +8,14 @@ import { TypeGetUserProps } from '@/types/users.types';
 export class CustomerController {
 	constructor(private customerService: CustomerService) {}
 
-	async create  (request: FastifyRequest, reply: FastifyReply) {
+	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const parsed = UserSchema.safeParse(request.body);
 
 			if (!parsed.success) {
-				return new HttpError({
+				throw new HttpError({
 					message: 'Dados enviados incorretos',
+                    errorCode: 'BAD_REQUEST',
 					statusCode: 400,
 				});
 			}
@@ -28,45 +29,52 @@ export class CustomerController {
 				}),
 			);
 		} catch (error) {
-			switch (error.errorCode) {
+			switch (error?.errorCode) {
 				case 'CONFLICT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 409,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 400,
 					});
 				case 'BAD_GATEWAY':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 502,
 					});
 				case 'GATEWAY_TIMEOUT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 504,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}
 		}
-	};
-	async get  (
-		request: FastifyRequest,
-		reply: FastifyReply,
-	) {
+	}
+	async get(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const { skip, take, ...filters } = request.query as TypeGetUserProps;
+			const { skip, take, ...filters } =
+				request.query as TypeGetUserProps;
 
-			const response = await this.customerService.get(filters, skip, take);
+			const response = await this.customerService.get(
+				filters,
+				skip,
+				take,
+			);
 
-			return reply.status(200).send(
+			reply.status(200).send(
 				new ApiResponse({
 					statusCode: 200,
 					success: true,
@@ -77,21 +85,23 @@ export class CustomerController {
 		} catch (error) {
 			switch (error?.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				default:
 					console.error(error);
-					return new HttpError({
+					throw new HttpError({
 						message: error?.message ?? 'Erro interno',
+						errorCode: 'INTERNAL_SERVER_ERROR',
 						statusCode: 500,
 					});
 			}
 		}
-	};
+	}
 
-	async update  (
+	async update(
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
 	) {
@@ -100,7 +110,9 @@ export class CustomerController {
 			const parsed = UserSchema.partial().parse(request.body);
 
 			await this.customerService.update(id, parsed);
-			reply.status(200).send({ message: 'Informação(ões) do usuário atualizada(s)' });
+			reply
+				.status(200)
+				.send({ message: 'Informação(ões) do usuário atualizada(s)' });
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
@@ -140,5 +152,5 @@ export class CustomerController {
 					});
 			}
 		}
-	};
+	}
 }
