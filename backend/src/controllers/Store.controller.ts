@@ -10,17 +10,20 @@ export class StoreController {
 
 	async get(request: FastifyRequest, reply: FastifyReply) {
 		try {
-            const { skip, take, ...filters } = request.query as TypeGetStoreProps;
-			const response = await this.storeService.get(filters, Number(skip), Number(take));
-
-			return reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Informações das filiais encontradas',
-					data: response,
-				}),
+			const { skip, take, ...filters } =
+				request.query as TypeGetStoreProps;
+			const response = await this.storeService.get(
+				filters,
+				Number(skip),
+				Number(take),
 			);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informações das filiais encontradas',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
@@ -50,13 +53,11 @@ export class StoreController {
 
 			await this.storeService.create(parsed.data!);
 
-			reply.status(201).send(
-				new ApiResponse({
-					statusCode: 201,
-					success: true,
-					message: 'Filial criada',
-				}),
-			);
+			new ApiResponse({
+				statusCode: 201,
+				success: true,
+				message: 'Filial criada',
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'CONFLICT':
@@ -88,14 +89,12 @@ export class StoreController {
 
 			const response = await this.storeService.update(id, parsed);
 
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Filial atualizada',
-					data: response,
-				}),
-			);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Filial atualizada',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
@@ -131,14 +130,13 @@ export class StoreController {
 				id,
 				newStatus,
 			);
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Status da filial atualizado',
-					data: response,
-				}),
-			);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Status da filial atualizado',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':

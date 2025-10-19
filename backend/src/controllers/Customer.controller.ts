@@ -15,19 +15,19 @@ export class CustomerController {
 			if (!parsed.success) {
 				throw new HttpError({
 					message: 'Dados enviados incorretos',
-                    errorCode: 'BAD_REQUEST',
+					errorCode: 'BAD_REQUEST',
 					statusCode: 400,
 				});
 			}
 
-			await this.customerService.create(parsed.data!);
-			reply.status(201).send(
-				new ApiResponse({
-					statusCode: 201,
-					success: true,
-					message: 'Usuário cadastrado',
-				}),
-			);
+			const response = await this.customerService.create(parsed.data!);
+
+			new ApiResponse({
+				statusCode: 201,
+				success: true,
+				message: 'Usuário cadastrado',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error?.errorCode) {
 				case 'CONFLICT':
@@ -74,14 +74,12 @@ export class CustomerController {
 				take,
 			);
 
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
-					data: response,
-				}),
-			);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error?.errorCode) {
 				case 'NOT_FOUND':
@@ -107,47 +105,66 @@ export class CustomerController {
 	) {
 		try {
 			const id = request.params['id'];
-			const parsed = UserSchema.partial().parse(request.body);
+			const parsed = UserSchema.partial().safeParse(request.body);
 
-			await this.customerService.update(id, parsed);
-			reply
-				.status(200)
-				.send({ message: 'Informação(ões) do usuário atualizada(s)' });
+			if (!parsed.success) {
+				throw new HttpError({
+					message: 'Dados enviados incorretos',
+					errorCode: 'BAD_REQUEST',
+					statusCode: 400,
+				});
+			}
+
+			const response = await this.customerService.update(id, parsed.data);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informação(ões) do usuário atualizada(s)',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				case 'UNAUTHORIZED':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 401,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 400,
 					});
 				case 'CONFLICT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 409,
 					});
 				case 'BAD_GATEWAY':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 502,
 					});
 				case 'GATEWAY_TIMEOUT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 504,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}

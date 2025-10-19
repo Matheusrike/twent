@@ -8,11 +8,11 @@ import {
 	CustomerGatewayTimeoutSchema,
 	CustomerGetResponseSchema,
 	CustomerPostResponseSchema,
+	CustomerPutResponseSchema,
 	CustomerQueystringSchema,
 } from '@/schemas/customer.schema';
 import { UserNotFoundResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
-import { UserSchema } from '@/schemas/user.schema';
 import { ApiResponse } from '@/utils/api-response.util';
 import { fastifyTypedInstance } from '@/types/types';
 
@@ -69,7 +69,6 @@ export function customerRoute(fastify: fastifyTypedInstance) {
             schema:{
                 tags: ['Customer'],
                 summary: 'Cria um novo cliente',
-                body: UserSchema,
                 response: {
                     201: CustomerPostResponseSchema,
                     400: CustomerBadRequestSchema,
@@ -113,7 +112,12 @@ export function customerRoute(fastify: fastifyTypedInstance) {
             schema: {
                tags: ['Customer'],
                summary: 'Atualiza as informações de um cliente',
-               body:  UserSchema.partial(),
+               response: {
+                200: CustomerPutResponseSchema,
+                400: CustomerBadRequestSchema,
+                404: UserNotFoundResponseSchema,
+                500: ApiGenericErrorSchema
+               }
             },
             preHandler: fastify.authorization({
                     requiredRoles: ['ADMIN']

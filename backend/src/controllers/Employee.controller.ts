@@ -1,18 +1,18 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserSchema } from '@/schemas/user.schema';
-import { EmployeeSchema } from '@/schemas/employee.schema';
-import { HttpError } from '@/utils/errors.util';
-import { ApiResponse } from '@/utils/api-response.util';
+import { UserSchema } from '../schemas/user.schema.ts';
+import { EmployeeSchema } from '@/schemas/employee.schema.ts';
+import { HttpError } from '../utils/errors.util.ts';
+import { ApiResponse } from '../utils/api-response.util.ts';
 import {
 	IEmployeeProps,
 	IUser,
 	TypeGetUserProps,
-} from '@/types/users.types';
-import { EmployeeService } from '@/services/Employee.service';
+} from '../types/users.types.ts';
+import { EmployeeService } from '../services/Employee.service.ts';
 
 export class EmployeeController {
 	constructor(private employeeService: EmployeeService) {}
-	async create (
+	async create(
 		request: FastifyRequest<{
 			Body: { userData: IUser; employeeData: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
@@ -27,8 +27,9 @@ export class EmployeeController {
 			);
 
 			if (!parsedUserData.success || !parsedEmployeeData.success) {
-				return new HttpError({
+				throw new HttpError({
 					message: 'Dados enviados incorretos',
+                    errorCode: 'BAD_REQUEST',
 					statusCode: 400,
 				});
 			}
@@ -36,14 +37,16 @@ export class EmployeeController {
 			const roleName = request.headers['x-role-name'];
 			const storeCode = request.headers['x-store-code'];
 			if (!roleName) {
-				return new HttpError({
+				throw new HttpError({
 					message: 'Cabeçalho x-role-name é obrigatório',
+                    errorCode: 'BAD_REQUEST',
 					statusCode: 400,
 				});
 			}
 			if (!storeCode) {
-				return new HttpError({
+				throw new HttpError({
 					message: 'Cabeçalho x-store-code é obrigatório',
+                    errorCode: 'BAD_REQUEST',
 					statusCode: 400,
 				});
 			}
@@ -53,65 +56,70 @@ export class EmployeeController {
 				roleName,
 				storeCode,
 			);
-			reply.status(201).send(
-				new ApiResponse({
-					statusCode: 201,
-					success: true,
-					message: 'Funcionário cadastrado com sucesso ',
-				}),
-			);
+
+			new ApiResponse({
+				statusCode: 201,
+				success: true,
+				message: 'Funcionário cadastrado com sucesso ',
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'CONFLICT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 409,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 400,
 					});
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				case 'BAD_GATEWAY':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 502,
 					});
 				case 'GATEWAY_TIMEOUT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 504,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+                        errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}
 		}
-	};
-	async get (
-		request: FastifyRequest,
-		reply: FastifyReply,
-	) {
+	}
+	async get(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const { skip, take, ...filters } = request.query as TypeGetUserProps;
+			const { skip, take, ...filters } =
+				request.query as TypeGetUserProps;
 
-			const response = await this.employeeService.get(filters, skip, take);
-
-			return reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
-					data: response,
-				}),
+			const response = await this.employeeService.get(
+				filters,
+				skip,
+				take,
 			);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error?.errorCode) {
 				case 'BAD_REQUEST':
@@ -132,9 +140,9 @@ export class EmployeeController {
 					});
 			}
 		}
-	};
+	}
 
-	async update (
+	async update(
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { userData: IUser; employeeData: IEmployeeProps };
@@ -163,7 +171,12 @@ export class EmployeeController {
 				roleName,
 				storeCode,
 			);
-			reply.status(200).send({ message: 'Infomação(ões) do funcionário atualizada(s)' });
+			new ApiResponse({
+				success: true,
+				statusCode: 200,
+				message: 'Funcionario atualizado com sucesso',
+				data: null,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
@@ -203,5 +216,5 @@ export class EmployeeController {
 					});
 			}
 		}
-	};
+	}
 }

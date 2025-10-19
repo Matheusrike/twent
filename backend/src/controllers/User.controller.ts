@@ -11,18 +11,15 @@ export class UserController {
 		reply: FastifyReply,
 	) {
 		try {
-			// se tiver querystring, usa o id do querystring, senao usa o id do token
 			const id = request.query.id || (request.user as { id: string }).id;
 
 			const response = await this.userService.getInfo(id);
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Informações do usuário encontradas',
-					data: response,
-				}),
-			);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informações do usuário encontradas',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
@@ -50,42 +47,43 @@ export class UserController {
 		reply: FastifyReply,
 	) {
 		try {
-			console.log(request.user);
-
 			const { id } = request.params;
 			const { newStatus } = request.body;
 			const response = await this.userService.changeStatus(id, newStatus);
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message:
-						newStatus == true
-							? 'Usuário:' + id + ' alterado para ativo'
-							: 'Usuário:' + id + ' alterado para inativo',
-					data: response,
-				}),
-			);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message:
+					newStatus == true
+						? 'Usuário:' + id + ' alterado para ativo'
+						: 'Usuário:' + id + ' alterado para inativo',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				case 'UNAUTHORIZED':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 401,
 					});
 				case 'CONFLICT':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 409,
 					});
 				default:
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}

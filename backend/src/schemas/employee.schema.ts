@@ -13,3 +13,17 @@ export const EmployeeSchema = z.object({
     emergency_contact: z.any().optional(),
     is_active: z.boolean().optional(),
 });
+
+export const EmployeePostResponseSchema = z.object({
+    success: z.literal(true),
+    message: z.string().meta({ examples: ['Funcionario cadastrado'] }),
+    data: z.any(),
+});
+
+export const EmployeeBadRequestSchema = z.object({
+    success: z.literal(false),
+    message: z
+        .string()
+        .meta({ examples: ['Informações do usuário inválidas'] }),
+    errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
+});
