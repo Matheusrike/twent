@@ -100,12 +100,6 @@ export const CustomerBadRequestSchema = z.object({
 	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
 });
 
-export const CustomerConflictSchema = z.object({
-	success: z.literal(false),
-	message: z.string().meta({ examples: ['Usuário conflitante'] }),
-	errorCode: z.string().meta({ examples: ['CONFLICT_USER'] }),
-});
-
 export const CustomerNotFoundSchema = z.object({
 	success: z.literal(false),
 	message: z.string().meta({ examples: ['Usuário nao encontrado'] }),

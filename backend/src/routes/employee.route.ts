@@ -3,7 +3,12 @@ import { EmployeeController } from '@/controllers/Employee.controller';
 import { EmployeeService } from '@/services/Employee.service';
 import { ApiResponse } from '@/utils/api-response.util';
 import { IEmployeeProps, IUser } from '@/types/users.types';
-import { EmployeeBadRequestSchema, EmployeePostResponseSchema } from '@/schemas/employee.schema';
+import {
+	EmployeeBadRequestSchema,
+	EmployeePostResponseSchema,
+} from '@/schemas/employee.schema';
+import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
+import { CustomerBadGatewaySchema, CustomerGatewayTimeoutSchema } from '@/schemas/customer.schema';
 
 export function employeeRoute(fastify: FastifyInstance) {
 	const employeeService = new EmployeeService();
@@ -15,14 +20,17 @@ export function employeeRoute(fastify: FastifyInstance) {
 	}>(
 		'/',
 		{
-            //TODO: documentar
+			//TODO: documentar
 			schema: {
 				tags: ['Employee'],
 				summary: 'Cria um novo funcionário',
 				description: 'Cria um novo funcionário',
 				response: {
 					201: EmployeePostResponseSchema,
-                    400: EmployeeBadRequestSchema,
+					400: EmployeeBadRequestSchema,
+					500: ApiGenericErrorSchema,
+					502: CustomerBadGatewaySchema,
+					504: CustomerGatewayTimeoutSchema,
 				},
 			},
 			preHandler: fastify.authorization({
@@ -47,7 +55,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 					success: false,
 					statusCode: error.statusCode,
 					message: error.message,
-                    errorCode: error.errorCode
+					errorCode: error.errorCode,
 				}).send(reply);
 			}
 		},

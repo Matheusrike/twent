@@ -14,6 +14,14 @@ export const EmployeeSchema = z.object({
     is_active: z.boolean().optional(),
 });
 
+export const EmployeeGetResponseSchema =  z.object({
+    success: z.literal(true),
+    message: z
+        .string()
+        .meta({ examples: ['Informações do usuário encontradas'] }),
+    data: z.any(),
+})
+
 export const EmployeePostResponseSchema = z.object({
     success: z.literal(true),
     message: z.string().meta({ examples: ['Funcionario cadastrado'] }),
