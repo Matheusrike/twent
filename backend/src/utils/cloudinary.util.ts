@@ -16,6 +16,7 @@ export async function uploadToCloudinary({
 	try {
 		const result = await cloudinary.uploader.upload(filePath, {
 			folder,
+			use_filename: true,
 			resource_type: 'image',
 		});
 
@@ -23,6 +24,7 @@ export async function uploadToCloudinary({
 
 		return { url: result.url, publicId: result.public_id };
 	} catch (error) {
-		throw new Error('Error uploading file to Cloudinary: ', error);
+		console.error(error);
+		throw new Error('Error uploading file to Cloudinary');
 	}
 }

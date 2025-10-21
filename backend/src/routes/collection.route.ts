@@ -41,10 +41,9 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.patch(
-		'/upload-banner/:id',
+		'/upload-banner/:collectionId',
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
-				console.log(request);
 				const uploadedCollection =
 					await collectionController.uploadBanner(request);
 				return new ApiResponse({
