@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Decimal } from '@prisma/client/runtime/library';
 import { StoreType } from '@prisma/generated/enums';
+import { ApiResponseSchema } from './api-response.schema';
 
 const storeType = StoreType;
 
@@ -12,13 +13,13 @@ const openingDays = [
 	'Friday',
 	'Saturday',
 	'Sunday',
-] as const;
+];
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export const StoreSchema = z.object({
 	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
-    code: z.string(),
+	code: z.string(),
 	type: z.enum(storeType),
 	email: z
 		.string()
@@ -98,4 +99,50 @@ export const StoreSchema = z.object({
 					'Não é permitido repetir dias da semana em opening_hours.',
 			},
 		),
+});
+
+export const StoreGetResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true).meta({
+		description: 'Indica se a requisição foi bem-sucedida',
+		examples: [true],
+	}),
+	message: z.string().meta({
+		description: 'Mensagem de sucesso retornada pela API',
+		examples: ['Informações da loja encontradas'],
+	}),
+	data: z.array(
+		z.object({
+			id: z
+				.string()
+				.meta({ examples: ['61ba3e5e-56e5-403b-bb26-e317011f7329'] }),
+			name: z.string().meta({ examples: ['Boutique Twent'] }),
+			code: z.string().meta({ examples: ['BRA001'] }),
+			type: z.enum(storeType).meta({ examples: ['BRANCH'] }),
+			email: z.string().meta({ examples: ['brasilial@twent.com.br'] }),
+			phone: z.string().meta({ examples: ['+55 11 3030-5050'] }),
+			street: z.string().meta({ examples: ['Rua Brasilia'] }),
+			number: z.string().meta({ examples: ['500'] }),
+			district: z.string().meta({ examples: ['Jardins'] }),
+			city: z.string().meta({ examples: ['São Paulo'] }),
+			state: z.string().meta({ examples: ['SP'] }),
+			zip_code: z.string().meta({ examples: ['01426-000'] }),
+			country: z.string().meta({ examples: ['BR'] }),
+			latitude: z.any().meta({ examples: ['-23.56019'] }),
+			longitude: z.any().meta({ examples: ['-46.67812'] }),
+			opening_hours: z.array(
+				z.object({
+					day: z.enum(openingDays).meta({ examples: ['Monday'] }),
+					open: z.string().meta({ examples: ['10:00'] }),
+					close: z.string().meta({ examples: ['19:00'] }),
+				}),
+			),
+			is_active: z.boolean().meta({ examples: [true] }),
+			created_at: z
+				.date()
+				.meta({ examples: ['2025-10-07T18:55:04.196Z'] }),
+			updated_at: z
+				.date()
+				.meta({ examples: ['2025-10-09T19:23:48.922Z'] }),
+		}),
+	),
 });

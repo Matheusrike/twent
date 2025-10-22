@@ -1,4 +1,4 @@
-import { IApiResponseOptions } from '../types/types';
+import { IApiResponseOptions } from '@/types/types';
 import { FastifyReply } from 'fastify';
 
 export class ApiResponse<T, E> {

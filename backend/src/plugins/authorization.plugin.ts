@@ -34,13 +34,11 @@ function authorization(options: IAuthorizationOptions = {}) {
 				requiredRoles &&
 				!requiredRoles.some((role) => decoded.roles.includes(role))
 			) {
-				throw new ApiResponse({
-					success: false,
-					message:
-						'Acesso negado, você não tem permissão suficiente para realizar essa operação',
-					errorCode: 'UNAUTHORIZED',
-					statusCode: 401,
-				});
+                throw new HttpError({
+                    message: 'Acesso negado, você não tem permissão suficiente para realizar essa operação',
+                    errorCode: 'UNAUTHORIZED',
+                    statusCode: 401,
+                })
 			}
 		} catch (error) {
 			if (error instanceof HttpError) {

@@ -1,8 +1,8 @@
 import prisma from './client';
 import { Prisma } from '@prisma/client/extension';
 import { UserType } from '@prisma/generated/enums';
-import { IStoreProps } from '../src/types/store.types';
-import { hashPassword } from '../src/utils/hash-password.util';
+import { IStoreProps } from '@/types/store.types';
+import { hashPassword } from '@/utils/hash-password.util';
 import { configDotenv } from 'dotenv';
 import { Decimal } from '@prisma/client/runtime/library';
 

@@ -80,11 +80,9 @@ export function userRoute(fastify: fastifyTypedInstance) {
 					request,
 					reply,
 				);
-				console.log(response);
 				return response;
 			} catch (error) {
 				console.log(error);
-
 				return new ApiResponse({
 					success: false,
 					statusCode: error.statusCode,

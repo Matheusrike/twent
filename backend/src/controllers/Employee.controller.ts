@@ -1,14 +1,14 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserSchema } from '../schemas/user.schema.ts';
+import { UserSchema } from '@/schemas/user.schema.ts';
 import { EmployeeSchema } from '@/schemas/employee.schema.ts';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
+import { HttpError } from '@/utils/errors.util.ts';
+import { ApiResponse } from '@/utils/api-response.util.ts';
 import {
 	IEmployeeProps,
 	IUser,
 	TypeGetUserProps,
-} from '../types/users.types.ts';
-import { EmployeeService } from '../services/Employee.service.ts';
+} from '@/types/users.types.ts';
+import { EmployeeService } from '@/services/Employee.service.ts';
 
 export class EmployeeController {
 	constructor(private employeeService: EmployeeService) {}
@@ -61,6 +61,7 @@ export class EmployeeController {
 				statusCode: 201,
 				success: true,
 				message: 'Funcionário cadastrado com sucesso ',
+                data: null
 			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
@@ -114,12 +115,13 @@ export class EmployeeController {
 				take,
 			);
 
-			new ApiResponse({
+            new ApiResponse({
 				statusCode: 200,
 				success: true,
 				message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
 				data: response,
 			}).send(reply);
+
 		} catch (error) {
 			switch (error?.errorCode) {
 				case 'BAD_REQUEST':

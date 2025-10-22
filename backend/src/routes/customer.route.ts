@@ -10,7 +10,10 @@ import {
 	CustomerPutResponseSchema,
 	CustomerQueystringSchema,
 } from '@/schemas/customer.schema';
-import { UserNotFoundResponseSchema } from '@/schemas/auth.schema';
+import {
+	UnauthorizedUserResponseSchema,
+	UserNotFoundResponseSchema,
+} from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import { ApiResponse } from '@/utils/api-response.util';
 import { fastifyTypedInstance } from '@/types/types';
@@ -32,6 +35,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 				response: {
 					200: CustomerGetResponseSchema,
 					404: UserNotFoundResponseSchema,
+					401: UnauthorizedUserResponseSchema,
 					500: ApiGenericErrorSchema,
 				},
 			},
@@ -69,6 +73,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 				response: {
 					201: CustomerPostResponseSchema,
 					400: CustomerBadRequestSchema,
+					401: UnauthorizedUserResponseSchema,
 					409: ConflictStatusResponseSchema,
 					500: ApiGenericErrorSchema,
 					502: CustomerBadGatewaySchema,
@@ -109,6 +114,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 				response: {
 					200: CustomerPutResponseSchema,
 					400: CustomerBadRequestSchema,
+					401: UnauthorizedUserResponseSchema,
 					404: UserNotFoundResponseSchema,
 					500: ApiGenericErrorSchema,
 					502: CustomerBadGatewaySchema,
