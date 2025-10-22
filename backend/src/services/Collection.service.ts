@@ -49,16 +49,18 @@ export class CollectionService {
 				folder: 'collections',
 			});
 
-			return await this.database.collection.update({
+			const collection = await this.database.collection.update({
 				where: { id },
 				data: {
 					image_banner: publicId,
 				},
 			});
+
+			return collection;
 		} catch (error) {
 			if (error.code === 'P2025') {
 				throw new AppError({
-					message: `Coleção com ID "${id}" nao encontrada!`,
+					message: `Coleção com ID ${id} nao encontrada!`,
 					errorCode: 'NOT_FOUND',
 				});
 			}

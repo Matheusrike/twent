@@ -5,6 +5,7 @@ import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import prisma from '@prisma/client';
 import { FastifyRequest, FastifyReply } from 'fastify';
+import z from 'zod/v4';
 
 export async function collectionRoutes(app: fastifyTypedInstance) {
 	const collectionService = new CollectionService(prisma);
@@ -42,6 +43,19 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 
 	app.patch(
 		'/upload-banner/:collectionId',
+		{
+			schema: {
+				description: 'Upload de imagem de banner da coleção',
+				tags: ['Collection'],
+				params: z.object({
+					collectionId: z.uuid().meta({
+						description: 'ID da coleção',
+						examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+					}),
+				}),
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const uploadedCollection =
