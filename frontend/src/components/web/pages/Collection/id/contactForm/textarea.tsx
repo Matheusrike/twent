@@ -44,23 +44,24 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
     <div className="w-full">
       <div className="relative">
-        <label
+      <label
           className={cn(
-            "absolute left-4 transition-all duration-200 ease-out pointer-events-none text-black",
+            "absolute left-4 text-muted-foreground transition-all duration-200 ease-out pointer-events-none ",
             isLabelFloating
-              ? "-top-2.5 text-xs bg-gray-200 px-1"
-              : "top-4 text-base"
+              ? "-top-7 text-xs px-1"
+              : "top-1/6 -translate-y-1/2 text-base"
           )}
         >
-          Mensagem *
+          Mensagem
         </label>
         <textarea
           data-slot="textarea"
           className={cn(
-            "border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex min-h-32 w-full border bg-gray-200 px-4 py-3 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] h-40 disabled:cursor-not-allowed disabled:opacity-50 resize-none",
+           "w-full h-50 h-max-50 rounded-lg border-gray-300  p-4 pe-12 text-sm shadow-sm  focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300 ease-in-out transform focus:-translate-y-1 dark:text-white dark:bg-background",
             error && "border-destructive",
             className
           )}
+          draggable="false"
           aria-invalid={!!error}
           onBlur={handleBlur}
           onFocus={handleFocus}
