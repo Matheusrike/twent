@@ -38,9 +38,7 @@ export class CollectionController {
 	async uploadBanner(request: FastifyRequest) {
 		try {
 			const { collectionId } = request.params as { collectionId: string };
-			const bannerImage = await request.saveRequestFiles({
-				limits: { fileSize: 8 * 1024 * 1024 },
-			});
+			const bannerImage = await request.saveRequestFiles();
 			const imagePath = bannerImage[0].filepath;
 
 			const uploadedCollection =
@@ -58,6 +56,13 @@ export class CollectionController {
 							errorCode: error.errorCode,
 							message: error.message,
 							statusCode: 409,
+						});
+
+					case 'NOT_FOUND':
+						throw new HttpError({
+							errorCode: error.errorCode,
+							message: 'Coleção nao encontrada',
+							statusCode: 404,
 						});
 					default:
 						console.error('Unhandled AppError:', error);

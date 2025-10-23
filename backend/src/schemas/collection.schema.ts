@@ -1,3 +1,4 @@
+import { UploadedFile } from '@/types/uploadFile.type';
 import { z } from 'zod';
 
 export const CreateCollectionSchema = z.object({
@@ -48,5 +49,32 @@ export const CreateCollectionSchema = z.object({
 		.meta({
 			description: 'Status de atividade da coleção',
 			examples: [true, false],
+		}),
+});
+
+export const UploadCollectionImageBodySchema = z.object({
+	bannerImage: z
+		.custom<UploadedFile>(
+			(val): val is UploadedFile =>
+				!!val &&
+				typeof val === 'object' &&
+				'mimetype' in val &&
+				(val as UploadedFile).mimetype.startsWith('image/'),
+			{
+				message:
+					'O arquivo enviado deve ser uma imagem com no máximo 5MB e em formato JPEG, JPG, PNG ou WEBP',
+			},
+		)
+		.refine((val) => !!val, {
+			message: 'O campo bannerImage é obrigatório.',
+		})
+		.meta({
+			description: 'Imagem de capa da coleção',
+			examples: [
+				'banner.jpeg',
+				'banner.jpg',
+				'banner.png',
+				'banner.webp',
+			],
 		}),
 });

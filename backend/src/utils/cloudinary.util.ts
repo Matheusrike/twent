@@ -28,3 +28,12 @@ export async function uploadToCloudinary({
 		throw new Error('Error uploading file to Cloudinary');
 	}
 }
+
+export async function deleteFromCloudinary(publicId: string) {
+	try {
+		await cloudinary.uploader.destroy(publicId);
+	} catch (error) {
+		console.error(error);
+		throw new Error('Error deleting file from Cloudinary');
+	}
+}

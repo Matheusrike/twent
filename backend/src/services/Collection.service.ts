@@ -6,7 +6,10 @@ import {
 	IUpdateCollection,
 } from '@/types/collection.types';
 import { AppError } from '@/utils/errors.util';
-import { uploadToCloudinary } from '@/utils/cloudinary.util';
+import {
+	deleteFromCloudinary,
+	uploadToCloudinary,
+} from '@/utils/cloudinary.util';
 
 export class CollectionService {
 	constructor(private database: PrismaClient) {}
@@ -49,6 +52,16 @@ export class CollectionService {
 				folder: 'collections',
 			});
 
+			const currentImageBanner =
+				await this.database.collection.findUnique({
+					where: { id },
+					select: { image_banner: true },
+				});
+
+			if (currentImageBanner?.image_banner) {
+				await deleteFromCloudinary(currentImageBanner.image_banner);
+			}
+
 			const collection = await this.database.collection.update({
 				where: { id },
 				data: {
@@ -78,7 +91,7 @@ export class CollectionService {
 
 		if (!collection) {
 			throw new AppError({
-				message: `Coleção com ID "${id}" não encontrada!`,
+				message: `Coleção com ID ${id} não encontrada!`,
 				errorCode: 'NOT_FOUND',
 			});
 		}

@@ -1,5 +1,8 @@
 import { CollectionController } from '@/controllers/Collection.controller';
-import { CreateCollectionSchema } from '@/schemas/collection.schema';
+import {
+	CreateCollectionSchema,
+	UploadCollectionImageBodySchema,
+} from '@/schemas/collection.schema';
 import { CollectionService } from '@/services/Collection.service';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
@@ -53,6 +56,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 						examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
 					}),
 				}),
+				body: UploadCollectionImageBodySchema,
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
