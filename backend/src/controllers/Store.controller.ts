@@ -2,7 +2,7 @@ import { StoreService } from '@/services/Store.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { HttpError } from '@/utils/errors.util';
 import { ApiResponse } from '@/utils/api-response.util';
-import { StoreSchema } from '@/schemas/store.schema';
+import { StoreBodySchema } from '@/schemas/store.schema';
 import { TypeGetStoreProps } from '@/types/store.types';
 
 export class StoreController {
@@ -12,12 +12,13 @@ export class StoreController {
 		try {
 			const { skip, take, ...filters } =
 				request.query as TypeGetStoreProps;
+
 			const response = await this.storeService.get(
 				filters,
 				Number(skip),
 				Number(take),
-			);
-
+			); 
+            
 			new ApiResponse({
 				statusCode: 200,
 				success: true,
@@ -34,10 +35,10 @@ export class StoreController {
 
 	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const parsed = StoreSchema.safeParse(request.body);
+			const parsed = StoreBodySchema.safeParse(request.body);
 
 			if (!parsed.success) {
-				return new HttpError({
+				throw new HttpError({
 					message: parsed.error.issues[0].message,
 					statusCode: 400,
 				});
@@ -53,17 +54,17 @@ export class StoreController {
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'CONFLICT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 409,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
 					});
@@ -77,7 +78,7 @@ export class StoreController {
 	) {
 		try {
 			const { id } = Request.params;
-			const parsed = StoreSchema.partial().parse(Request.body);
+			const parsed = StoreBodySchema.partial().parse(Request.body);
 
 			const response = await this.storeService.update(id, parsed);
 

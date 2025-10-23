@@ -33,23 +33,22 @@ export class EmployeeService extends UserService {
 	}
 
 	async create(
-		userData: IUser,
-		employeeData: IEmployeeProps,
+		data: IEmployeeProps,
 		roleName: string,
 		storeCode: string,
 	) {
 		let response = {};
-		await this.validateUser(userData?.email, userData?.document_number);
+		await this.validateUser(data?.email, data?.document_number);
 
-		userData.password_hash = await validatePassword(userData.password_hash);
+		data.password_hash = await validatePassword(data.password_hash);
 
 		await validateLocation({
-			country: userData?.country,
-			state: userData?.state,
-			city: userData?.city,
-			road: userData?.street,
-			district: userData?.district,
-			postalcode: userData?.zip_code,
+			country: data?.country,
+			state: data?.state,
+			city: data?.city,
+			road: data?.street,
+			district: data?.district,
+			postalcode: data?.zip_code,
 		});
 
 		const employee = await prisma.$transaction(async (tx) => {
@@ -73,7 +72,22 @@ export class EmployeeService extends UserService {
 			}
 			const user = await tx.user.create({
 				data: {
-					...userData,
+                    email: data.email,
+                    document_number: data.document_number,
+                    password_hash: data.password_hash,
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    phone: data.phone,
+                    birth_date: data.birth_date,
+                    street: data.street,
+                    number: data.number,
+                    district: data.district,
+                    city: data.city,
+                    state: data.state,
+                    zip_code: data.zip_code,
+                    country: data.country,
+                    created_at: new Date(),
+                    updated_at: new Date(),
 					is_active: true,
 					user_type: 'EMPLOYEE',
 					store_id: store.id,
@@ -88,10 +102,12 @@ export class EmployeeService extends UserService {
 
 			response = await tx.employee.create({
 				data: {
-					...employeeData,
+					national_id: data.national_id,
+                    department: data.department,
+                    currency: data.currency,
 					user_id: user.id,
-					position: employeeData.position || '',
-					salary: employeeData.salary || 0.0,
+					position: data.position || '',
+					salary: data.salary || 0.0,
 					employee_code,
 					hire_date: new Date(),
 					is_active: true,
@@ -119,7 +135,7 @@ export class EmployeeService extends UserService {
 
 	async update(
 		id: string,
-		userData?: Partial<IUser>,
+		data?: Partial<IUser>,
 		employeeData?: Partial<IEmployeeProps>,
 		roleName?: string,
 		storeCode?: string,
@@ -135,27 +151,27 @@ export class EmployeeService extends UserService {
 		}
 
 		if (
-			userData?.country ||
-			userData?.state ||
-			userData?.city ||
-			userData?.street ||
-			userData?.district ||
-			userData?.zip_code
+			data?.country ||
+			data?.state ||
+			data?.city ||
+			data?.street ||
+			data?.district ||
+			data?.zip_code
 		) {
 			await validateLocation({
-				country: userData?.country,
-				state: userData?.state,
-				city: userData?.city,
-				road: userData?.street,
-				district: userData?.district,
-				postalcode: userData?.zip_code,
+				country: data?.country,
+				state: data?.state,
+				city: data?.city,
+				road: data?.street,
+				district: data?.district,
+				postalcode: data?.zip_code,
 			});
 		}
 
-		await this.validateUser(userData?.email, userData?.document_number);
-		if (userData?.password_hash) {
-			userData.password_hash = await validatePassword(
-				userData?.password_hash,
+		await this.validateUser(data?.email, data?.document_number);
+		if (data?.password_hash) {
+			data.password_hash = await validatePassword(
+				data?.password_hash,
 			);
 		}
 
@@ -181,7 +197,7 @@ export class EmployeeService extends UserService {
 			const user = await tx.user.update({
 				where: { id },
 				data: {
-					...userData,
+					...data,
 				},
 			});
 			await tx.employee.update({

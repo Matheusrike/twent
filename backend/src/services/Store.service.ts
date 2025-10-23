@@ -34,8 +34,12 @@ export class StoreService {
 	}
 
 	async get(where?: TypeGetStoreProps, skip = 0, take = 10) {
-
-		const response = await prisma.store.findMany({ skip, take, where });
+  
+		const response = await prisma.store.findMany({
+			take: Number(take) || 10,
+			skip: Number(skip) || 0,
+			where,
+		});
 
 		return response;
 	}

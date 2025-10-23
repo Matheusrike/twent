@@ -2,74 +2,7 @@ import { z } from 'zod';
 import { UserType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
 
-const UserTypes: UserType[] = ['CUSTOMER', 'EMPLOYEE'];
-
-export const UserSchema = z.object({
-	email: z.string().email().meta({
-		examples: ['jane.doe@example.com'],
-		description: 'User email address',
-	}),
-	password_hash: z.string().min(6).meta({
-		examples: ['$2b$10$eImiTXuWVxfM37uY4JANjQ=='],
-		description: 'Hashed user password',
-	}),
-	first_name: z.string().meta({
-		examples: ['Jane'],
-		description: 'User first name',
-	}),
-	last_name: z.string().meta({
-		examples: ['Doe'],
-		description: 'User last name',
-	}),
-	phone: z.string().optional().meta({
-		examples: ['+1 202-555-0123'],
-		description: 'User phone number (international format)',
-	}),
-	user_type: z.enum(UserTypes).meta({
-		examples: ['EMPLOYEE'],
-		description: 'User type (CUSTOMER or EMPLOYEE)',
-	}),
-	document_number: z.string().optional().meta({
-		examples: ['A1234567'],
-		description: 'Passport or document number',
-	}),
-	birth_date: z.date().optional().meta({
-		examples: ['1992-03-15T00:00:00.000Z'],
-		description: 'Birth date in ISO 8601 format',
-	}),
-	street: z.string().optional().meta({
-		examples: ['221B Baker Street'],
-		description: 'Street address',
-	}),
-	number: z.string().optional().meta({
-		examples: ['221B'],
-		description: 'Street number or identifier',
-	}),
-	district: z.string().optional().meta({
-		examples: ['Marylebone'],
-		description: 'District or neighborhood',
-	}),
-	city: z.string().optional().meta({
-		examples: ['London'],
-		description: 'City name',
-	}),
-	state: z.string().optional().meta({
-		examples: ['England'],
-		description: 'State, region, or province',
-	}),
-	zip_code: z.string().optional().meta({
-		examples: ['NW1 6XE'],
-		description: 'Postal or ZIP code',
-	}),
-	country: z.string().optional().meta({
-		examples: ['United Kingdom'],
-		description: 'Country name',
-	}),
-	is_active: z.boolean().optional().meta({
-		examples: [true],
-		description: 'Whether the user is active or not',
-	}),
-});
+export const UserTypes: UserType[] = ['CUSTOMER', 'EMPLOYEE'];
 
 export const UserGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
@@ -95,6 +28,7 @@ export const UserGetResponseSchema = ApiResponseSchema.extend({
 		is_active: z.boolean().nullable().meta({ examples: [true] }),
 	}),
 });
+
 
 export const ChangeStatusBodySchema = z.object({
 	newStatus: z.boolean().meta({

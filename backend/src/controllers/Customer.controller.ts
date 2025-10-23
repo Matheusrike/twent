@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserSchema } from '@/schemas/user.schema';
+import { CustomerBodySchema } from '@/schemas/customer.schema';
 import { CustomerService } from '@/services/Customer.service';
 import { HttpError } from '@/utils/errors.util';
 import { ApiResponse } from '@/utils/api-response.util';
@@ -10,7 +10,7 @@ export class CustomerController {
 
 	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const parsed = UserSchema.safeParse(request.body);
+			const parsed = CustomerBodySchema.safeParse(request.body);
 
 			if (!parsed.success) {
 				throw new HttpError({
@@ -105,7 +105,7 @@ export class CustomerController {
 	) {
 		try {
 			const id = request.params['id'];
-			const parsed = UserSchema.partial().safeParse(request.body);
+			const parsed = CustomerBodySchema.partial().safeParse(request.body);
 
 			if (!parsed.success) {
 				throw new HttpError({

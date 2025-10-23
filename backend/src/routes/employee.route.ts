@@ -5,6 +5,7 @@ import { ApiResponse } from '@/utils/api-response.util';
 import { IEmployeeProps, IUser } from '@/types/users.types';
 import {
 	EmployeeBadRequestSchema,
+	EmployeeBodySchema,
 	EmployeeGetResponseSchema,
 	EmployeePostResponseSchema,
 	EmployeePutResponseSchema,
@@ -15,13 +16,14 @@ import {
 	CustomerGatewayTimeoutSchema,
 } from '@/schemas/customer.schema';
 import { UnauthorizedUserResponseSchema } from '@/schemas/auth.schema';
+import { EmployeeQuerystringSchema } from '@/schemas/employee.schema';
 
 export function employeeRoute(fastify: FastifyInstance) {
 	const employeeService = new EmployeeService();
 	const employeeController = new EmployeeController(employeeService);
 
 	fastify.post<{
-		Body: { userData: IUser; employeeData: IEmployeeProps };
+		Body: { data: IEmployeeProps };
 		Headers: { 'x-role-name': string; 'x-store-code': string };
 	}>(
 		'/',
@@ -30,6 +32,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 				tags: ['Employee'],
 				summary: 'Cria um novo funcionário',
 				description: 'Cria um novo funcionário',
+                body: EmployeeBodySchema,
 				response: {
 					201: EmployeePostResponseSchema,
 					400: EmployeeBadRequestSchema,
@@ -45,7 +48,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 		},
 		async (
 			request: FastifyRequest<{
-				Body: { userData: IUser; employeeData: IEmployeeProps };
+				Body: { data: IEmployeeProps };
 				Headers: { 'x-role-name': string; 'x-store-code': string };
 			}>,
 			reply: FastifyReply,
@@ -74,6 +77,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 				tags: ['Employee'],
 				summary: 'Busca todos os funcionários',
 				description: 'Busca todos os funcionários, com ou sem filtros',
+                querystring: EmployeeQuerystringSchema,
 				response: {
 					200: EmployeeGetResponseSchema,
 					400: EmployeeBadRequestSchema,
@@ -113,6 +117,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 				tags: ['Employee'],
 				summary: 'Atualiza um funcionário',
 				description: 'Atualiza um funcionário',
+                body: EmployeeBodySchema.partial(),
 				response: {
 					200: EmployeePutResponseSchema,
 					400: EmployeeBadRequestSchema,

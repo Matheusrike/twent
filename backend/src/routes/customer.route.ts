@@ -4,11 +4,12 @@ import { CustomerService } from '@/services/Customer.service';
 import {
 	CustomerBadGatewaySchema,
 	CustomerBadRequestSchema,
+	CustomerBodySchema,
 	CustomerGatewayTimeoutSchema,
 	CustomerGetResponseSchema,
 	CustomerPostResponseSchema,
 	CustomerPutResponseSchema,
-	CustomerQueystringSchema,
+    CustomerQuerystringSchema
 } from '@/schemas/customer.schema';
 import {
 	UnauthorizedUserResponseSchema,
@@ -31,7 +32,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 				summary: 'Busca todos os clientes',
 				description:
 					'Faz busca de todos os clientes, com ou sem filtros',
-				querystring: CustomerQueystringSchema,
+				querystring: CustomerQuerystringSchema,
 				response: {
 					200: CustomerGetResponseSchema,
 					404: UserNotFoundResponseSchema,
@@ -70,6 +71,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 			schema: {
 				tags: ['Customer'],
 				summary: 'Cria um novo cliente',
+                body: CustomerBodySchema,
 				response: {
 					201: CustomerPostResponseSchema,
 					400: CustomerBadRequestSchema,
@@ -111,6 +113,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 			schema: {
 				tags: ['Customer'],
 				summary: 'Atualiza as informações de um cliente',
+                body: CustomerBodySchema.partial(),
 				response: {
 					200: CustomerPutResponseSchema,
 					400: CustomerBadRequestSchema,

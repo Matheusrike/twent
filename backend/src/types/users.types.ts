@@ -40,7 +40,7 @@ export type TypeGetUserProps = Prisma.UserWhereInput & {
 	take?: number;
 };
 
-export interface IEmployeeProps{
+export interface IEmployeeProps extends IUser {
 	national_id?: string;
 	position?: string;
 	department?: string;

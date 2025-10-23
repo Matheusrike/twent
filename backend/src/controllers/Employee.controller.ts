@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserSchema } from '@/schemas/user.schema.ts';
-import { EmployeeSchema } from '@/schemas/employee.schema.ts';
+import { CustomerBodySchema } from '@/schemas/customer.schema';
+import { EmployeeBodySchema } from '@/schemas/employee.schema.ts';
 import { HttpError } from '@/utils/errors.util.ts';
 import { ApiResponse } from '@/utils/api-response.util.ts';
 import {
@@ -12,21 +12,18 @@ import { EmployeeService } from '@/services/Employee.service.ts';
 
 export class EmployeeController {
 	constructor(private employeeService: EmployeeService) {}
+    
 	async create(
 		request: FastifyRequest<{
-			Body: { userData: IUser; employeeData: IEmployeeProps };
+			Body: { data: IEmployeeProps };
 			Headers: { 'x-role-name': string; 'x-store-code': string };
 		}>,
 		reply: FastifyReply,
 	) {
 		try {
-			const parsedUserData = UserSchema.safeParse(request.body.userData);
+            const parsed = EmployeeBodySchema.safeParse(request.body);
 
-			const parsedEmployeeData = EmployeeSchema.safeParse(
-				request.body.employeeData,
-			);
-
-			if (!parsedUserData.success || !parsedEmployeeData.success) {
+			if (!parsed.success) {
 				throw new HttpError({
 					message: 'Dados enviados incorretos',
                     errorCode: 'BAD_REQUEST',
@@ -51,8 +48,7 @@ export class EmployeeController {
 				});
 			}
 			await this.employeeService.create(
-				parsedUserData.data,
-				parsedEmployeeData.data,
+				parsed.data,
 				roleName,
 				storeCode,
 			);
@@ -155,11 +151,11 @@ export class EmployeeController {
 		try {
 			const id = request.params['id'];
 
-			const parsedUserData = UserSchema.partial().parse(
+			const parsedUserData = CustomerBodySchema.partial().parse(
 				request.body.userData,
 			);
 
-			const parsedEmployeeData = EmployeeSchema.partial().parse(
+			const parsedEmployeeData = EmployeeBodySchema.partial().parse(
 				request.body.employeeData,
 			);
 

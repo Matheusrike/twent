@@ -82,7 +82,6 @@ export function userRoute(fastify: fastifyTypedInstance) {
 				);
 				return response;
 			} catch (error) {
-				console.log(error);
 				return new ApiResponse({
 					success: false,
 					statusCode: error.statusCode,
