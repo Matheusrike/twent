@@ -1,7 +1,7 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import "@/app/globals.css";
-
+import SideBar from "@/components/private/global/sideBar/sideBar";
 
 const notoSansAdlam = Noto_Sans_Adlam({
   subsets: ["latin"],
@@ -39,8 +39,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br"  className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}  bg-white`}>
-      <body cz-shortcut-listen="true"  data-layout="manager">
+    <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}  bg-white`}>
+      <body cz-shortcut-listen="true" data-layout="manager">
+        <SideBar />
         {children}
       </body>
     </html>

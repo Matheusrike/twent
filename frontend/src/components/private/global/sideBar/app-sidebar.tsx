@@ -20,9 +20,9 @@ import {
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/private/views/dashboard/nav-documents"
-import { NavMain } from "@/components/private/views/dashboard/nav-main"
-import { NavSecondary } from "@/components/private/views/dashboard/nav-secondary"
-import { NavUser } from "@/components/private/views/dashboard/nav-user"
+import { NavMain } from "@/components/private/global/sideBar/nav-main"
+import { NavSecondary } from "@/components/private/global/sideBar/nav-secondary"
+import { NavUser } from "@/components/private/global/sideBar/nav-user"
 import {
   Sidebar,
   SidebarContent,
