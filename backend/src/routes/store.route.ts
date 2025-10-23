@@ -4,6 +4,7 @@ import { StoreController } from '@/controllers/Store.controller';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import { StoreGetResponseSchema } from '@/schemas/store.schema';
+import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 
 export function storeRoute(fastify: fastifyTypedInstance) {
 	const storeService = new StoreService();
@@ -12,14 +13,15 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 	fastify.get(
 		'/',
 		{
-         schema: {
-            tags: ['Store'],
-            summary: 'Busca todos as lojas',
-            description: 'Faz busca de todas as lojas, com ou sem filtros',
-            response: {
-               200: StoreGetResponseSchema,
-            },
-         },
+			schema: {
+				tags: ['Store'],
+				summary: 'Busca todos as lojas',
+				description: 'Faz busca de todas as lojas, com ou sem filtros',
+				response: {
+					200: StoreGetResponseSchema,
+                    500: ApiGenericErrorSchema
+				},
+			},
 			preHandler: fastify.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),

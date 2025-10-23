@@ -17,7 +17,7 @@ export class StoreController {
 				Number(skip),
 				Number(take),
 			);
-            
+
 			new ApiResponse({
 				statusCode: 200,
 				success: true,
@@ -25,18 +25,10 @@ export class StoreController {
 				data: response,
 			}).send(reply);
 		} catch (error) {
-			switch (error.errorCode) {
-				case 'NOT_FOUND':
-					throw new HttpError({
-						message: error.message,
-						statusCode: 404,
-					});
-				default:
-					throw new HttpError({
-						message: error.message,
-						statusCode: 500,
-					});
-			}
+			throw new HttpError({
+				message: error.message,
+				statusCode: 500,
+			});
 		}
 	}
 

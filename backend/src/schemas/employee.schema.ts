@@ -8,35 +8,35 @@ export const EmployeeSchema = z.object({
 		.optional()
 		.meta({
 			description: 'Número de identificação nacional do funcionário',
-			examples: ['123.456.789-00'],
+			examples: ['AB123456C'],
 		}),
 	department: z
 		.string()
 		.optional()
 		.meta({
 			description: 'Departamento em que o funcionário trabalha',
-			examples: ['Recursos Humanos', 'Financeiro'],
+			examples: ['Human Resources', 'Finance'],
 		}),
 	salary: z
 		.union([z.string(), z.number()])
 		.transform((val) => new Decimal(val))
 		.meta({
 			description: 'Salário do funcionário (convertido em Decimal)',
-			examples: ['3500.50', 4200],
+			examples: ['4200.75', 5100],
 		}),
 	currency: z
 		.string()
 		.optional()
 		.meta({
 			description: 'Moeda usada no salário',
-			examples: ['BRL', 'USD'],
+			examples: ['USD', 'EUR', 'GBP'],
 		}),
 	benefits: z
 		.any()
 		.optional()
 		.meta({
 			description: 'Lista de benefícios do funcionário',
-			examples: [['Vale-refeição', 'Plano de saúde']],
+			examples: [['Health insurance', 'Meal voucher']],
 		}),
 	termination_date: z
 		.date()
@@ -50,7 +50,7 @@ export const EmployeeSchema = z.object({
 		.optional()
 		.meta({
 			description: 'Informações de contato de emergência',
-			examples: [{ name: 'Maria Silva', phone: '(11) 99999-9999' }],
+			examples: [{ name: 'Emma Johnson', phone: '+1 415-555-0199' }],
 		}),
 	is_active: z
 		.boolean()
@@ -68,48 +68,50 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 	}),
 	message: z.string().meta({
 		description: 'Mensagem de sucesso retornada pela API',
-		examples: ['Informações do empregado encontradas'],
+		examples: ['Informações do funcionário encontradas'],
 	}),
 	data: z
 		.array(
 			z.object({
-				id: z.string().meta({ examples: ['usr_12345'] }),
-				email: z.string().meta({ examples: ['cFtZ4@example.com'] }),
-				first_name: z.string().meta({ examples: ['Carlos'] }),
-				last_name: z.string().meta({ examples: ['Ferreira'] }),
+				id: z.string().meta({ examples: ['emp_7b2f4a8d'] }),
+				email: z
+					.string()
+					.meta({ examples: ['oliver.smith@example.com'] }),
+				first_name: z.string().meta({ examples: ['Oliver'] }),
+				last_name: z.string().meta({ examples: ['Smith'] }),
 				phone: z
 					.string()
 					.nullable()
-					.meta({ examples: ['+55 11 91234-5678', null] }),
+					.meta({ examples: ['+44 20 7946 0958', null] }),
 				user_type: z.enum(['EMPLOYEE']).meta({
 					description: 'Tipo de usuário (fixo: EMPLOYEE)',
 				}),
 				city: z
 					.string()
 					.nullable()
-					.meta({ examples: ['São Paulo', null] }),
+					.meta({ examples: ['London', null] }),
 				state: z
 					.string()
 					.nullable()
-					.meta({ examples: ['SP', null] }),
+					.meta({ examples: ['England', null] }),
 				country: z
 					.string()
 					.nullable()
-					.meta({ examples: ['BR', null] }),
+					.meta({ examples: ['United Kingdom', null] }),
 				street: z
 					.string()
 					.nullable()
-					.meta({ examples: ['Rua das Flores, 123', null] }),
+					.meta({ examples: ['10 Downing Street', null] }),
 				is_active: z.boolean().meta({ examples: [true, false] }),
 				employee: z
 					.object({
 						position: z
 							.string()
 							.nullable()
-							.meta({ examples: ['Analista', null] }),
-						salary: z.any().meta({ examples: [5000.0] }),
+							.meta({ examples: ['Data Analyst', null] }),
+						salary: z.any().meta({ examples: [5200.5] }),
 						is_active: z.boolean().meta({ examples: [true] }),
-					})
+					}).nullable() // retirar nullable depois
 					.meta({
 						description:
 							'Informações complementares do funcionário',
@@ -120,7 +122,7 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 							role: z.object({
 								name: z
 									.string()
-									.meta({ examples: ['MANAGER_HQ'] }),
+									.meta({ examples: ['STORE_MANAGER'] }),
 							}),
 						}),
 					)
@@ -129,9 +131,11 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 					}),
 				store: z
 					.object({
-						code: z.string().meta({ examples: ['ST001'] }),
-						name: z.string().meta({ examples: ['Loja Central'] }),
-					})
+						code: z.string().meta({ examples: ['ST101'] }),
+						name: z
+							.string()
+							.meta({ examples: ['Main Store - New York'] }),
+					}).nullable() // retirar nullable depois 
 					.meta({ description: 'Loja associada ao funcionário' }),
 			}),
 		)
@@ -142,20 +146,18 @@ export const EmployeePostResponseSchema = z.object({
 	success: z.literal(true),
 	message: z
 		.string()
-		.meta({ examples: ['Funcionário cadastrado com sucesso'] }),    
+		.meta({ examples: ['Funcionário cadastrado com sucesso'] }),
 });
 
 export const EmployeePutResponseSchema = z.object({
 	success: z.literal(true),
 	message: z
 		.string()
-		.meta({ examples: ['Funcionário atualizado com sucesso'] }),    
+		.meta({ examples: ['Funcionário atualizado com sucesso'] }),
 });
 
 export const EmployeeBadRequestSchema = z.object({
 	success: z.literal(false),
-	message: z
-		.string()
-		.meta({ examples: ['Informações do usuário inválidas'] }),
+	message: z.string().meta({ examples: ['Dados do funcionário inválidos'] }),
 	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
 });

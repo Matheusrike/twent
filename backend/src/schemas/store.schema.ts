@@ -114,19 +114,19 @@ export const StoreGetResponseSchema = ApiResponseSchema.extend({
 		z.object({
 			id: z
 				.string()
-				.meta({ examples: ['61ba3e5e-56e5-403b-bb26-e317011f7329'] }),
-			name: z.string().meta({ examples: ['Boutique Twent'] }),
-			code: z.string().meta({ examples: ['BRA001'] }),
+				.meta({ examples: ['61ba0e5e-59e5-403b-bb76-e317011f7399'] }),
+			name: z.string().meta({ examples: ['Example Twent'] }),
+			code: z.string().meta({ examples: ['EXA001'] }),
 			type: z.enum(storeType).meta({ examples: ['BRANCH'] }),
-			email: z.string().meta({ examples: ['brasilial@twent.com.br'] }),
-			phone: z.string().meta({ examples: ['+55 11 3030-5050'] }),
-			street: z.string().meta({ examples: ['Rua Brasilia'] }),
+			email: z.string().meta({ examples: ['example@twent.com.br'] }),
+			phone: z.string().meta({ examples: ['+55 11 9999-8888'] }),
+			street: z.string().meta({ examples: ['St. Example'] }),
 			number: z.string().meta({ examples: ['500'] }),
-			district: z.string().meta({ examples: ['Jardins'] }),
-			city: z.string().meta({ examples: ['São Paulo'] }),
-			state: z.string().meta({ examples: ['SP'] }),
-			zip_code: z.string().meta({ examples: ['01426-000'] }),
-			country: z.string().meta({ examples: ['BR'] }),
+			district: z.string().meta({ examples: ['Manhattan'] }),
+			city: z.string().meta({ examples: ['New York'] }),
+			state: z.string().meta({ examples: ['NY'] }),
+			zip_code: z.string().meta({ examples: ['01000-000'] }),
+			country: z.string().meta({ examples: ['US'] }),
 			latitude: z.any().meta({ examples: ['-23.56019'] }),
 			longitude: z.any().meta({ examples: ['-46.67812'] }),
 			opening_hours: z.array(
@@ -146,3 +146,9 @@ export const StoreGetResponseSchema = ApiResponseSchema.extend({
 		}),
 	),
 });
+
+export const StoreNotFoundSchema =  ApiResponseSchema.extend({
+    success: z.literal(false),
+    message: z.string().meta({ examples: ['Loja nao encontrada'] }),
+    errorCode: z.string().meta({ examples: ['STORE_NOT_FOUND'] }),
+})
