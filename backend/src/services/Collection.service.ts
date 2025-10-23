@@ -1,20 +1,24 @@
-import prisma from '@prisma/client';
-import { Prisma, PrismaClient } from '@prisma/generated/client';
-import {
-	ICollectionFilters,
-	ICreateCollection,
-	IUpdateCollection,
-} from '@/types/collection.types';
+import type {
+	PrismaClient,
+	Prisma,
+	GenderTarget,
+} from '@prisma/generated/client';
 import { AppError } from '@/utils/errors.util';
 import {
 	deleteFromCloudinary,
 	uploadToCloudinary,
 } from '@/utils/cloudinary.util';
+import { IPaginationParams } from '@/types/pagination.types';
+import {
+	CreateCollectionType,
+	UpdateCollectionType,
+} from '@/schemas/collection.schema';
+import { ICollectionFilters } from '@/types/collection.types';
 
 export class CollectionService {
 	constructor(private database: PrismaClient) {}
 
-	async create(data: ICreateCollection) {
+	async create(data: CreateCollectionType) {
 		try {
 			this.validatePriceRange(data.price_range_min, data.price_range_max);
 
@@ -23,7 +27,8 @@ export class CollectionService {
 					name: data.name,
 					description: data.description,
 					launch_year: data.launch_year,
-					target_gender: data.target_gender || 'UNISEX',
+					target_gender: (data.target_gender ||
+						'UNISEX') as GenderTarget,
 					price_range_min: data.price_range_min,
 					price_range_max: data.price_range_max,
 					is_active: data.is_active ?? true,
@@ -34,8 +39,9 @@ export class CollectionService {
 			});
 
 			return collection;
-		} catch (error) {
-			if (error.code === 'P2002') {
+		} catch (error: unknown) {
+			const prismaError = error as { code?: string };
+			if (prismaError.code === 'P2002') {
 				throw new AppError({
 					message: `Coleção com o nome "${data.name}" já existe!`,
 					errorCode: 'CONFLICT',
@@ -70,10 +76,11 @@ export class CollectionService {
 			});
 
 			return collection;
-		} catch (error) {
-			if (error.code === 'P2025') {
+		} catch (error: unknown) {
+			const prismaError = error as { code?: string };
+			if (prismaError.code === 'P2025') {
 				throw new AppError({
-					message: `Coleção com ID ${id} nao encontrada!`,
+					message: `Coleção com ID ${id} não encontrada!`,
 					errorCode: 'NOT_FOUND',
 				});
 			}
@@ -99,7 +106,16 @@ export class CollectionService {
 		return collection;
 	}
 
-	async findAll(filters?: ICollectionFilters) {
+	async findAll(
+		filters?: ICollectionFilters,
+		pagination?: IPaginationParams,
+	) {
+		const page =
+			pagination?.page && pagination.page > 0 ? pagination.page : 1;
+		const limit =
+			pagination?.limit && pagination.limit > 0 ? pagination.limit : 10;
+		const skip = (page - 1) * limit;
+
 		const where: Prisma.CollectionWhereInput = {};
 
 		if (filters?.name) {
@@ -117,56 +133,97 @@ export class CollectionService {
 			where.launch_year = filters.launch_year;
 		}
 
-		const collections = await prisma.collection.findMany({
-			where,
-			include: {
-				products: {
-					select: {
-						id: true,
-						name: true,
+		const [collections, total] = await Promise.all([
+			this.database.collection.findMany({
+				where,
+				include: {
+					products: {
+						select: {
+							id: true,
+							name: true,
+						},
 					},
 				},
-			},
-			orderBy: {
-				created_at: 'desc',
-			},
-		});
+				orderBy: {
+					created_at: 'desc',
+				},
+				skip,
+				take: limit,
+			}),
+			this.database.collection.count({ where }),
+		]);
 
-		return collections;
+		const totalPages = Math.ceil(total / limit);
+		const hasNext = page < totalPages;
+		const hasPrev = page > 1;
+
+		return {
+			collections,
+			pagination: {
+				page,
+				limit,
+				total,
+				totalPages,
+				hasNext,
+				hasPrev,
+			},
+		};
 	}
 
-	async findActive() {
-		return this.findAll({ is_active: true });
+	async findActive(pagination?: IPaginationParams) {
+		return this.findAll({ is_active: true }, pagination);
 	}
 
-	async update(id: string, data: IUpdateCollection) {
+	async update(id: string, data: UpdateCollectionType) {
 		try {
 			if (
 				data.price_range_min !== undefined ||
 				data.price_range_max !== undefined
 			) {
-				const current = await prisma.collection.findUnique({
+				const current = await this.database.collection.findUnique({
 					where: { id },
 				});
 				const newMin = data.price_range_min ?? current?.price_range_min;
 				const newMax = data.price_range_max ?? current?.price_range_max;
-				this.validatePriceRange(Number(newMin), Number(newMax));
+				this.validatePriceRange(
+					newMin ? Number(newMin) : undefined,
+					newMax ? Number(newMax) : undefined,
+				);
 			}
 
-			const collection = await prisma.collection.update({
+			const updateData: Prisma.CollectionUpdateInput = {};
+
+			if (data.name !== undefined) updateData.name = data.name;
+			if (data.description !== undefined)
+				updateData.description = data.description;
+			if (data.launch_year !== undefined)
+				updateData.launch_year = data.launch_year;
+			if (data.target_gender !== undefined)
+				updateData.target_gender = data.target_gender as GenderTarget;
+			if (data.price_range_min !== undefined)
+				updateData.price_range_min = data.price_range_min;
+			if (data.price_range_max !== undefined)
+				updateData.price_range_max = data.price_range_max;
+			if (data.image_banner !== undefined)
+				updateData.image_banner = data.image_banner;
+			if (data.is_active !== undefined)
+				updateData.is_active = data.is_active;
+
+			const collection = await this.database.collection.update({
 				where: { id },
-				data,
+				data: updateData,
 				include: {
 					products: true,
 				},
 			});
 
 			return collection;
-		} catch (error) {
-			switch (error.code) {
+		} catch (error: unknown) {
+			const prismaError = error as { code?: string };
+			switch (prismaError.code) {
 				case 'P2025':
 					throw new AppError({
-						message: `Coleção com ID "${id}" nao encontrada!`,
+						message: `Coleção com ID "${id}" não encontrada!`,
 						errorCode: 'NOT_FOUND',
 					});
 
@@ -191,7 +248,7 @@ export class CollectionService {
 	async delete(id: string) {
 		await this.findById(id);
 
-		const collection = await prisma.collection.findUnique({
+		const collection = await this.database.collection.findUnique({
 			where: { id },
 			include: {
 				_count: {
@@ -203,11 +260,11 @@ export class CollectionService {
 		if (collection && collection._count.products > 0) {
 			throw new AppError({
 				message: `Não é possível deletar a coleção "${collection.name}" pois ela possui ${collection._count.products} produto(s) associado(s)!`,
-				errorCode: 'CONSTRAINT_VIOLATION',
+				errorCode: 'CONFLICT',
 			});
 		}
 
-		await prisma.collection.delete({
+		await this.database.collection.delete({
 			where: { id },
 		});
 
@@ -215,7 +272,7 @@ export class CollectionService {
 	}
 
 	async getStats(id: string) {
-		const collection = await prisma.collection.findUnique({
+		const collection = await this.database.collection.findUnique({
 			where: { id },
 			include: {
 				products: {
@@ -253,8 +310,10 @@ export class CollectionService {
 
 	private validatePriceRange(min?: number, max?: number) {
 		if (min !== undefined && max !== undefined) {
-			const minNum = typeof min === 'number' ? min : parseFloat(min);
-			const maxNum = typeof max === 'number' ? max : parseFloat(max);
+			const minNum =
+				typeof min === 'number' ? min : parseFloat(String(min));
+			const maxNum =
+				typeof max === 'number' ? max : parseFloat(String(max));
 
 			if (minNum > maxNum) {
 				throw new AppError({

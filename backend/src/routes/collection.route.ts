@@ -1,19 +1,22 @@
 import { CollectionController } from '@/controllers/Collection.controller';
 import {
 	CreateCollectionSchema,
+	UpdateCollectionSchema,
 	UploadCollectionImageBodySchema,
+	CollectionParamsSchema,
+	CollectionQuerySchema,
 } from '@/schemas/collection.schema';
 import { CollectionService } from '@/services/Collection.service';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import prisma from '@prisma/client';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import z from 'zod/v4';
 
 export async function collectionRoutes(app: fastifyTypedInstance) {
 	const collectionService = new CollectionService(prisma);
 	const collectionController = new CollectionController(collectionService);
 
+	// CREATE
 	app.post(
 		'/',
 		{
@@ -44,18 +47,14 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
+	// UPLOAD BANNER
 	app.patch(
-		'/upload-banner/:collectionId',
+		'/:id/upload-banner',
 		{
 			schema: {
 				description: 'Upload de imagem de banner da coleção',
 				tags: ['Collection'],
-				params: z.object({
-					collectionId: z.uuid().meta({
-						description: 'ID da coleção',
-						examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
-					}),
-				}),
+				params: CollectionParamsSchema,
 				body: UploadCollectionImageBodySchema,
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
@@ -69,6 +68,255 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Banner da coleção atualizado com sucesso',
 					data: uploadedCollection,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// GET ACTIVE COLLECTIONS (antes do /:id para não dar conflito)
+	app.get(
+		'/actives',
+		{
+			schema: {
+				description: 'Buscar coleções ativas com paginação',
+				tags: ['Collection'],
+				querystring: CollectionQuerySchema,
+			},
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const collections =
+					await collectionController.findActive(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleções ativas encontradas com sucesso',
+					data: collections,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// GET BY ID
+	app.get(
+		'/:id',
+		{
+			schema: {
+				description: 'Buscar coleção por ID',
+				tags: ['Collection'],
+				params: CollectionParamsSchema,
+			},
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const collection = await collectionController.findById(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleção encontrada com sucesso',
+					data: collection,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// GET ALL (com filtros e paginação)
+	app.get(
+		'/',
+		{
+			schema: {
+				description: 'Buscar todas as coleções com filtros e paginação',
+				tags: ['Collection'],
+				querystring: CollectionQuerySchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const collections = await collectionController.findAll(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleções encontradas com sucesso',
+					data: collections,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// UPDATE
+	app.put(
+		'/:id',
+		{
+			schema: {
+				description: 'Atualizar coleção',
+				tags: ['Collection'],
+				params: CollectionParamsSchema,
+				body: UpdateCollectionSchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const collection = await collectionController.update(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleção atualizada com sucesso',
+					data: collection,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// DEACTIVATE
+	app.patch(
+		'/:id/deactivate',
+		{
+			schema: {
+				description: 'Desativar coleção',
+				tags: ['Collection'],
+				params: CollectionParamsSchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const collection =
+					await collectionController.deactivate(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleção desativada com sucesso',
+					data: collection,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// ACTIVATE
+	app.patch(
+		'/:id/activate',
+		{
+			schema: {
+				description: 'Ativar coleção',
+				tags: ['Collection'],
+				params: CollectionParamsSchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const collection = await collectionController.activate(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleção ativada com sucesso',
+					data: collection,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// DELETE
+	app.delete(
+		'/:id',
+		{
+			schema: {
+				description: 'Deletar coleção',
+				tags: ['Collection'],
+				params: CollectionParamsSchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const result = await collectionController.delete(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Coleção deletada com sucesso',
+					data: result,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	// GET STATS
+	app.get(
+		'/:id/stats',
+		{
+			schema: {
+				description: 'Buscar estatísticas da coleção',
+				tags: ['Collection'],
+				params: CollectionParamsSchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const stats = await collectionController.getStats(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Estatísticas da coleção obtidas com sucesso',
+					data: stats,
 				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({

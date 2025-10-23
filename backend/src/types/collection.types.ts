@@ -28,3 +28,5 @@ export interface ICollectionFilters {
 	is_active?: boolean;
 	launch_year?: number;
 }
+
+export { GenderTarget };
