@@ -41,6 +41,7 @@ export class StoreController {
 				throw new HttpError({
 					message: parsed.error.issues[0].message,
 					statusCode: 400,
+                    errorCode: 'BAD_REQUEST'
 				});
 			}
 
@@ -57,16 +58,19 @@ export class StoreController {
 					throw new HttpError({
 						message: error.message,
 						statusCode: 409,
+                        errorCode: error.errorCode
 					});
 				case 'BAD_REQUEST':
 					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
+                        errorCode: error.errorCode
 					});
 				default:
 					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
+						errorCode: error.errorCode,
 					});
 			}
 		}
@@ -78,9 +82,17 @@ export class StoreController {
 	) {
 		try {
 			const { id } = Request.params;
-			const parsed = StoreBodySchema.partial().parse(Request.body);
+			const parsed = StoreBodySchema.partial().safeParse(Request.body);
+            
+            if (!parsed.success) {
+                throw new HttpError({
+                    message: parsed.error.issues[0].message,
+                    statusCode: 400,
+                    errorCode: 'BAD_REQUEST'
+                });
+            }
 
-			const response = await this.storeService.update(id, parsed);
+			const response = await this.storeService.update(id, parsed.data!);
 
 			new ApiResponse({
 				statusCode: 200,
@@ -91,19 +103,28 @@ export class StoreController {
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 404,
+						errorCode: error.errorCode,
+					});
+				case 'CONFLICT':
+					throw new HttpError({
+						message: error.message,
+						statusCode: 409,
+						errorCode: error.errorCode,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
+						errorCode: error.errorCode,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
+						errorCode: error.errorCode,
 					});
 			}
 		}
@@ -133,19 +154,22 @@ export class StoreController {
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 404,
+						errorCode: error.errorCode,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
+						errorCode: error.errorCode,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
+						errorCode: error.errorCode,
 					});
 			}
 		}

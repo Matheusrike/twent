@@ -69,8 +69,6 @@ export class StoreService {
 			});
 		}
 
-        
-
 		const currentData = store[0];
 
 		if (storeData.opening_hours) {

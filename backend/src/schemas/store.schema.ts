@@ -106,7 +106,7 @@ export const StoreBodySchema = z.object({
 	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
 	type: z.enum(storeType),
 	email: z
-		.string()
+		.email()
 		.max(100, 'E-mail da loja deve ter menos de 100 caracteres'),
 	phone: z.string(),
 	street: z.string().max(100, 'Rua da loja deve ter menos de 100 caracteres'),
@@ -234,8 +234,31 @@ export const StorePostResponseSchema = ApiResponseSchema.extend({
 	message: z.string().meta({ examples: ['Filial criada com sucesso'] }),
 });
 
+export const StorePutResponseSchema =  ApiResponseSchema.extend({
+    success: z.literal(true),
+    message: z.string().meta({ examples: ['Loja atualizada com sucesso'] }),
+})
+
+export const StoreChangeStatusResponseSchema = ApiResponseSchema.extend({
+    success: z.literal(true),
+    message: z
+        .string()
+        .meta({ examples: ['Status da loja atualizado com sucesso'] }),
+})
 export const StoreNotFoundSchema = ApiResponseSchema.extend({
 	success: z.literal(false),
 	message: z.string().meta({ examples: ['Loja nao encontrada'] }),
 	errorCode: z.string().meta({ examples: ['STORE_NOT_FOUND'] }),
+});
+
+export const StoreBadRequestSchema = ApiResponseSchema.extend({
+	success: z.literal(false),
+	message: z.string().meta({ examples: ['Dados da loja inválidos'] }),
+	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
+});
+
+export const StoreConflictSchema = ApiResponseSchema.extend({
+	success: z.literal(false),
+	message: z.string().meta({ examples: ['Dados da loja conflitantes'] }),
+	errorCode: z.string().meta({ examples: ['STORE_CONFLICT'] }),
 });
