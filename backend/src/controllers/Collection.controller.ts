@@ -1,7 +1,7 @@
 import type { FastifyRequest } from 'fastify';
 import { CollectionService } from '@/services/Collection.service';
 import { AppError, HttpError } from '@/utils/errors.util';
-import { ICollectionFilters } from '@/types/collection.types';
+import { GenderTarget, ICollectionFilters } from '@/types/collection.types';
 import { IPaginationParams } from '@/types/pagination.types';
 import {
 	CollectionParamsType,
@@ -114,7 +114,7 @@ export class CollectionController {
 
 			const filters: ICollectionFilters = {
 				name: query.name,
-				target_gender: query.target_gender,
+				target_gender: query.target_gender as GenderTarget,
 				is_active: query.is_active,
 				launch_year: query.launch_year,
 			};

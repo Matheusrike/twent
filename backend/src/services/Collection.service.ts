@@ -1,8 +1,4 @@
-import type {
-	PrismaClient,
-	Prisma,
-	GenderTarget,
-} from '@prisma/generated/client';
+import type { PrismaClient, Prisma } from '@prisma/generated/client';
 import { AppError } from '@/utils/errors.util';
 import {
 	deleteFromCloudinary,
@@ -13,7 +9,7 @@ import {
 	CreateCollectionType,
 	UpdateCollectionType,
 } from '@/schemas/collection.schema';
-import { ICollectionFilters } from '@/types/collection.types';
+import { ICollectionFilters, GenderTarget } from '@/types/collection.types';
 
 export class CollectionService {
 	constructor(private database: PrismaClient) {}
@@ -204,8 +200,6 @@ export class CollectionService {
 				updateData.price_range_min = data.price_range_min;
 			if (data.price_range_max !== undefined)
 				updateData.price_range_max = data.price_range_max;
-			if (data.image_banner !== undefined)
-				updateData.image_banner = data.image_banner;
 			if (data.is_active !== undefined)
 				updateData.is_active = data.is_active;
 

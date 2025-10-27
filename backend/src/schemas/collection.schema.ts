@@ -5,7 +5,6 @@ export const GenderTargetEnum = z.enum(['MALE', 'FEMALE', 'UNISEX']);
 
 export const CollectionParamsSchema = z.object({
 	id: z
-		.string()
 		.uuid({
 			message: 'ID da coleção deve ser um UUID válido',
 		})
@@ -56,13 +55,11 @@ export const CollectionQuerySchema = z.object({
 	}),
 
 	is_active: z
-		.string()
-		.optional()
-		.transform((val) => {
-			if (val === 'true') return true;
-			if (val === 'false') return false;
-			return undefined;
-		})
+		.preprocess(
+			(val) =>
+				val === 'true' ? true : val === 'false' ? false : undefined,
+			z.boolean().optional(),
+		)
 		.meta({
 			description: 'Filtrar por status ativo/inativo',
 			examples: ['true', 'false'],
@@ -125,7 +122,6 @@ export const CreateCollectionSchema = z
 				description: 'Preço máximo da coleção',
 				examples: [20000000.01],
 			}),
-		image_banner: z.string().optional(),
 		is_active: z
 			.boolean()
 			.optional()
@@ -200,15 +196,6 @@ export const UpdateCollectionSchema = z
 				examples: [20000000.01],
 			}),
 
-		image_banner: z
-			.string()
-			.optional()
-			.nullable()
-			.meta({
-				description: 'URL da imagem de banner',
-				examples: ['https://example.com/banner.jpg'],
-			}),
-
 		is_active: z
 			.boolean()
 			.optional()
@@ -262,50 +249,3 @@ export const UploadCollectionImageBodySchema = z.object({
 export type UploadCollectionImageBodyType = z.infer<
 	typeof UploadCollectionImageBodySchema
 >;
-
-export const CollectionResponseSchema = z.object({
-	id: z.string().uuid(),
-	name: z.string(),
-	description: z.string().nullable(),
-	launch_year: z.number().nullable(),
-	target_gender: GenderTargetEnum,
-	price_range_min: z.number().nullable(),
-	price_range_max: z.number().nullable(),
-	image_banner: z.string().nullable(),
-	is_active: z.boolean(),
-	created_at: z.date(),
-	updated_at: z.date(),
-	products: z
-		.array(
-			z.object({
-				id: z.string(),
-				name: z.string(),
-			}),
-		)
-		.optional(),
-});
-
-export const PaginatedCollectionsResponseSchema = z.object({
-	collections: z.array(CollectionResponseSchema),
-	pagination: z.object({
-		page: z.number(),
-		limit: z.number(),
-		total: z.number(),
-		totalPages: z.number(),
-		hasNext: z.boolean(),
-		hasPrev: z.boolean(),
-	}),
-});
-
-export const CollectionStatsResponseSchema = z.object({
-	collection_name: z.string(),
-	total_products: z.number(),
-	active_products: z.number(),
-	inactive_products: z.number(),
-	price_range: z.object({
-		min: z.number().nullable(),
-		max: z.number().nullable(),
-	}),
-	target_gender: GenderTargetEnum,
-	is_active: z.boolean(),
-});

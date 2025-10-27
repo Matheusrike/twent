@@ -16,7 +16,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 	const collectionService = new CollectionService(prisma);
 	const collectionController = new CollectionController(collectionService);
 
-	// CREATE
 	app.post(
 		'/',
 		{
@@ -37,6 +36,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 					data: collection,
 				}).send(reply);
 			} catch (error) {
+				console.log(error);
 				return new ApiResponse({
 					statusCode: error.statusCode,
 					success: false,
@@ -47,7 +47,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// UPLOAD BANNER
 	app.patch(
 		'/:id/upload-banner',
 		{
@@ -80,7 +79,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// GET ACTIVE COLLECTIONS (antes do /:id para não dar conflito)
 	app.get(
 		'/actives',
 		{
@@ -111,7 +109,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// GET BY ID
 	app.get(
 		'/:id',
 		{
@@ -141,7 +138,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// GET ALL (com filtros e paginação)
 	app.get(
 		'/',
 		{
@@ -172,7 +168,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// UPDATE
 	app.put(
 		'/:id',
 		{
@@ -204,7 +199,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// DEACTIVATE
 	app.patch(
 		'/:id/deactivate',
 		{
@@ -236,7 +230,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// ACTIVATE
 	app.patch(
 		'/:id/activate',
 		{
@@ -267,7 +260,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// DELETE
 	app.delete(
 		'/:id',
 		{
@@ -298,7 +290,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	// GET STATS
 	app.get(
 		'/:id/stats',
 		{
