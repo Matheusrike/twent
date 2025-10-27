@@ -11,7 +11,7 @@ interface ContactFormProps {
 export default function ContactForm({ onBack }: ContactFormProps) {
     const handleCancel = () => {
         if (onBack) {
-            onBack(); // Volta para o card da boutique
+            onBack();
         }
     };
 

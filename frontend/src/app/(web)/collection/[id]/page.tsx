@@ -124,32 +124,32 @@ export default function CollectionIdHero({ params }: any) {
               <div className="space-y-3 text-sm">
                 {item.reference && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-200">Referência</span>
-                    <span className="font-medium">{item.reference}</span>
+                    <span className="text-gray-600 dark:text-red-500">Referência</span>
+                    <span className="font-medium dark:text-white">{item.reference}</span>
                   </div>
                 )}
                 {item.material && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-200">Material</span>
-                    <span className="font-medium">{item.material}</span>
+                    <span className="text-gray-600 dark:text-red-500">Material</span>
+                    <span className="font-medium dark:text-white">{item.material}</span>
                   </div>
                 )}
                 {item.movement && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-200">Movimento</span>
-                    <span className="font-medium">{item.movement}</span>
+                    <span className="text-gray-600 dark:text-red-500">Movimento</span>
+                    <span className="font-medium dark:text-white">{item.movement}</span>
                   </div>
                 )}
                 {item.diameter && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-200">Diâmetro</span>
-                    <span className="font-medium">{item.diameter}</span>
+                    <span className="text-gray-600 dark:text-red-500">Diâmetro</span>
+                    <span className="font-medium dark:text-white">{item.diameter}</span>
                   </div>
                 )}
                 {item.waterResistance && (
                   <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                    <span className="text-gray-600 dark:text-gray-200">Resistência à água</span>
-                    <span className="font-medium">{item.waterResistance}</span>
+                    <span className="text-gray-600 dark:text-red-500">Resistência à água</span>
+                    <span className="font-medium dark:text-white">{item.waterResistance}</span>
                   </div>
                 )}
               </div>
