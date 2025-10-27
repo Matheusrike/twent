@@ -1,10 +1,10 @@
 import type { FastifyInstance } from 'fastify';
 import cookie from '@fastify/cookie';
 import jwt from '@fastify/jwt';
+import fastifyMultipart from '@fastify/multipart';
 import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { jsonSchemaTransform } from 'fastify-type-provider-zod';
-
 import authorizationPlugin from './authorization.plugin';
 import type { IAppConfig } from '../types/types';
 
@@ -24,8 +24,15 @@ export async function registerPlugins(
 
 	await app.register(authorizationPlugin);
 
+	await app.register(fastifyMultipart, {
+		attachFieldsToBody: true,
+		limits: {
+			fileSize: 5 * 1024 * 1024,
+		},
+	});
+
 	// Plugins de documentação (apenas em ambiente de desenvolvimento)
-	if (config.nodeEnv !== 'production') {
+	if (config.nodeEnv !== 'prod') {
 		await app.register(fastifySwagger, {
 			openapi: {
 				info: {

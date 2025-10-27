@@ -11,7 +11,7 @@ async function startServer() {
 			host: '0.0.0.0',
 		});
 
-		console.log(`🚀 Server running on http://localhost:${config.port}`);
+		console.log(`🚀 Server running on http://localhost:${config.port}/api`);
 		console.log(
 			`📚 API Documentation available at http://localhost:${config.port}/docs`,
 		);

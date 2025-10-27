@@ -14,6 +14,9 @@ export type IAppConfig = {
 	cookieSecret: string;
 	jwtSecret: string;
 	adminPassword: string;
+	cloudinaryCloudName: string;
+	cloudinaryApiKey: string;
+	cloudinaryApiSecret: string;
 };
 
 export type fastifyTypedInstance = FastifyInstance<

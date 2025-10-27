@@ -48,6 +48,14 @@ function authorization(options: IAuthorizationOptions = {}) {
 				}).send(reply);
 			}
 
+			if (error.code === 'FAST_JWT_EXPIRED') {
+				return new ApiResponse({
+					success: false,
+					statusCode: 401,
+					message: 'Token de autenticação expirado',
+					errorCode: 'TOKEN_EXPIRED',
+				}).send(reply);
+			}
 			console.error(error);
 			return ApiResponse.genericError(reply);
 		}
