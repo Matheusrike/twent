@@ -50,4 +50,6 @@ export interface IEmployeeProps extends IUser {
 	termination_date?: Date;
 	emergency_contact?: object;
 	is_active?: boolean;
+    role: string;
+    store_code?: string
 }

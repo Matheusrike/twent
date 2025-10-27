@@ -7,7 +7,7 @@ export const ApiResponseSchema = z.object({
 
 export const ApiGenericErrorSchema = ApiResponseSchema.extend({
 	success: z.literal(false),
-	message: z.literal('Ocorreu um erro interno no servidor.'),
+	message: z.string().default('Ocorreu um erro interno no servidor.'),
 	errorCode: z.literal('INTERNAL_SERVER_ERROR'),
 	errors: z.array(z.string()).optional(),
 }).meta({

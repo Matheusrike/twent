@@ -1,7 +1,10 @@
 import { Decimal } from '@prisma/client/runtime/library';
 import { z } from 'zod';
 import { ApiResponseSchema } from './api-response.schema';
-import { CustomerBodySchema, CustomerQuerystringSchema } from './customer.schema';
+import {
+	CustomerBodySchema,
+	CustomerQuerystringSchema,
+} from './customer.schema';
 
 export const EmployeeQuerystringSchema = CustomerQuerystringSchema.extend({
 	national_id: z
@@ -121,6 +124,14 @@ export const EmployeeBodySchema = CustomerBodySchema.extend({
 			description: 'Indica se o funcionário está ativo',
 			examples: [true],
 		}),
+	role: z.string().meta({
+		description: 'Papel do usuário',
+		examples: ['MANAGER_HQ', 'EMPLOYEE_BRANCH'],
+	}),
+    store_code: z.string().meta({
+        description: 'Código da loja',
+        examples: ['CHE999'],
+    }).optional()
 });
 
 export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
@@ -174,7 +185,7 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 						salary: z.any().meta({ examples: [5200.5] }),
 						is_active: z.boolean().meta({ examples: [true] }),
 					})
-					.nullable() // retirar nullable depois
+					.nullable()
 					.meta({
 						description:
 							'Informações complementares do funcionário',
@@ -199,7 +210,6 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 							.string()
 							.meta({ examples: ['Main Store - New York'] }),
 					})
-					.nullable() // retirar nullable depois
 					.meta({ description: 'Loja associada ao funcionário' }),
 			}),
 		)

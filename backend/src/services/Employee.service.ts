@@ -1,11 +1,7 @@
 import { Prisma } from '@prisma/client/extension';
 import prisma from '@prisma/client';
 import { validateLocation } from '@/helpers/validate-location.helper';
-import {
-	IEmployeeProps,
-	IUser,
-	TypeGetUserProps,
-} from '@/types/users.types';
+import { IEmployeeProps, TypeGetUserProps } from '@/types/users.types';
 import { validatePassword } from '@/utils/password.util';
 import { UserService } from './User.service';
 import { AppError } from '@/utils/errors.util';
@@ -32,96 +28,109 @@ export class EmployeeService extends UserService {
 		return `${base}${nextSeq}`;
 	}
 
-	async create(
-		data: IEmployeeProps,
-		roleName: string,
-		storeCode: string,
-	) {
-		let response = {};
-		await this.validateUser(data?.email, data?.document_number);
+	async create(data: IEmployeeProps, id: string) {
+		try {
+			let response = {};
+			await this.validateUser(data?.email, data?.document_number);
 
-		data.password_hash = await validatePassword(data.password_hash);
+			data.password_hash = await validatePassword(data.password_hash);
 
-		await validateLocation({
-			country: data?.country,
-			state: data?.state,
-			city: data?.city,
-			road: data?.street,
-			district: data?.district,
-			postalcode: data?.zip_code,
-		});
-
-		const employee = await prisma.$transaction(async (tx) => {
-			const role = await tx.role.findUnique({
-				where: { name: roleName },
+			await validateLocation({
+				country: data?.country,
+				state: data?.state,
+				city: data?.city,
+				road: data?.street,
+				district: data?.district,
+				postalcode: data?.zip_code,
 			});
-			if (!role) {
-				throw new AppError({
-					message: 'Cargo não encontrado',
-					errorCode: 'NOT_FOUND',
+
+			if (!data.store_code) {
+				const user = await prisma.user.findUnique({
+					where: { id },
 				});
-			}
-			const store = await tx.store.findUnique({
-				where: { code: storeCode },
-			});
-			if (!store) {
-				throw new AppError({
-					message: 'Filial não encontrada',
-					errorCode: 'NOT_FOUND',
+
+				const storeId = await prisma.store.findFirst({
+					where: { id: user!.store_id! },
 				});
+				data.store_code = storeId!.code;
 			}
-			const user = await tx.user.create({
-				data: {
-                    email: data.email,
-                    document_number: data.document_number,
-                    password_hash: data.password_hash,
-                    first_name: data.first_name,
-                    last_name: data.last_name,
-                    phone: data.phone,
-                    birth_date: data.birth_date,
-                    street: data.street,
-                    number: data.number,
-                    district: data.district,
-                    city: data.city,
-                    state: data.state,
-                    zip_code: data.zip_code,
-                    country: data.country,
-                    created_at: new Date(),
-                    updated_at: new Date(),
-					is_active: true,
-					user_type: 'EMPLOYEE',
-					store_id: store.id,
-				},
-			});
+			const employee = await prisma.$transaction(async (tx) => {
+				const role = await tx.role.findUnique({
+					where: { name: data.role },
+				});
+				if (!role) {
+					throw new AppError({
+						message: 'Cargo não encontrado',
+						errorCode: 'NOT_FOUND',
+					});
+				}
+				const store = await tx.store.findUnique({
+					where: { code: data.store_code },
+				});
+				if (!store) {
+					throw new AppError({
+						message: 'Filial não encontrada',
+						errorCode: 'NOT_FOUND',
+					});
+				}
+				const user = await tx.user.create({
+					data: {
+						email: data.email,
+						document_number: data.document_number,
+						password_hash: data.password_hash,
+						first_name: data.first_name,
+						last_name: data.last_name,
+						phone: data.phone,
+						birth_date: data.birth_date,
+						street: data.street,
+						number: data.number,
+						district: data.district,
+						city: data.city,
+						state: data.state,
+						zip_code: data.zip_code,
+						country: data.country,
+						created_at: new Date(),
+						updated_at: new Date(),
+						is_active: true,
+						user_type: 'EMPLOYEE',
+						store_id: store.id,
+					},
+				});
 
-			const employee_code = await this.generateEmployeeCodeTx(
-				tx,
-				storeCode,
-				new Date(),
-			);
+				const employee_code = await this.generateEmployeeCodeTx(
+					tx,
+					data.store_code!,
+					new Date(),
+				);
 
-			response = await tx.employee.create({
-				data: {
-					national_id: data.national_id,
-                    department: data.department,
-                    currency: data.currency,
-					user_id: user.id,
-					position: data.position || '',
-					salary: data.salary || 0.0,
-					employee_code,
-					hire_date: new Date(),
-					is_active: true,
-				},
+				response = await tx.employee.create({
+					data: {
+						national_id: data.national_id,
+						department: data.department,
+						currency: data.currency,
+						user_id: user.id,
+						position: data.position || '',
+						salary: data.salary || 0.0,
+						employee_code,
+						hire_date: new Date(),
+						is_active: true,
+					},
+				});
+				response = await tx.userRole.create({
+					data: {
+						user_id: user.id,
+						role_id: role.id,
+					},
+				});
+				return response;
 			});
-			response = await tx.userRole.create({
-				data: {
-					user_id: user.id,
-					role_id: role.id,
-				},
+			return employee;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
-			return response;
-		});
-		return employee;
+		}
 	}
 
 	async get(filters: TypeGetUserProps, skip = 0, take = 10) {
@@ -129,18 +138,11 @@ export class EmployeeService extends UserService {
 
 		const response = await super.get(filters, skip, take);
 
-		return response
-	
+		return response;
 	}
 
-	async update(
-		id: string,
-		data?: Partial<IUser>,
-		employeeData?: Partial<IEmployeeProps>,
-		roleName?: string,
-		storeCode?: string,
-	) {
-        
+    //precisa terminar
+	async update(id: string, data?: Partial<IEmployeeProps>) {
 		const user = await prisma.user.findUnique({ where: { id } });
 
 		if (!user) {
@@ -170,14 +172,12 @@ export class EmployeeService extends UserService {
 
 		await this.validateUser(data?.email, data?.document_number);
 		if (data?.password_hash) {
-			data.password_hash = await validatePassword(
-				data?.password_hash,
-			);
+			data.password_hash = await validatePassword(data?.password_hash);
 		}
 
 		await prisma.$transaction(async (tx) => {
 			const role = await tx.role.findUnique({
-				where: { name: roleName },
+				where: { name: data?.role },
 			});
 			if (!role) {
 				throw new AppError({
@@ -186,7 +186,7 @@ export class EmployeeService extends UserService {
 				});
 			}
 			const store = await tx.store.findUnique({
-				where: { code: storeCode },
+				where: { code: data?.store_code },
 			});
 			if (!store) {
 				throw new AppError({
@@ -197,13 +197,36 @@ export class EmployeeService extends UserService {
 			const user = await tx.user.update({
 				where: { id },
 				data: {
-					...data,
+					email: data?.email,
+					document_number: data?.document_number,
+					password_hash: data?.password_hash,
+					first_name: data?.first_name,
+					last_name: data?.last_name,
+					phone: data?.phone,
+					birth_date: data?.birth_date,
+					street: data?.street,
+					number: data?.number,
+					district: data?.district,
+					city: data?.city,
+					state: data?.state,
+					zip_code: data?.zip_code,
+					country: data?.country,
+					updated_at: new Date(),
+					is_active: data?.is_active,
+					user_type: data?.user_type,
+					store_id: store.id,
 				},
 			});
 			await tx.employee.update({
 				where: { user_id: id },
 				data: {
-					...employeeData,
+					national_id: data?.national_id,
+					department: data?.department,
+					currency: data?.currency,
+					user_id: user.id,
+					position: data?.position || '',
+					salary: data?.salary || 0.0,
+					is_active: true,
 				},
 			});
 			return user;

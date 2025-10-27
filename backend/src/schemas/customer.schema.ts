@@ -206,52 +206,64 @@ const customerDataSchema = z.object({
 	phone: z
 		.string()
 		.nullable()
-		.meta({ examples: ['+44 20 7946 0958'] }),
+		.meta({ examples: ['+44 20 7946 0958'] })
+		.optional(),
 	user_type: z.enum(['CUSTOMER']).meta({ examples: ['CUSTOMER'] }),
 	document_number: z
 		.string()
 		.nullable()
-		.meta({ examples: ['C9876543'] }),
+		.meta({ examples: ['C9876543'] })
+		.optional(),
 	birth_date: z
 		.string()
 		.nullable()
-		.meta({ examples: ['1988-11-02T00:00:00.000Z'] }),
+		.meta({ examples: ['1988-11-02T00:00:00.000Z'] })
+		.optional(),
 	street: z
 		.string()
 		.nullable()
-		.meta({ examples: ['Unter den Linden'] }),
+		.meta({ examples: ['Unter den Linden'] })
+		.optional(),
 	number: z
 		.string()
 		.nullable()
-		.meta({ examples: ['77'] }),
+		.meta({ examples: ['77'] })
+		.optional(),
 	district: z
 		.string()
 		.nullable()
-		.meta({ examples: ['Mitte'] }),
+		.meta({ examples: ['Mitte'] })
+		.optional(),
 	city: z
 		.string()
 		.nullable()
-		.meta({ examples: ['Berlin'] }),
+		.meta({ examples: ['Berlin'] })
+		.optional(),
 	state: z
 		.string()
 		.nullable()
-		.meta({ examples: ['Berlin'] }),
+		.meta({ examples: ['Berlin'] })
+		.optional(),
 	country: z
 		.string()
 		.nullable()
-		.meta({ examples: ['Germany'] }),
+		.meta({ examples: ['Germany'] })
+		.optional(),
 	zip_code: z
 		.string()
 		.nullable()
-		.meta({ examples: ['10117'] }),
+		.meta({ examples: ['10117'] })
+		.optional(),
 	is_active: z
 		.boolean()
 		.nullable()
-		.meta({ examples: [true] }),
+		.meta({ examples: [true] })
+		.optional(),
 	created_at: z
 		.date()
 		.nullable()
-		.meta({ examples: ['2025-10-23T14:00:00.000Z'] }),
+		.meta({ examples: ['2025-10-23T14:00:00.000Z'] })
+		.optional(),
 });
 
 export const CustomerGetResponseSchema = ApiResponseSchema.extend({

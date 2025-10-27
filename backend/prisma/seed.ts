@@ -115,6 +115,11 @@ async function headquarterSeed(tx: Prisma.TransactionClient) {
 }
 
 async function adminSeed(tx: Prisma.TransactionClient) {
+    const store = await tx.store.findFirst({
+        where: {
+            type: 'HEADQUARTERS',
+        },
+    });
 	if (!process.env.ADMIN_PASSWORD) {
 		throw new Error('✖ ADMIN_PASSWORD not found in .env');
 	}
@@ -126,6 +131,7 @@ async function adminSeed(tx: Prisma.TransactionClient) {
 		update: {},
 		create: {
 			user_type: UserType.EMPLOYEE,
+            store_id: store.id,
 			email: 'admin@twent.ch',
 			password_hash: await hashPassword(process.env.ADMIN_PASSWORD),
 			first_name: 'Super',

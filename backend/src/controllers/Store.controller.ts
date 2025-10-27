@@ -77,12 +77,12 @@ export class StoreController {
 	}
 
 	async update(
-		Request: FastifyRequest<{ Params: { id: string } }>,
+		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
 	) {
 		try {
-			const { id } = Request.params;
-			const parsed = StoreBodySchema.partial().safeParse(Request.body);
+			const { id } = request.params;
+			const parsed = StoreBodySchema.partial().safeParse(request.body);
             
             if (!parsed.success) {
                 throw new HttpError({

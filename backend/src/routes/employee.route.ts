@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { EmployeeController } from '@/controllers/Employee.controller';
 import { EmployeeService } from '@/services/Employee.service';
 import { ApiResponse } from '@/utils/api-response.util';
-import { IEmployeeProps, IUser } from '@/types/users.types';
+import { IEmployeeProps } from '@/types/users.types';
 import {
 	EmployeeBadRequestSchema,
 	EmployeeBodySchema,
@@ -24,7 +24,6 @@ export function employeeRoute(fastify: FastifyInstance) {
 
 	fastify.post<{
 		Body: { data: IEmployeeProps };
-		Headers: { 'x-role-name': string; 'x-store-code': string };
 	}>(
 		'/',
 		{
@@ -49,7 +48,6 @@ export function employeeRoute(fastify: FastifyInstance) {
 		async (
 			request: FastifyRequest<{
 				Body: { data: IEmployeeProps };
-				Headers: { 'x-role-name': string; 'x-store-code': string };
 			}>,
 			reply: FastifyReply,
 		) => {
@@ -108,8 +106,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 
 	fastify.put<{
 		Params: { id: string };
-		Body: { userData: IUser; employeeData: IEmployeeProps };
-		Headers: { 'x-role-name': string; 'x-store-code': string };
+		Body: { data: IEmployeeProps };
 	}>(
 		'/:id',
 		{
@@ -134,8 +131,7 @@ export function employeeRoute(fastify: FastifyInstance) {
 		async (
 			request: FastifyRequest<{
 				Params: { id: string };
-				Body: { userData: IUser; employeeData: IEmployeeProps };
-				Headers: { 'x-role-name': string; 'x-store-code': string };
+				Body: { data: IEmployeeProps };
 			}>,
 			reply: FastifyReply,
 		) => {
