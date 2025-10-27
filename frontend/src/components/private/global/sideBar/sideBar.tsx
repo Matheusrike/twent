@@ -8,7 +8,11 @@ import {
 } from "@/components/ui/sidebar";
 import { SiteHeader } from "./site-header";
 
-export default function SideBar() {
+export default function SideBar({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
 
   if (pathname === "/login") {
@@ -27,6 +31,10 @@ export default function SideBar() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
+
+        <main className="p-6">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

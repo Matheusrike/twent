@@ -9,13 +9,11 @@ const notoSansAdlam = Noto_Sans_Adlam({
   variable: "--font-sans",
 });
 
-
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-serif",
 });
-
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
@@ -26,12 +24,10 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "Portal Empresarial TWENT®",
   description: "",
-  icons:
-  {
-    icon: "/img/global/dark/iconDark.svg"
-  }
+  icons: {
+    icon: "/img/global/dark/iconDark.svg",
+  },
 };
-
 
 export default function RootLayout({
   children,
@@ -39,10 +35,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br" className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable}  bg-white`}>
-      <body cz-shortcut-listen="true" data-layout="manager">
-        <SideBar />
-        {children}
+    <html
+      lang="pt-br"
+      className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} bg-white`}
+    >
+      <body data-layout="manager">
+        <SideBar>
+          {children}
+        </SideBar>
       </body>
     </html>
   );
