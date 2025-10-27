@@ -9,7 +9,7 @@ import React from "react";
 import { formatCurrency } from "@/utils/functions/formatCurrency";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import CollectionIdSideBar from "@/components/web/pages/Collection/id/sideBar/navigation-sheet";
+import CollectionIdSideBar from "@/components/web/views/Collection/id/sideBar/navigation-sheet";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/web/Global/Navbar/sheet";
 
 export default function CollectionIdHero({ params }: any) {

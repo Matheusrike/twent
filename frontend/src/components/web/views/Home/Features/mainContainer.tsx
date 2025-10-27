@@ -2,9 +2,10 @@ import { Button } from "@/components/web/Global/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-
+import CollectionCard from "../../Collection/card/CollectionCard"
 import mainContainerData from './json/mainContainerData.json'
 import { MainImage } from "./img/images"
+import { truncateText } from "@/utils/functions/truncateText";
 
 interface Category {
   title: string
@@ -86,43 +87,19 @@ const MainContainer: React.FC = () => {
             {collections.subtitle}
           </p>
         </div>
-        {/* collection static clocks */}
+
+        {/* collection preview*/}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {collections.items.map((collection) => (
-            <Link key={collection.id} href={collection.href}>
-              <div className="group bg-white dark:bg-background border border-gray-200/50 dark:border-white/5 hover:border-primary dark:hover:border-primary transition-all duration-500 overflow-hidden rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1">
-                <div className="relative overflow-hidden">
-                  <div className="relative w-full h-80">
-                    {/* <Image
-                      src={collection.image}
-                      alt={collection.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    /> */}
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <span className="bg-primary text-white px-3 py-1 text-sm font-semibold uppercase">
-                      {collection.badge}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold text-primary dark:text-primary mb-3">
-                    {collection.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 font-semibold mb-6">
-                    {collection.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <button className="text-primary dark:text-primary hover:text-primary/80 dark:hover:text-primary/80 transition-colors">
-                      <ArrowRight className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </Link>
+            <CollectionCard
+              key={collection.id}
+              id={collection.id}
+              href={collection.href}
+              image={collection.image}
+              title={collection.title}
+              description={truncateText(collection.description, 100)}
+              badge={collection.badge}
+            />
           ))}
         </div>
       </section>

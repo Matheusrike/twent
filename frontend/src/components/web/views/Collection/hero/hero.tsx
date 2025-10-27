@@ -18,7 +18,7 @@ export default function CollectionHero() {
             href={collection.href}
             image={collection.image}
             title={collection.title}
-            description={truncateText(collection.description, 150)}
+            description={truncateText(collection.description, 100)}
             badge={collection.badge}
           />
         ))}
