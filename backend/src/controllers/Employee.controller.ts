@@ -97,17 +97,20 @@ export class EmployeeController {
 				case 'BAD_REQUEST':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 400,
 					});
 				case 'NOT_FOUND':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				default:
 					console.error(error);
 					throw new HttpError({
 						message: error?.message ?? 'Erro interno',
+						errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}
@@ -138,36 +141,43 @@ export class EmployeeController {
 				case 'NOT_FOUND':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				case 'UNAUTHORIZED':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 401,
 					});
 				case 'BAD_REQUEST':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 400,
 					});
 				case 'CONFLICT':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 409,
 					});
 				case 'BAD_GATEWAY':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 502,
 					});
 				case 'GATEWAY_TIMEOUT':
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 504,
 					});
 				default:
 					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}

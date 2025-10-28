@@ -141,95 +141,139 @@ export class EmployeeService extends UserService {
 		return response;
 	}
 
-    //precisa terminar
 	async update(id: string, data?: Partial<IEmployeeProps>) {
-		const user = await prisma.user.findUnique({ where: { id } });
+		try {
+			let response = {};
 
-		if (!user) {
-			throw new AppError({
-				message: 'Usuário não encontrado',
-				errorCode: 'NOT_FOUND',
-			});
-		}
+			const user = await prisma.user.findUnique({ where: { id } });
 
-		if (
-			data?.country ||
-			data?.state ||
-			data?.city ||
-			data?.street ||
-			data?.district ||
-			data?.zip_code
-		) {
-			await validateLocation({
-				country: data?.country,
-				state: data?.state,
-				city: data?.city,
-				road: data?.street,
-				district: data?.district,
-				postalcode: data?.zip_code,
-			});
-		}
-
-		await this.validateUser(data?.email, data?.document_number);
-		if (data?.password_hash) {
-			data.password_hash = await validatePassword(data?.password_hash);
-		}
-
-		await prisma.$transaction(async (tx) => {
-			const role = await tx.role.findUnique({
-				where: { name: data?.role },
-			});
-			if (!role) {
+			if (!user) {
 				throw new AppError({
-					message: 'Cargo não encontrado',
+					message: 'Usuário não encontrado',
 					errorCode: 'NOT_FOUND',
 				});
 			}
-			const store = await tx.store.findUnique({
-				where: { code: data?.store_code },
-			});
-			if (!store) {
-				throw new AppError({
-					message: 'Filial não encontrada',
-					errorCode: 'NOT_FOUND',
-				});
+
+			await this.validateUser(data?.email, data?.document_number);
+
+			if (data?.password_hash) {
+				data.password_hash = await validatePassword(data.password_hash);
 			}
-			const user = await tx.user.update({
-				where: { id },
-				data: {
-					email: data?.email,
-					document_number: data?.document_number,
-					password_hash: data?.password_hash,
-					first_name: data?.first_name,
-					last_name: data?.last_name,
-					phone: data?.phone,
-					birth_date: data?.birth_date,
-					street: data?.street,
-					number: data?.number,
-					district: data?.district,
-					city: data?.city,
-					state: data?.state,
-					zip_code: data?.zip_code,
+
+			if (
+				data?.country ||
+				data?.state ||
+				data?.city ||
+				data?.street ||
+				data?.district ||
+				data?.zip_code
+			) {
+				await validateLocation({
 					country: data?.country,
-					updated_at: new Date(),
-					is_active: data?.is_active,
-					user_type: data?.user_type,
-					store_id: store.id,
-				},
+					state: data?.state,
+					city: data?.city,
+					road: data?.street,
+					district: data?.district,
+					postalcode: data?.zip_code,
+				});
+			}
+
+			if (!data?.store_code) {
+				const store = await prisma.store.findFirst({
+					where: { id: user.store_id! },
+				});
+				data!.store_code = store!.code!;
+			}
+
+			const updatedEmployee = await prisma.$transaction(async (tx) => {
+				let role = null;
+				if (data?.role) {
+					role = await tx.role.findUnique({
+						where: { name: data.role },
+					});
+
+					if (!role) {
+						throw new AppError({
+							message: 'Cargo não encontrado',
+							errorCode: 'NOT_FOUND',
+						});
+					}
+				}
+				const store = await tx.store.findUnique({
+					where: { code: data?.store_code },
+				});
+				if (!store) {
+					throw new AppError({
+						message: 'Filial não encontrada',
+						errorCode: 'NOT_FOUND',
+					});
+				}
+
+				const updatedUser = await tx.user.update({
+					where: { id },
+					data: {
+						email: data?.email,
+						document_number: data?.document_number,
+						password_hash: data?.password_hash,
+						first_name: data?.first_name,
+						last_name: data?.last_name,
+						phone: data?.phone,
+						birth_date: data?.birth_date,
+						street: data?.street,
+						number: data?.number,
+						district: data?.district,
+						city: data?.city,
+						state: data?.state,
+						zip_code: data?.zip_code,
+						country: data?.country,
+						updated_at: new Date(),
+						is_active: data?.is_active ?? user.is_active,
+						user_type: 'EMPLOYEE',
+						store_id: store.id,
+					},
+				});
+
+				response = await tx.employee.update({
+					where: { user_id: id },
+					data: {
+						national_id: data?.national_id,
+						department: data?.department,
+						currency: data?.currency,
+						user_id: updatedUser.id,
+						position: data?.position || '',
+						salary: data?.salary || 0.0,
+						is_active: data?.is_active ?? true,
+						updated_at: new Date(),
+					},
+				});
+
+				if (!role) return response;
+                
+				await tx.userRole.upsert({
+					where: {
+						user_id_role_id: {
+							user_id: user.id,
+							role_id: role.id,
+						},
+					},
+					create: {
+						user_id: user.id,
+						role_id: role.id,
+					},
+					update: {
+						role_id: role.id,
+					},
+				});
+
+				return response;
 			});
-			await tx.employee.update({
-				where: { user_id: id },
-				data: {
-					national_id: data?.national_id,
-					department: data?.department,
-					currency: data?.currency,
-					user_id: user.id,
-					position: data?.position || '',
-					salary: data?.salary || 0.0,
-					is_active: true,
-				},
+
+			return updatedEmployee;
+		} catch (error) {
+			throw new AppError({
+				message: error.message || 'Erro interno no servidor',
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
-			return user;
-		});
+		}
 	}
 }
