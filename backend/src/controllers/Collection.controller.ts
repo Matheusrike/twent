@@ -145,34 +145,6 @@ export class CollectionController {
 		}
 	}
 
-	async findActive(request: FastifyRequest) {
-		try {
-			const query = request.query as CollectionQueryType;
-
-			const pagination: IPaginationParams = {
-				page: query.page,
-				limit: query.limit,
-			};
-
-			const collections =
-				await this.collectionService.findActive(pagination);
-			return collections;
-		} catch (error) {
-			if (error instanceof AppError) {
-				switch (error.errorCode) {
-					default:
-						console.error('Unhandled AppError:', error);
-						throw new HttpError({
-							message: error.message,
-							errorCode: error.errorCode,
-							statusCode: 500,
-						});
-				}
-			}
-			throw error;
-		}
-	}
-
 	async update(request: FastifyRequest) {
 		try {
 			const { id } = request.params as CollectionParamsType;

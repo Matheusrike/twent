@@ -1,18 +1,18 @@
 import type { PrismaClient, Prisma } from '@prisma/generated/client';
 import { AppError } from '@/utils/errors.util';
-import {
-	deleteFromCloudinary,
-	uploadToCloudinary,
-} from '@/utils/cloudinary.util';
 import { IPaginationParams } from '@/types/pagination.types';
 import {
 	CreateCollectionType,
 	UpdateCollectionType,
 } from '@/schemas/collection.schema';
 import { ICollectionFilters, GenderTarget } from '@/types/collection.types';
+import { IImageService } from '@/types/image.types';
 
 export class CollectionService {
-	constructor(private database: PrismaClient) {}
+	constructor(
+		private database: PrismaClient,
+		private imageService: IImageService,
+	) {}
 
 	async create(data: CreateCollectionType) {
 		try {
@@ -49,25 +49,27 @@ export class CollectionService {
 
 	async uploadBanner(id: string, filePath: string) {
 		try {
-			const { publicId } = await uploadToCloudinary({
-				filePath,
-				folder: 'collections',
-			});
-
 			const currentImageBanner =
 				await this.database.collection.findUnique({
 					where: { id },
-					select: { image_banner: true },
+					select: { image_public_id: true },
 				});
 
-			if (currentImageBanner?.image_banner) {
-				await deleteFromCloudinary(currentImageBanner.image_banner);
+			if (currentImageBanner?.image_public_id) {
+				await this.imageService.delete(
+					currentImageBanner.image_public_id,
+				);
 			}
+
+			const { publicId } = await this.imageService.upload(
+				filePath,
+				'collections',
+			);
 
 			const collection = await this.database.collection.update({
 				where: { id },
 				data: {
-					image_banner: publicId,
+					image_public_id: publicId,
 				},
 			});
 
@@ -164,10 +166,6 @@ export class CollectionService {
 				hasPrev,
 			},
 		};
-	}
-
-	async findActive(pagination?: IPaginationParams) {
-		return this.findAll({ is_active: true }, pagination);
 	}
 
 	async update(id: string, data: UpdateCollectionType) {

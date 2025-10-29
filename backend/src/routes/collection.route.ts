@@ -7,13 +7,15 @@ import {
 	CollectionQuerySchema,
 } from '@/schemas/collection.schema';
 import { CollectionService } from '@/services/Collection.service';
+import { ImageService } from '@/services/Image.service';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import prisma from '@prisma/client';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 export async function collectionRoutes(app: fastifyTypedInstance) {
-	const collectionService = new CollectionService(prisma);
+	const imageService = new ImageService();
+	const collectionService = new CollectionService(prisma, imageService);
 	const collectionController = new CollectionController(collectionService);
 
 	app.post(
@@ -67,36 +69,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Banner da coleção atualizado com sucesso',
 					data: uploadedCollection,
-				}).send(reply);
-			} catch (error) {
-				return new ApiResponse({
-					statusCode: error.statusCode,
-					success: false,
-					message: error.message,
-					errorCode: error.errorCode,
-				}).send(reply);
-			}
-		},
-	);
-
-	app.get(
-		'/actives',
-		{
-			schema: {
-				description: 'Buscar coleções ativas com paginação',
-				tags: ['Collection'],
-				querystring: CollectionQuerySchema,
-			},
-		},
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			try {
-				const collections =
-					await collectionController.findActive(request);
-				return new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Coleções ativas encontradas com sucesso',
-					data: collections,
 				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
