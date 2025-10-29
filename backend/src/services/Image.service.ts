@@ -40,19 +40,20 @@ export class ImageService implements IImageService {
 		}
 	}
 
-	generateUrl({
-		publicId,
-		width,
-		height,
-		quality = 'auto',
-		format = 'webp',
-		crop = 'fill',
-	}: GenerateCloudinaryImageUrlParams): string {
+	generateUrl(
+		publicId: string,
+		{
+			width = undefined,
+			height = undefined,
+			format = 'webp',
+			crop = 'fill',
+		}: GenerateCloudinaryImageUrlParams,
+	): string {
 		try {
 			return cloudinary.url(publicId, {
 				width,
 				height,
-				quality,
+				quality: 'auto',
 				format,
 				crop,
 			});
