@@ -79,6 +79,8 @@ export class EmployeeController {
 		try {
 			const { skip, take, ...filters } =
 				request.query as TypeGetUserProps;
+                console.log(request.query);
+                console.log('UserService.get called with params:', { filters, skip, take });
 
 			const response = await this.employeeService.get(
 				filters,

@@ -88,6 +88,8 @@ export const CustomerQuerystringSchema = z.object({
 		}, z.boolean())
 		.optional()
 		.meta({ examples: [true] }),
+	skip: z.any().optional(),
+	take: z.any().optional(),
 });
 
 export const CustomerBodySchema = z.object({
