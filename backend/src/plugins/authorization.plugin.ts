@@ -34,11 +34,12 @@ function authorization(options: IAuthorizationOptions = {}) {
 				requiredRoles &&
 				!requiredRoles.some((role) => decoded.roles.includes(role))
 			) {
-                throw new HttpError({
-                    message: 'Acesso negado, você não tem permissão suficiente para realizar essa operação',
-                    errorCode: 'UNAUTHORIZED',
-                    statusCode: 401,
-                })
+				throw new HttpError({
+					message:
+						'Acesso negado, você não tem permissão suficiente para realizar essa operação',
+					errorCode: 'UNAUTHORIZED',
+					statusCode: 401,
+				});
 			}
 		} catch (error) {
 			if (error instanceof HttpError) {
@@ -61,9 +62,16 @@ function authorization(options: IAuthorizationOptions = {}) {
 				return;
 			}
 
-			console.error('Authorization Error:', error);
-			ApiResponse.genericError(reply);
-			return;
+			if (error.code === 'FAST_JWT_EXPIRED') {
+				return new ApiResponse({
+					success: false,
+					statusCode: 401,
+					message: 'Token de autenticação expirado',
+					errorCode: 'TOKEN_EXPIRED',
+				}).send(reply);
+			}
+			console.error(error);
+			return ApiResponse.genericError(reply);
 		}
 	};
 }

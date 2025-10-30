@@ -240,7 +240,7 @@ model Collection {
   target_gender   GenderTarget @default(UNISEX)
   price_range_min Decimal?     @db.Decimal(10, 2)
   price_range_max Decimal?     @db.Decimal(10, 2)
-  image_banner    String?
+  image_public_id String?
   is_active       Boolean      @default(true)
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt

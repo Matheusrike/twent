@@ -1,17 +1,14 @@
-import { UploadedFile } from '@/types/uploadFile.type';
+import { UploadedFile } from '@/types/uploadFile.types';
 import { z } from 'zod';
+import { UuidSchema } from './generic.schema';
 
 export const GenderTargetEnum = z.enum(['MALE', 'FEMALE', 'UNISEX']);
 
-export const CollectionParamsSchema = z.object({
-	id: z
-		.uuid({
-			message: 'ID da coleção deve ser um UUID válido',
-		})
-		.meta({
-			description: 'ID da coleção',
-			examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
-		}),
+export const CollectionParamsSchema = UuidSchema.extend({
+	id: z.uuid('ID da coleção deve ser um UUID válido').meta({
+		description: 'ID da coleção',
+		examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+	}),
 });
 
 export type CollectionParamsType = z.infer<typeof CollectionParamsSchema>;

@@ -1,4 +1,4 @@
-import { IAppErrorOptions, IHttpErrorOptions } from '@/types/errors.type';
+import { IAppErrorOptions, IHttpErrorOptions } from '@/types/errors.types';
 
 export class AppError extends Error {
 	errorCode?: string;

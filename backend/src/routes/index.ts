@@ -10,6 +10,7 @@ import { userRoute } from './user.route';
 import { storeRoute } from './store.route';
 import { collectionRoutes } from './collection.route';
 import authorizationPlugin from '@/plugins/authorization.plugin';
+import { imageRoutes } from './image.route';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
@@ -33,14 +34,15 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 					}).send(reply);
 				},
 			);
-            await app.register(authorizationPlugin);
-            
+			await app.register(authorizationPlugin);
+
 			await app.register(authRoutes, { prefix: '/auth' });
 			await app.register(customerRoute, { prefix: '/customer' });
 			await app.register(employeeRoute, { prefix: '/employee' });
 			await app.register(userRoute, { prefix: '/user' });
 			await app.register(storeRoute, { prefix: '/store' });
 			await app.register(collectionRoutes, { prefix: '/collection' });
+			await app.register(imageRoutes, { prefix: '/image' });
 		},
 		{ prefix: '/api' },
 	);
