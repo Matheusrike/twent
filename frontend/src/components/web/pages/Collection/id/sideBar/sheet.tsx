@@ -69,11 +69,11 @@ function SheetContent({
         data-slot="sheet-content"
         style={{
           boxShadow: "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
-      
+
         }}
         className={cn(
           "bg-background dark:bg-gradient-to-br dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-900 data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-          
+
           side === "right" &&
           "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-full lg:w-2/5 ",
 
@@ -97,13 +97,13 @@ function SheetContent({
 
         {/* Menu Header */}
         <div className="w-full flex items-center justify-between px-5 py-6 border-b border-gray-200 dark:border-gray-700">
-  
+
           <div className="w-6"></div>
 
-         
+
           <h2 className="text-3xl font-semibold leading-tight tracking-tighter dark:text-white ">Contactar Uma Boutique</h2>
 
-         
+
           <SheetPrimitive.Close asChild>
             <button className="cursor-pointer">
               <XIcon className="text-md hover:text-gray-400 dark:text-white" />

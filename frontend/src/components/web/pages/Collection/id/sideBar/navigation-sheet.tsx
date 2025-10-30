@@ -27,7 +27,7 @@ export default function CollectionIdSideBar() {
     <div className="flex flex-col justify-center items-center w-full h-full">
       <Sheet onOpenChange={handleOpenChange}>
         <SheetTrigger asChild>
-          <Button size="standartButton" variant="standartButton" className="w-full! h-auto">
+          <Button size="standartButton" variant="standartButton" className="w-full! h-12">
             Contactar Uma Boutique
           </Button>
         </SheetTrigger>
