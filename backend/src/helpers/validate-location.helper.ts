@@ -1,4 +1,4 @@
-import { AppError } from '../utils/errors.util.ts';
+import { AppError } from '@/utils/errors.util';
 
 interface NominatimResult {
 	address: {

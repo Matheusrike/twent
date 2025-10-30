@@ -61,6 +61,14 @@ export const InvalidPasswordResponseSchema = ApiResponseSchema.extend({
 	description: 'Resposta para senha inválida (401).',
 });
 
+export const UnauthorizedUserResponseSchema = ApiResponseSchema.extend({
+    success: z.literal(false),
+    message: z.string().meta({ examples: ['Usuário não autorizado'] }),
+    errorCode: z.string().meta({ examples: ['UNAUTHORIZED_USER'] }),
+}).meta({
+    description: 'Resposta para usuário não autorizado (401).',
+})
+
 // Logout Responses
 export const LogoutSuccessResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
@@ -68,3 +76,4 @@ export const LogoutSuccessResponseSchema = ApiResponseSchema.extend({
 }).meta({
 	description: 'Resposta para logout bem-sucedido (200).',
 });
+

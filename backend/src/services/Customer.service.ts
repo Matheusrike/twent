@@ -1,9 +1,9 @@
-import { validateLocation } from '../helpers/validate-location.helper.ts';
-import prisma from '../../prisma/client.ts';
-import { TypeGetUserProps, IUser } from '../types/users.types.ts';
-import { AppError } from '../utils/errors.util.ts';
-import { UserService } from './User.service.ts';
-import { comparePassword, validatePassword } from '../utils/password.util.ts';
+import { validateLocation } from '@/helpers/validate-location.helper';
+import prisma from '@prisma/client';
+import { TypeGetUserProps, IUser } from '@/types/users.types';
+import { AppError } from '@/utils/errors.util';
+import { UserService } from './User.service';
+import { comparePassword, validatePassword } from '@/utils/password.util';
 
 export class CustomerService extends UserService {
 	async create(customerData: IUser) {
@@ -46,9 +46,7 @@ export class CustomerService extends UserService {
 
 		const response = await super.get(filters, skip, take);
 
-		return {
-			...response,
-		};
+		return response;
 	}
 
 	async update(id: string, customerData: Partial<IUser>) {

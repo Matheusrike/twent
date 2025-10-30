@@ -2,14 +2,17 @@ import type { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import type {
 	IJwtAuthPayload,
 	IAuthorizationOptions,
-} from '../types/authorization.types';
-import { getToken } from '../helpers/get-token.helper';
-import { ApiResponse } from '../utils/api-response.util';
+} from '@/types/authorization.types';
+import { getToken } from '@/helpers/get-token.helper';
+import { ApiResponse } from '@/utils/api-response.util';
 import fp from 'fastify-plugin';
-import { HttpError } from '../utils/errors.util';
+import { HttpError } from '@/utils/errors.util';
 
 function authorization(options: IAuthorizationOptions = {}) {
-	return async (request: FastifyRequest, reply: FastifyReply) => {
+	return async (
+		request: FastifyRequest,
+		reply: FastifyReply,
+	): Promise<void> => {
 		try {
 			const { requiredRoles } = options;
 
@@ -22,42 +25,45 @@ function authorization(options: IAuthorizationOptions = {}) {
 				});
 			}
 
-			const decoded: IJwtAuthPayload =
-				await request.server.jwt.verify(token);
+			const decoded =
+				await request.server.jwt.verify<IJwtAuthPayload>(token);
 			request.user = decoded;
 
-			// Verifica se há roles requeridas e verifica se o usuário possui elas
+			// Verifica roles
 			if (
 				requiredRoles &&
 				!requiredRoles.some((role) => decoded.roles.includes(role))
 			) {
-				throw new HttpError({
-					message:
-						'Acesso negado, você não tem permissão suficiente para realizar essa operação',
-					errorCode: 'FORBIDDEN',
-					statusCode: 403,
-				});
+                throw new HttpError({
+                    message: 'Acesso negado, você não tem permissão suficiente para realizar essa operação',
+                    errorCode: 'UNAUTHORIZED',
+                    statusCode: 401,
+                })
 			}
 		} catch (error) {
 			if (error instanceof HttpError) {
-				return new ApiResponse({
+				new ApiResponse({
 					success: false,
 					statusCode: error.statusCode,
 					message: error.message,
 					errorCode: error.errorCode,
 				}).send(reply);
+				return;
 			}
 
 			if (error.code === 'FAST_JWT_EXPIRED') {
-				return new ApiResponse({
+				new ApiResponse({
 					success: false,
 					statusCode: 401,
 					message: 'Token de autenticação expirado',
-					errorCode: 'TOKEN_EXPIRED',
+					errorCode: 'FAST_JWT_EXPIRED',
 				}).send(reply);
+				return;
 			}
-			console.error(error);
-			return ApiResponse.genericError(reply);
+
+			console.error('Authorization Error:', error);
+			ApiResponse.genericError(reply);
+			return;
 		}
 	};
 }

@@ -1,9 +1,14 @@
-import type { fastifyTypedInstance } from '../types/types';
+import type { fastifyTypedInstance } from '@/types/types';
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { ApiResponseSchema } from '../schemas/api-response.schema';
-import { ApiResponse } from '../utils/api-response.util';
+import { ApiResponseSchema } from '@/schemas/api-response.schema';
+import { ApiResponse } from '@/utils/api-response.util';
 
 import { authRoutes } from '@/routes/auth.routes';
+import { customerRoute } from './customer.route';
+import { employeeRoute } from './employee.route';
+import { userRoute } from './user.route';
+import { storeRoute } from './store.route';
+import authorizationPlugin from '@/plugins/authorization.plugin';
 import { customerRoute } from './customer.route.ts';
 import { employeeRoute } from './employee.route.ts';
 import { userRoute } from './user.route.ts';
@@ -32,7 +37,8 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 					}).send(reply);
 				},
 			);
-
+            await app.register(authorizationPlugin);
+            
 			await app.register(authRoutes, { prefix: '/auth' });
 			await app.register(customerRoute, { prefix: '/customer' });
 			await app.register(employeeRoute, { prefix: '/employee' });

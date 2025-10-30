@@ -6,7 +6,7 @@ import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { jsonSchemaTransform } from 'fastify-type-provider-zod';
 import authorizationPlugin from './authorization.plugin';
-import type { IAppConfig } from '../types/types';
+import type { IAppConfig } from '@/types/types';
 
 export async function registerPlugins(
 	app: FastifyInstance,

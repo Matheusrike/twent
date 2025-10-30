@@ -1,42 +1,45 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { UserService } from '../services/User.service.ts';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
+import { UserService } from '@/services/User.service';
+import { AppError, HttpError } from '@/utils/errors.util';
+import { ApiResponse } from '@/utils/api-response.util';
 
 export class UserController {
 	constructor(private userService: UserService) {}
 
-	async getInfo (
-		request: FastifyRequest<{ Params: { id: string } }>,
+	async getInfo(
+		request: FastifyRequest<{ Querystring: { id: string } }>,
 		reply: FastifyReply,
 	) {
 		try {
-			const { id } = request.params;
+			const id = request.query.id || (request.user as { id: string }).id;
+
 			const response = await this.userService.getInfo(id);
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Informações do usuário encontradas',
-					data: response,
-				}),
-			);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informações do usuário encontradas',
+				data: response,
+			}).send(reply);
 		} catch (error) {
-			switch (error.errorCode) {
-				case 'NOT_FOUND':
-					return new HttpError({
-						message: error.message,
-						statusCode: 404,
-					});
-				default:
-					return new HttpError({
-						message: error.message,
-						statusCode: 500,
-					});
+			if (error instanceof AppError) {
+				switch (error.errorCode) {
+					case 'USER_NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						throw new HttpError({
+							message: 'Erro interno do servidor',
+							errorCode: 'INTERNAL_SERVER_ERROR',
+							statusCode: 500,
+						});
+				}
 			}
 		}
-	};
-	async changeStatus (
+	}
+	async changeStatus(
 		request: FastifyRequest<{
 			Params: { id: string };
 			Body: { newStatus: boolean };
@@ -47,40 +50,43 @@ export class UserController {
 			const { id } = request.params;
 			const { newStatus } = request.body;
 			const response = await this.userService.changeStatus(id, newStatus);
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message:
-						newStatus == true
-							? 'Usuário:' + id + ' alterado para ativo'
-							: 'Usuário:' + id + ' alterado para inativo',
-					data: response,
-				}),
-			);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message:
+					newStatus == true
+						? 'Usuário:' + id + ' alterado para ativo'
+						: 'Usuário:' + id + ' alterado para inativo',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 404,
 					});
 				case 'UNAUTHORIZED':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 401,
 					});
-				case 'BAD_REQUEST':
-					return new HttpError({
+				case 'CONFLICT':
+					throw new HttpError({
 						message: error.message,
-						statusCode: 400,
+						errorCode: error.errorCode,
+						statusCode: 409,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
+						errorCode: error.errorCode,
 						statusCode: 500,
 					});
 			}
 		}
-	};
+	}
 }

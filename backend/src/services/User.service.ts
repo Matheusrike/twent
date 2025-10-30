@@ -1,8 +1,8 @@
-import { AppError } from '../utils/errors.util.ts';
-import prisma from '../../prisma/client.ts';
-import { TypeGetUserProps } from '../types/users.types.ts';
+import { AppError } from '@/utils/errors.util';
+import prisma from '@prisma/client';
+import { TypeGetUserProps } from '@/types/users.types';
 
-export class UserService {
+export class  UserService {
 	async validateUser(email?: string, document_number?: string) {
 		if (email !== undefined) {
 			const usedEmail = await prisma.user.findUnique({
@@ -29,8 +29,7 @@ export class UserService {
 		return true;
 	}
 
-	async get(params?:TypeGetUserProps, skip = 0, take = 10, id?: string) {
-
+	async get(params?: TypeGetUserProps, skip = 0, take = 10, id?: string) {
 		let response;
 
 		if (params?.user_type === 'EMPLOYEE') {
@@ -45,12 +44,13 @@ export class UserService {
 					email: true,
 					first_name: true,
 					last_name: true,
+					phone: true,
 					user_type: true,
 					city: true,
 					district: true,
 					state: true,
+                    country: true,
 					street: true,
-					phone: true,
 					is_active: true,
 					created_at: true,
 					employee: {
@@ -87,11 +87,15 @@ export class UserService {
 					email: true,
 					first_name: true,
 					last_name: true,
+					birth_date: true,
 					user_type: true,
+					document_number: true,
 					city: true,
+					number: true,
 					district: true,
 					state: true,
 					street: true,
+					country: true,
 					phone: true,
 					is_active: true,
 					created_at: true,
@@ -105,20 +109,7 @@ export class UserService {
 			});
 		}
 
-		const hasNextPage = response.length > take!;
-		const data = hasNextPage ? response.slice(0, -1) : response;
-		const nextCursor = hasNextPage ? data[data.length - 1].id : null;
-		const total = await prisma.user.count({ where: params});
-
-		return {
-			...response,
-			pagination: {
-				nextCursor,
-				hasNextPage,
-				take: take,
-				total,
-			},
-		};
+		return response;
 	}
 
 	async getInfo(id: string) {
@@ -129,18 +120,14 @@ export class UserService {
 		if (!user) {
 			throw new AppError({
 				message: 'Usuário não encontrado',
-				errorCode: 'NOT_FOUND',
+				errorCode: 'USER_NOT_FOUND',
 			});
 		}
 		return user;
 	}
 
 	async changeStatus(id: string, newStatus: boolean) {
-		const user = await this.get({
-			query: {
-				id,
-			},
-		});
+		const user = await this.get({ id } as TypeGetUserProps);
 		if (!user) {
 			throw new AppError({
 				message: 'Usuário não encontrado',
@@ -148,28 +135,35 @@ export class UserService {
 			});
 		}
 
-
-		if (newStatus === user.pop()?.is_active) {
+		if (newStatus === user[0].is_active) {
 			throw new AppError({
 				message:
 					newStatus === true
 						? 'Usuário já ativo'
 						: 'Usuário já inativo',
-				errorCode: 'BAD_REQUEST',
+				errorCode: 'CONFLICT',
 			});
 		}
 
-		if (user.pop()?.user_type === 'EMPLOYEE') {
+		if (user[0].user_type === 'EMPLOYEE') {
 			const employee = await prisma.$transaction(async (tx) => {
-				const res1 = await tx.user.update({
+				const res = await tx.user.update({
 					where: { id: id },
 					data: { is_active: newStatus },
+					select: {
+						id: true,
+						email: true,
+						first_name: true,
+						last_name: true,
+						user_type: true,
+						is_active: true,
+					},
 				});
-				const res2 = await tx.employee.update({
+				await tx.employee.update({
 					where: { user_id: id },
 					data: { is_active: newStatus },
 				});
-				return { res1, res2 };
+				return res;
 			});
 			return employee;
 		}
@@ -177,6 +171,14 @@ export class UserService {
 		const customer = await prisma.user.update({
 			where: { id: id },
 			data: { is_active: newStatus },
+			select: {
+				id: true,
+				email: true,
+				first_name: true,
+				last_name: true,
+				user_type: true,
+				is_active: true,
+			},
 		});
 
 		return customer;

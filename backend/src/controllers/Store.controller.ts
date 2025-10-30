@@ -1,117 +1,130 @@
-import { StoreService } from '../services/Store.service.ts';
+import { StoreService } from '@/services/Store.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { HttpError } from '../utils/errors.util.ts';
-import { ApiResponse } from '../utils/api-response.util.ts';
-import { StoreSchema } from '../schemas/store.schema.ts';
-import { TypeGetStoreProps } from '@/types/store.types.ts';
+import { HttpError } from '@/utils/errors.util';
+import { ApiResponse } from '@/utils/api-response.util';
+import { StoreBodySchema } from '@/schemas/store.schema';
+import { TypeGetStoreProps } from '@/types/store.types';
 
 export class StoreController {
 	constructor(private storeService: StoreService) {}
 
 	async get(request: FastifyRequest, reply: FastifyReply) {
 		try {
-            const { skip, take, ...filters } = request.query as TypeGetStoreProps;
-			const response = await this.storeService.get(filters, Number(skip), Number(take));
+			const { skip, take, ...filters } =
+				request.query as TypeGetStoreProps;
 
-			return reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Informações das filiais encontradas',
-					data: response,
-				}),
-			);
+			const response = await this.storeService.get(
+				filters,
+				Number(skip),
+				Number(take),
+			); 
+            
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Informações das filiais encontradas',
+				data: response,
+			}).send(reply);
 		} catch (error) {
-			switch (error.errorCode) {
-				case 'NOT_FOUND':
-					return new HttpError({
-						message: error.message,
-						statusCode: 404,
-					});
-				default:
-					return new HttpError({
-						message: error.message,
-						statusCode: 500,
-					});
-			}
+			throw new HttpError({
+				message: error.message,
+				statusCode: 500,
+			});
 		}
 	}
 
 	async create(request: FastifyRequest, reply: FastifyReply) {
 		try {
-			const parsed = StoreSchema.safeParse(request.body);
+			const parsed = StoreBodySchema.safeParse(request.body);
 
 			if (!parsed.success) {
-				return new HttpError({
+				throw new HttpError({
 					message: parsed.error.issues[0].message,
 					statusCode: 400,
+                    errorCode: 'BAD_REQUEST'
 				});
 			}
 
 			await this.storeService.create(parsed.data!);
 
-			reply.status(201).send(
-				new ApiResponse({
-					statusCode: 201,
-					success: true,
-					message: 'Filial criada',
-				}),
-			);
+			new ApiResponse({
+				statusCode: 201,
+				success: true,
+				message: 'Filial criada',
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'CONFLICT':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 409,
+                        errorCode: error.errorCode
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
+                        errorCode: error.errorCode
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
+						errorCode: error.errorCode,
 					});
 			}
 		}
 	}
 
 	async update(
-		Request: FastifyRequest<{ Params: { id: string } }>,
+		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
 	) {
 		try {
-			const { id } = Request.params;
-			const parsed = StoreSchema.partial().parse(Request.body);
+			const { id } = request.params;
+			const parsed = StoreBodySchema.partial().safeParse(request.body);
+            
+            if (!parsed.success) {
+                throw new HttpError({
+                    message: parsed.error.issues[0].message,
+                    statusCode: 400,
+                    errorCode: 'BAD_REQUEST'
+                });
+            }
 
-			const response = await this.storeService.update(id, parsed);
+			const response = await this.storeService.update(id, parsed.data!);
 
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Filial atualizada',
-					data: response,
-				}),
-			);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Filial atualizada',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 404,
+						errorCode: error.errorCode,
+					});
+				case 'CONFLICT':
+					throw new HttpError({
+						message: error.message,
+						statusCode: 409,
+						errorCode: error.errorCode,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
+						errorCode: error.errorCode,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
+						errorCode: error.errorCode,
 					});
 			}
 		}
@@ -131,30 +144,32 @@ export class StoreController {
 				id,
 				newStatus,
 			);
-			reply.status(200).send(
-				new ApiResponse({
-					statusCode: 200,
-					success: true,
-					message: 'Status da filial atualizado',
-					data: response,
-				}),
-			);
+
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Status da filial atualizado',
+				data: response,
+			}).send(reply);
 		} catch (error) {
 			switch (error.errorCode) {
 				case 'NOT_FOUND':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 404,
+						errorCode: error.errorCode,
 					});
 				case 'BAD_REQUEST':
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 400,
+						errorCode: error.errorCode,
 					});
 				default:
-					return new HttpError({
+					throw new HttpError({
 						message: error.message,
 						statusCode: 500,
+						errorCode: error.errorCode,
 					});
 			}
 		}

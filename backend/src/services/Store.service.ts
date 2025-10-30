@@ -1,11 +1,11 @@
-import prisma from '../../prisma/client.ts';
+import prisma from '@prisma/client';
 import {
 	IStoreProps,
 	OpeningHours,
 	TypeGetStoreProps,
-} from '../types/store.types.ts';
-import { AppError } from '../utils/errors.util.ts';
-import { generateStoreCode } from '../utils/generate-store-code.util.ts';
+} from '@/types/store.types';
+import { AppError } from '@/utils/errors.util';
+import { generateStoreCode } from '@/utils/generate-store-code.util';
 
 export class StoreService {
 	private async validateStore(email?: string, street?: string) {
@@ -34,8 +34,12 @@ export class StoreService {
 	}
 
 	async get(where?: TypeGetStoreProps, skip = 0, take = 10) {
-
-		const response = await prisma.store.findMany({ skip, take, where });
+  
+		const response = await prisma.store.findMany({
+			take: Number(take) || 10,
+			skip: Number(skip) || 0,
+			where,
+		});
 
 		return response;
 	}
@@ -64,8 +68,6 @@ export class StoreService {
 				errorCode: 'NOT_FOUND',
 			});
 		}
-
-        
 
 		const currentData = store[0];
 

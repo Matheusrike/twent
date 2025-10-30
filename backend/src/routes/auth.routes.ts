@@ -28,7 +28,6 @@ export async function authRoutes(app: fastifyTypedInstance) {
 				response: {
 					200: LoginSuccessResponseSchema,
 					400: InvalidPasswordResponseSchema,
-					401: UserNotFoundResponseSchema,
 					403: UserInactiveResponseSchema,
 					404: UserNotFoundResponseSchema,
 					500: ApiGenericErrorSchema,
