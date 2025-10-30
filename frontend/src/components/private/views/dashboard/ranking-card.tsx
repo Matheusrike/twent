@@ -77,7 +77,7 @@ export default function SalesRankingCard() {
                 Ranking de Vendas
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Top 5 vendedores do mês
+                Top 3 vendedores do mês
               </p>
             </div>
             <div className="text-right">

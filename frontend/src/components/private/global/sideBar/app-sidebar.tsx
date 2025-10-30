@@ -17,6 +17,7 @@ import {
   IconSearch,
   IconSettings,
   IconUsers,
+  IconLayoutDashboard
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/private/global/sideBar/nav-documents"
@@ -44,12 +45,12 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "matriz/dashboard",
-      icon: IconDashboard,
+      url: "/matriz/dashboard",
+      icon: IconLayoutDashboard,
     },
     {
       title: "Lifecycle",
-      url: "#",
+      url: "/matriz/teste",
       icon: IconListDetails,
     },
     {
