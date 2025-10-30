@@ -30,7 +30,7 @@ export default function CollectionCard({
 
   return (
     <Link href={href} key={id} className='block'>
-      <div className='relative max-w-md rounded-xl bg-black pt-0  shadow-lg duration-500 overflow-hidden  hover:shadow-xl hover:-translate-y-1  '>
+      <div className='relative max-w-md rounded-xl bg-zinc-600 pt-0  shadow-lg duration-500 overflow-hidden  hover:shadow-xl hover:-translate-y-1  '>
         {/* Image wrapper */}
         <div className='relative h-60 w-full flex items-center justify-center'>
           <Image
@@ -45,7 +45,7 @@ export default function CollectionCard({
         <Button
           size='icon'
           onClick={(e) => {
-            e.preventDefault() // Prevents navigating when clicking like
+            e.preventDefault() 
             setLiked(!liked)
           }}
           className='bg-primary/10 hover:bg-primary/20 absolute top-4 right-4 rounded-full '
@@ -55,7 +55,7 @@ export default function CollectionCard({
         </Button>
 
         {/* Card content */}
-        <Card className='border-none! min-h-60 max-h-60 '>
+        <Card className='border-none! min-h-60 max-h-60 bg-white dark:bg-black '>
           <CardHeader className='px-6 pt-4'>
             {/* Title and badge */}
             <div className="flex items-center justify-between gap-2">

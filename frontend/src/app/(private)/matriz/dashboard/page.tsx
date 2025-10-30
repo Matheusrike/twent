@@ -1,8 +1,6 @@
 "use client"
-import Data from "./data.json"
-import { DataTable } from "@/components/private/global/tables/data-table"
 import { ChartBarInteractive } from "@/components/private/views/dashboard/bar-chart"
-import { ChartAreaInteractive } from "@/components/private/views/dashboard/chart-area-interactive"
+import RankingCard from "@/components/private/views/dashboard/ranking-card"
 import { ChartPieDonutText } from "@/components/private/views/dashboard/pie-chart"
 
 
@@ -10,14 +8,16 @@ export default function Dashboard() {
   return (
     <section className=" w-full flex flex-col gap-5">
       <ChartBarInteractive />
-      <section className="w-full h-auto flex  gap-2">
-        <ChartPieDonutText />
-      
-
+      <section className="w-full flex justify-center">
+        <div className="w-full   flex flex-col lg:flex-row gap-5 items-stretch">
+          <div className="w-full">
+            <ChartPieDonutText />
+          </div>
+          <div className="w-full ">
+            <RankingCard />
+          </div>
+        </div>
       </section>
-
-
-      {/* <DataTable data={Data} /> */}
     </section>
   )
 }

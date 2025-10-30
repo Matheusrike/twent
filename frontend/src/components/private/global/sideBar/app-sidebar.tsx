@@ -19,7 +19,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/private/views/dashboard/nav-documents"
+import { NavDocuments } from "@/components/private/global/sideBar/nav-documents"
 import { NavMain } from "@/components/private/global/sideBar/nav-main"
 import { NavSecondary } from "@/components/private/global/sideBar/nav-secondary"
 import { NavUser } from "@/components/private/global/sideBar/nav-user"
@@ -32,6 +32,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
+import Image from "next/image"
 
 const data = {
   user: {
@@ -42,7 +44,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "matriz/dashboard",
       icon: IconDashboard,
     },
     {
@@ -153,24 +155,26 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
+
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
-            </SidebarMenuButton>
+          <SidebarMenuItem className="flex justify-center items-center my-5">
+            {/* logo */}
+            <Link href="/matriz/dashboard">
+              <Image
+                src="/img/global/light/horizontalLogoLight.svg"
+                width={220}
+                height={40}
+                alt="Picture of the author"
+              />
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        {/* <NavDocuments items={data.documents} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

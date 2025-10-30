@@ -31,7 +31,6 @@ export default function SideBar({
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-
         <main className="p-6">
           {children}
         </main>

@@ -39,7 +39,7 @@ export default function RootLayout({
       lang="pt-br"
       className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} bg-white`}
     >
-      <body data-layout="manager">
+      <body data-layout="manager"  cz-shortcut-listen="true">
         <SideBar>
           {children}
         </SideBar>
