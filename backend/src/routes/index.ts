@@ -8,12 +8,8 @@ import { customerRoute } from './customer.route';
 import { employeeRoute } from './employee.route';
 import { userRoute } from './user.route';
 import { storeRoute } from './store.route';
+import { collectionRoutes } from './collection.route';
 import authorizationPlugin from '@/plugins/authorization.plugin';
-import { customerRoute } from './customer.route.ts';
-import { employeeRoute } from './employee.route.ts';
-import { userRoute } from './user.route.ts';
-import { storeRoute } from './store.route.ts';
-import { collectionRoutes } from './collection.route.ts';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
