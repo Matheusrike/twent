@@ -3,13 +3,14 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ApiResponseSchema } from '../schemas/api-response.schema';
 import { ApiResponse } from '../utils/api-response.util';
 
-import { authRoutes } from '@/routes/auth.routes';
-import { customerRoute } from './customer.route.ts';
-import { employeeRoute } from './employee.route.ts';
-import { userRoute } from './user.route.ts';
-import { storeRoute } from './store.route.ts';
-import { collectionRoutes } from './collection.route.ts';
+import { authRoutes } from '@/routes/auth.route';
+import { customerRoute } from './customer.route';
+import { employeeRoute } from './employee.route';
+import { userRoute } from './user.route';
+import { storeRoute } from './store.route';
+import { collectionRoutes } from './collection.route';
 import { imageRoutes } from './image.route';
+import { productRoutes } from './product.route';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
@@ -41,6 +42,7 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 			await app.register(storeRoute, { prefix: '/store' });
 			await app.register(collectionRoutes, { prefix: '/collection' });
 			await app.register(imageRoutes, { prefix: '/image' });
+			await app.register(productRoutes, { prefix: '/product' });
 		},
 		{ prefix: '/api' },
 	);

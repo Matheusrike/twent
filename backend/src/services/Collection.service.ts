@@ -137,7 +137,7 @@ export class CollectionService {
 				include: {
 					products: {
 						select: {
-							id: true,
+							sku: true,
 							name: true,
 						},
 					},

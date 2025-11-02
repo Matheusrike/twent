@@ -11,6 +11,8 @@ export const CollectionParamsSchema = UuidSchema.extend({
 	}),
 });
 
+export type CollectionParamsType = z.infer<typeof CollectionParamsSchema>;
+
 export const CollectionQuerySchema = z.object({
 	page: z
 		.string()
