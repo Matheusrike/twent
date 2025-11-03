@@ -16,7 +16,9 @@ export default function SideBar({
   const pathname = usePathname();
 
   if (pathname === "/login") {
-    return null;
+    return(
+      <>{children}</>
+    )
   }
 
   return (

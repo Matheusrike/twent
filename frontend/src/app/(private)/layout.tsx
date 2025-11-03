@@ -1,7 +1,7 @@
 import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import SideBar from "@/components/private/global/sideBar/sideBar";
+import SideBar from "@/components/private/global/sideBar/sideBarLayout";
 
 const notoSansAdlam = Noto_Sans_Adlam({
   subsets: ["latin"],

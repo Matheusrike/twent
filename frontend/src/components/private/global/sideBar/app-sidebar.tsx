@@ -2,27 +2,19 @@
 
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
+  IconLayoutDashboard,
   IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
+  IconChartBar,
+  IconFolder,
   IconUsers,
-  IconLayoutDashboard
+  IconSettings,
+  IconGlobe,
+  IconHelp,
+  IconSparkles,
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/private/global/sideBar/nav-documents"
-import { NavMain } from "@/components/private/global/sideBar/nav-main"
-import { NavSecondary } from "@/components/private/global/sideBar/nav-secondary"
+import { Container } from "lucide-react"
+
 import { NavUser } from "@/components/private/global/sideBar/nav-user"
 import {
   Sidebar,
@@ -30,13 +22,15 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import Image from "next/image"
 
-const data = {
+const Matrizdata = {
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -49,137 +43,136 @@ const data = {
       icon: IconLayoutDashboard,
     },
     {
-      title: "Lifecycle",
-      url: "/matriz/teste",
-      icon: IconListDetails,
+      title: "Filiais",
+      url: "/matriz/filiais",
+      icon: IconGlobe,
     },
     {
-      title: "Analytics",
-      url: "#",
+      title: "Financeiro",
+      url: "/matriz/financeiro",
       icon: IconChartBar,
     },
     {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
+      title: "Estoque",
+      url: "/matriz/estoque",
+      icon: Container,
     },
     {
-      title: "Team",
-      url: "#",
+      title: "Colaboradores",
+      url: "/matriz/colaboradores",
       icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
     },
   ],
   navSecondary: [
     {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
+      title: "Ajuda",
       url: "#",
       icon: IconHelp,
     },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
+   
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  return (
-    <Sidebar collapsible="offcanvas" {...props}>
+  const [activeItem, setActiveItem] = React.useState<string>("Dashboard")
 
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem className="flex justify-center items-center my-5">
-            {/* logo */}
-            <Link href="/matriz/dashboard">
-              <Image
-                src="/img/global/light/horizontalLogoLight.svg"
-                width={220}
-                height={40}
-                alt="Picture of the author"
-              />
-            </Link>
-          </SidebarMenuItem>
-        </SidebarMenu>
+  return (
+    <Sidebar collapsible="offcanvas" className="border-r" {...props}>
+      {/* Header */}
+      <SidebarHeader className="border-b px-6 py-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
+            <Image
+              src="/img/global/light/faviconLight.svg"
+              width={60}
+              height={60}
+              alt="Matriz Logo"
+              className="object-contain"
+            />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold tracking-tight">Matriz</h2>
+            <p className="text-xs text-muted-foreground">Gerenciador</p>
+          </div>
+        </div>
       </SidebarHeader>
 
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavDocuments items={data.documents} /> */}
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+      <SidebarContent className="px-3 py-4">
+        {/* Main Navigation */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Menu
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {Matrizdata.navMain.map((item) => {
+                const isActive = activeItem === item.title
+                const Icon = item.icon
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <Link 
+                      href={item.url} 
+                      className="block w-full"
+                      onClick={() => setActiveItem(item.title)}
+                    >
+                      <div
+                        className={`
+                          group relative flex items-center gap-3 rounded-lg px-3 py-2.5 
+                          transition-all duration-200 ease-out
+                          ${isActive 
+                            ? 'bg-primary text-primary-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                          }
+                        `}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" />
+                        <span className="flex-1 font-medium text-sm">
+                          {item.title}
+                        </span>
+                        {isActive && (
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+                        )}
+                      </div>
+                    </Link>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Secondary Navigation */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Suport
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {Matrizdata.navSecondary.map((item) => {
+                const Icon = item.icon
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <a href={item.url} className="block w-full">
+                      <div className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground">
+                        <Icon className="h-5 w-5 shrink-0" />
+                        <span className="flex-1 font-medium text-sm">
+                          {item.title}
+                        </span>
+                      </div>
+                    </a>
+                  </SidebarMenuItem>
+                  
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
+
+      <SidebarFooter className="border-t p-4">
+        <NavUser user={Matrizdata.user} />
       </SidebarFooter>
     </Sidebar>
   )
