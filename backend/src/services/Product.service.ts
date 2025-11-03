@@ -41,4 +41,123 @@ export class ProductService {
 			throw error;
 		}
 	}
+
+	async findAllPublic() {
+		const products = await this.database.product.findMany({
+			where: {
+				is_active: true,
+			},
+			select: {
+				sku: true,
+				name: true,
+				description: true,
+				price: true,
+				currency: true,
+				limited_edition: true,
+				production_limit: true,
+				specifications: true,
+				collection: {
+					select: {
+						id: true,
+						name: true,
+						description: true,
+						target_gender: true,
+						launch_year: true,
+					},
+				},
+				images: {
+					select: {
+						id: true,
+						public_id: true,
+						is_primary: true,
+					},
+				},
+			},
+			orderBy: {
+				created_at: 'desc',
+			},
+		});
+
+		return products;
+	}
+
+	async findBySkuPublic(sku: string) {
+		const product = await this.database.product.findUnique({
+			where: {
+				sku,
+				is_active: true,
+			},
+			select: {
+				sku: true,
+				name: true,
+				description: true,
+				price: true,
+				currency: true,
+				limited_edition: true,
+				production_limit: true,
+				specifications: true,
+				collection: {
+					select: {
+						id: true,
+						name: true,
+						description: true,
+						target_gender: true,
+						launch_year: true,
+						price_range_min: true,
+						price_range_max: true,
+					},
+				},
+				images: {
+					select: {
+						id: true,
+						public_id: true,
+						is_primary: true,
+					},
+				},
+			},
+		});
+
+		if (!product) {
+			throw new AppError({
+				message: 'Product not found',
+				errorCode: 'PRODUCT_NOT_FOUND',
+			});
+		}
+
+		return product;
+	}
+
+	async findAllInternal(user: IJwtAuthPayload) {
+		const products = await this.database.product.findMany({
+			where: {
+				is_active: true,
+			},
+			include: {
+				collection: true,
+				images: {
+					where: {
+						is_primary: true,
+					},
+				},
+				inventory: user.storeId
+					? {
+							where: {
+								store_id: user.storeId,
+							},
+						}
+					: true,
+				_count: {
+					select: {
+						sale_items: true,
+						favorites: true,
+					},
+				},
+			},
+			orderBy: {
+				created_at: 'desc',
+			},
+		});
+
+		return products;
+	}
 }

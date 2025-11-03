@@ -9,6 +9,7 @@ export interface IJwtProvider {
 export interface IJwtAuthPayload {
 	id: string;
 	roles: string[];
+	storeId?: string;
 }
 
 export interface ILoginInput {

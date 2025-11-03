@@ -22,6 +22,7 @@ export class AuthService {
 				is_active: true,
 				first_name: true,
 				email: true,
+				store_id: true,
 			},
 		});
 
@@ -74,6 +75,7 @@ export class AuthService {
 		const token: IJwtAuthPayload = {
 			id: user.id,
 			roles: userRoles.map((r) => r.role.name),
+			storeId: user.store_id || undefined,
 		};
 
 		return this.jwtProvider.sign(token, { expiresIn: '1d' });
