@@ -100,6 +100,8 @@ export const StoreQuerystringSchema = z.object({
 		}, z.boolean())
 		.optional()
 		.meta({ examples: [true] }),
+        skip: z.any().optional(),
+        take: z.any().optional(),
 });
 
 export const StoreBodySchema = z.object({

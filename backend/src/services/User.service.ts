@@ -32,7 +32,6 @@ export class  UserService {
 	async get(params?: TypeGetUserProps, skip = 0, take = 10, id?: string) {
 		let response;
 
-        console.log('UserService.get called with params:', { params, skip, take, id });
 		if (params?.user_type === 'EMPLOYEE') {
 			response = await prisma.user.findMany({
 				cursor: id ? { id } : undefined,
