@@ -1,5 +1,63 @@
 import { z } from 'zod';
 
+const specificationsSchema = z
+	.object({
+		case_material: z
+			.string()
+			.max(60, 'Material da caixa muito extenso')
+			.optional()
+			.meta({
+				description: 'Material da caixa do produto',
+				examples: ['Aço inoxidável', 'Titânio'],
+			}),
+
+		case_diameter: z
+			.number()
+			.positive('O diâmetro deve ser positivo')
+			.optional()
+			.meta({
+				description: 'Diâmetro da caixa do produto em milímetros',
+				examples: [40, 42.5],
+			}),
+
+		water_resistance: z
+			.string()
+			.max(60)
+			.optional()
+			.meta({
+				description: 'Resistência à água do produto',
+				examples: ['50 metros', '100 metros'],
+			}),
+
+		movement_type: z
+			.string()
+			.max(100)
+			.optional()
+			.meta({
+				description: 'Tipo de movimento do relógio',
+				examples: ['Automático', 'Quartzo'],
+			}),
+
+		total_weight: z
+			.number()
+			.positive('O peso total deve ser positivo')
+			.optional()
+			.meta({
+				description: 'Peso total do produto em gramas',
+				examples: [150, 200],
+			}),
+
+		glass: z
+			.string()
+			.max(60)
+			.optional()
+			.meta({
+				description: 'Tipo de vidro do produto',
+				examples: ['Safira', 'Mineral'],
+			}),
+	})
+	.optional();
+
 export const createProductSchema = z.object({
 	name: z
 		.string('O nome do produto é obrigatório')
@@ -135,4 +193,46 @@ export const createProductSchema = z.object({
 		}),
 });
 
+export const updateProductSchema = z.object({
+	name: z
+		.string()
+		.min(2, 'O nome deve ter no mínimo 2 caracteres')
+		.max(255, 'O nome deve ter no máximo 255 caracteres')
+		.optional(),
+
+	description: z
+		.string()
+		.max(2000, 'A descrição pode ter no máximo 2000 caracteres')
+		.optional(),
+
+	price: z.number().positive('O preço deve ser positivo').optional(),
+
+	currency: z
+		.string()
+		.length(3, 'A moeda deve seguir o padrão ISO 4217')
+		.optional(),
+
+	cost_price: z.number().positive('O custo deve ser positivo').optional(),
+
+	collection_id: z.uuid('O ID da coleção deve ser um UUID válido').optional(),
+
+	limited_edition: z.boolean().optional(),
+
+	production_limit: z
+		.number()
+		.int('O limite de produção deve ser um número inteiro')
+		.positive('O limite deve ser positivo')
+		.optional(),
+
+	specifications: specificationsSchema,
+
+	is_active: z.boolean().optional(),
+
+	price_change_reason: z
+		.string()
+		.max(500, 'A razão deve ter no máximo 500 caracteres')
+		.optional(),
+});
+
 export type CreateProductType = z.infer<typeof createProductSchema>;
+export type UpdateProductType = z.infer<typeof updateProductSchema>;

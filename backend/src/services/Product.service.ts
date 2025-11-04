@@ -1,5 +1,5 @@
 import { generateUniqueSKU } from '@/helpers/product-codes.helper';
-import { CreateProductType } from '@/schemas/product.schema';
+import { CreateProductType, UpdateProductType } from '@/schemas/product.schema';
 import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError } from '@/utils/errors.util';
 import { Prisma, PrismaClient } from '@prisma/generated/client';
@@ -159,5 +159,167 @@ export class ProductService {
 		});
 
 		return products;
+	}
+
+	async findBySkuInternal(sku: string, user: IJwtAuthPayload) {
+		const product = await this.database.product.findUnique({
+			where: { sku },
+			include: {
+				collection: true,
+				images: true,
+				price_history: {
+					include: {
+						changedBy: {
+							select: {
+								id: true,
+								first_name: true,
+								last_name: true,
+								email: true,
+							},
+						},
+					},
+					orderBy: {
+						changed_at: 'desc',
+					},
+					take: 10,
+				},
+				inventory: user.storeId
+					? {
+							where: {
+								store_id: user.storeId,
+							},
+							include: {
+								store: {
+									select: {
+										id: true,
+										name: true,
+										code: true,
+									},
+								},
+							},
+						}
+					: {
+							include: {
+								store: {
+									select: {
+										id: true,
+										name: true,
+										code: true,
+									},
+								},
+							},
+						},
+				updatedBy: {
+					select: {
+						id: true,
+						first_name: true,
+						last_name: true,
+						email: true,
+					},
+				},
+				_count: {
+					select: {
+						sale_items: true,
+						favorites: true,
+						inventory_movements: true,
+					},
+				},
+			},
+		});
+
+		if (!product) {
+			throw new AppError({
+				message: 'Product not found',
+				errorCode: 'PRODUCT_NOT_FOUND',
+			});
+		}
+
+		return product;
+	}
+
+	async update(sku: string, data: UpdateProductType, user: IJwtAuthPayload) {
+		try {
+			const existingProduct = await this.database.product.findUnique({
+				where: { sku },
+			});
+
+			if (!existingProduct) {
+				throw new AppError({
+					message: 'Product not found',
+					errorCode: 'PRODUCT_NOT_FOUND',
+				});
+			}
+
+			const shouldLogPriceChange =
+				data.price && data.price !== existingProduct.price.toNumber();
+
+			const updatedProduct = await this.database.product.update({
+				where: { sku },
+				data: {
+					name: data.name,
+					description: data.description,
+					price: data.price
+						? new Prisma.Decimal(data.price)
+						: undefined,
+					currency: data.currency,
+					cost_price: data.cost_price
+						? new Prisma.Decimal(data.cost_price)
+						: undefined,
+					collection_id: data.collection_id,
+					limited_edition: data.limited_edition,
+					production_limit: data.production_limit,
+					specifications: data.specifications,
+					is_active: data.is_active,
+					updated_by: user.id,
+				},
+				include: {
+					collection: true,
+					images: true,
+				},
+			});
+
+			if (shouldLogPriceChange) {
+				await this.database.productPriceHistory.create({
+					data: {
+						product_id: sku,
+						old_price: existingProduct.price,
+						new_price: new Prisma.Decimal(data.price!),
+						changed_by: user.id,
+						reason: data.price_change_reason,
+					},
+				});
+			}
+
+			return updatedProduct;
+		} catch (error) {
+			if (error.code === 'P2003') {
+				throw new AppError({
+					message: 'Collection not found',
+					errorCode: 'COLLECTION_NOT_FOUND',
+				});
+			}
+			throw error;
+		}
+	}
+
+	async delete(sku: string, user: IJwtAuthPayload) {
+		const product = await this.database.product.findUnique({
+			where: { sku },
+		});
+
+		if (!product) {
+			throw new AppError({
+				message: 'Product not found',
+				errorCode: 'PRODUCT_NOT_FOUND',
+			});
+		}
+
+		await this.database.product.update({
+			where: { sku },
+			data: {
+				is_active: false,
+				updated_by: user.id,
+			},
+		});
 	}
 }
