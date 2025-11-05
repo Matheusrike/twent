@@ -1,4 +1,12 @@
 import { z } from 'zod';
+import { SkuSchema } from './generic.schema';
+
+export const ProductSkuSchema = SkuSchema.extend({
+	sku: z.uuid('ID do produto deve ser um UUID válido').meta({
+		description: 'ID do produto',
+		examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+	}),
+});
 
 const specificationsSchema = z
 	.object({
@@ -234,5 +242,6 @@ export const updateProductSchema = z.object({
 		.optional(),
 });
 
+export type ProductSkuType = z.infer<typeof ProductSkuSchema>;
 export type CreateProductType = z.infer<typeof createProductSchema>;
 export type UpdateProductType = z.infer<typeof updateProductSchema>;

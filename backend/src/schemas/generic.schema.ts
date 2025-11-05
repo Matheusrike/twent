@@ -7,4 +7,17 @@ export const UuidSchema = z.object({
 	}),
 });
 
+export const SkuSchema = z.object({
+	sku: z
+		.string()
+		.min(1)
+		.max(100)
+		.regex(/^TW-\d{4}-\d+$/, 'O SKU deve seguir o formato TW-YYYY-NNNNN')
+		.meta({
+			description: 'SKU do produto',
+			examples: ['ABC123', 'XYZ789'],
+		}),
+});
+
 export type UuidType = z.infer<typeof UuidSchema>;
+export type SkuType = z.infer<typeof SkuSchema>;

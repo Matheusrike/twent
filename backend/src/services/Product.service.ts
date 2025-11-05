@@ -3,9 +3,14 @@ import { CreateProductType, UpdateProductType } from '@/schemas/product.schema';
 import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError } from '@/utils/errors.util';
 import { Prisma, PrismaClient } from '@prisma/generated/client';
+import { ImageService } from '@/services/Image.service';
 
 export class ProductService {
-	constructor(private database: PrismaClient) {}
+	private imageService: ImageService;
+
+	constructor(private database: PrismaClient) {
+		this.imageService = new ImageService();
+	}
 
 	async create(data: CreateProductType, user: IJwtAuthPayload) {
 		try {
@@ -28,6 +33,10 @@ export class ProductService {
 					created_by: user.id,
 					updated_by: user.id,
 				},
+				include: {
+					collection: true,
+					images: true,
+				},
 			});
 
 			return product;
@@ -44,9 +53,7 @@ export class ProductService {
 
 	async findAllPublic() {
 		const products = await this.database.product.findMany({
-			where: {
-				is_active: true,
-			},
+			where: { is_active: true },
 			select: {
 				sku: true,
 				name: true,
@@ -73,9 +80,7 @@ export class ProductService {
 					},
 				},
 			},
-			orderBy: {
-				created_at: 'desc',
-			},
+			orderBy: { created_at: 'desc' },
 		});
 
 		return products;
@@ -83,10 +88,7 @@ export class ProductService {
 
 	async findBySkuPublic(sku: string) {
 		const product = await this.database.product.findUnique({
-			where: {
-				sku,
-				is_active: true,
-			},
+			where: { sku, is_active: true },
 			select: {
 				sku: true,
 				name: true,
@@ -129,22 +131,12 @@ export class ProductService {
 
 	async findAllInternal(user: IJwtAuthPayload) {
 		const products = await this.database.product.findMany({
-			where: {
-				is_active: true,
-			},
+			where: { is_active: true },
 			include: {
 				collection: true,
-				images: {
-					where: {
-						is_primary: true,
-					},
-				},
+				images: { where: { is_primary: true } },
 				inventory: user.storeId
-					? {
-							where: {
-								store_id: user.storeId,
-							},
-						}
+					? { where: { store_id: user.storeId } }
 					: true,
 				_count: {
 					select: {
@@ -153,9 +145,7 @@ export class ProductService {
 					},
 				},
 			},
-			orderBy: {
-				created_at: 'desc',
-			},
+			orderBy: { created_at: 'desc' },
 		});
 
 		return products;
@@ -178,16 +168,12 @@ export class ProductService {
 							},
 						},
 					},
-					orderBy: {
-						changed_at: 'desc',
-					},
+					orderBy: { changed_at: 'desc' },
 					take: 10,
 				},
 				inventory: user.storeId
 					? {
-							where: {
-								store_id: user.storeId,
-							},
+							where: { store_id: user.storeId },
 							include: {
 								store: {
 									select: {
@@ -272,10 +258,7 @@ export class ProductService {
 					is_active: data.is_active,
 					updated_by: user.id,
 				},
-				include: {
-					collection: true,
-					images: true,
-				},
+				include: { collection: true, images: true },
 			});
 
 			if (shouldLogPriceChange) {
@@ -292,6 +275,7 @@ export class ProductService {
 
 			return updatedProduct;
 		} catch (error) {
+			if (error instanceof AppError) throw error;
 			if (error.code === 'P2003') {
 				throw new AppError({
 					message: 'Collection not found',
@@ -316,10 +300,123 @@ export class ProductService {
 
 		await this.database.product.update({
 			where: { sku },
+			data: { is_active: false, updated_by: user.id },
+		});
+	}
+
+	// ----- IMAGES ----
+	async uploadImage(sku: string, filePath: string) {
+		const product = await this.database.product.findUnique({
+			where: { sku },
+		});
+
+		if (!product) {
+			throw new AppError({
+				message: 'Product not found',
+				errorCode: 'PRODUCT_NOT_FOUND',
+			});
+		}
+
+		const { publicId } = await this.imageService.upload(
+			filePath,
+			'products',
+		);
+
+		const existingImages = await this.database.productImage.count({
+			where: { product_id: sku },
+		});
+
+		const image = await this.database.productImage.create({
 			data: {
-				is_active: false,
-				updated_by: user.id,
+				product_id: sku,
+				public_id: publicId,
+				is_primary: existingImages === 0,
 			},
 		});
+
+		return image;
+	}
+
+	async deleteImage(sku: string, imageId: string) {
+		const image = await this.database.productImage.findFirst({
+			where: { id: imageId, product_id: sku },
+		});
+
+		if (!image) {
+			throw new AppError({
+				message: 'Image not found',
+				errorCode: 'IMAGE_NOT_FOUND',
+			});
+		}
+
+		await this.imageService.delete(image.public_id);
+
+		await this.database.productImage.delete({ where: { id: imageId } });
+
+		if (image.is_primary) {
+			const firstImage = await this.database.productImage.findFirst({
+				where: { product_id: sku },
+			});
+
+			if (firstImage) {
+				await this.database.productImage.update({
+					where: { id: firstImage.id },
+					data: { is_primary: true },
+				});
+			}
+		}
+	}
+
+	async setPrimaryImage(sku: string, imageId: string) {
+		const image = await this.database.productImage.findFirst({
+			where: { id: imageId, product_id: sku },
+		});
+
+		if (!image) {
+			throw new AppError({
+				message: 'Image not found',
+				errorCode: 'IMAGE_NOT_FOUND',
+			});
+		}
+
+		await this.database.productImage.updateMany({
+			where: { product_id: sku },
+			data: { is_primary: false },
+		});
+
+		await this.database.productImage.update({
+			where: { id: imageId },
+			data: { is_primary: true },
+		});
+	}
+
+	async getPriceHistory(sku: string) {
+		const product = await this.database.product.findUnique({
+			where: { sku },
+		});
+
+		if (!product) {
+			throw new AppError({
+				message: 'Product not found',
+				errorCode: 'PRODUCT_NOT_FOUND',
+			});
+		}
+
+		const history = await this.database.productPriceHistory.findMany({
+			where: { product_id: sku },
+			include: {
+				changedBy: {
+					select: {
+						id: true,
+						first_name: true,
+						last_name: true,
+						email: true,
+					},
+				},
+			},
+			orderBy: { changed_at: 'desc' },
+		});
+
+		return history;
 	}
 }
