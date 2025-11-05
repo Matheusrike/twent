@@ -1,6 +1,6 @@
 import { FastifyRequest } from 'fastify';
 import { ProductService } from '@/services/Product.service';
-import { CreateProductType } from '@/schemas/product.schema';
+import { CreateProductType, UpdateProductType } from '@/schemas/product.schema';
 import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError, HttpError } from '@/utils/errors.util';
 
@@ -81,6 +81,7 @@ export class ProductController {
 			const products = await this.productService.findAllInternal(user);
 			return products;
 		} catch (error) {
+			console.error(error);
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
@@ -96,11 +97,14 @@ export class ProductController {
 		}
 	}
 
-	async getOneInternal(request: FastifyRequest) {
+	async findBySkuInternal(request: FastifyRequest) {
 		try {
 			const { sku } = request.params as { sku: string };
 			const user = request.user as IJwtAuthPayload;
-			const product = await this.productService.getOneInternal(sku, user);
+			const product = await this.productService.findBySkuInternal(
+				sku,
+				user,
+			);
 			return product;
 		} catch (error) {
 			if (error instanceof AppError) {

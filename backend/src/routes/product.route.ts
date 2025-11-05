@@ -1,7 +1,10 @@
 import { fastifyTypedInstance } from '@/types/types';
 import { ProductController } from '@/controllers/Product.controller';
 import { ProductService } from '@/services/Product.service';
-import { createProductSchema } from '@/schemas/product.schema';
+import {
+	createProductSchema,
+	updateProductSchema,
+} from '@/schemas/product.schema';
 import prisma from '@prisma/client';
 import { ApiResponse } from '@/utils/api-response.util';
 import { HttpError } from '@/utils/errors.util';
@@ -9,6 +12,48 @@ import { HttpError } from '@/utils/errors.util';
 export async function productRoutes(app: fastifyTypedInstance) {
 	const productService = new ProductService(prisma);
 	const productController = new ProductController(productService);
+
+	app.get('/public', async (request, reply) => {
+		try {
+			const products = await productController.findAllPublic();
+			return new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Produtos recuperados com sucesso',
+				data: products,
+			}).send(reply);
+		} catch (error) {
+			if (error instanceof HttpError) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		}
+	});
+
+	app.get('/public/:sku', async (request, reply) => {
+		try {
+			const product = await productController.findBySkuPublic(request);
+			return new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Produto recuperado com sucesso',
+				data: product,
+			}).send(reply);
+		} catch (error) {
+			if (error instanceof HttpError) {
+				return new ApiResponse({
+					statusCode: error.statusCode,
+					success: false,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		}
+	});
 
 	app.post(
 		'/',
@@ -26,6 +71,126 @@ export async function productRoutes(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Produto criado com sucesso',
 					data: newProduct,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.get(
+		'/',
+		{
+			preHandler: [
+				app.authorization({
+					requiredRoles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
+				}),
+			],
+		},
+		async (request, reply) => {
+			try {
+				const products =
+					await productController.findAllInternal(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Produtos recuperados com sucesso',
+					data: products,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.get(
+		'/:sku',
+		{
+			preHandler: [
+				app.authorization({
+					requiredRoles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
+				}),
+			],
+		},
+		async (request, reply) => {
+			try {
+				const product =
+					await productController.findBySkuInternal(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Produto recuperado com sucesso',
+					data: product,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.put(
+		'/:sku',
+		{
+			schema: {
+				body: updateProductSchema,
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				const updatedProduct = await productController.update(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Produto atualizado com sucesso',
+					data: updatedProduct,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.delete(
+		'/:sku',
+		{
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				await productController.delete(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Produto desativado com sucesso',
 				}).send(reply);
 			} catch (error) {
 				if (error instanceof HttpError) {
