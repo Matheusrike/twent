@@ -1,10 +1,11 @@
+
 import { Button } from "@/components/web/Global/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import textCardsData from "./textCardsData.json";
 
-const TextCards = () => {
+const TextCardsCollection = () => {
     return (
         <div className="w-full flex justify-center py-20">
             <div className="container px-6 lg:px-8">
@@ -51,4 +52,4 @@ const TextCards = () => {
     );
 };
 
-export default TextCards;
+export default TextCardsCollection;

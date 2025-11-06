@@ -11,8 +11,10 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CollectionIdSideBar from "@/components/web/views/Collection/id/sideBar/navigation-sheet";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/web/Global/Navbar/sheet";
-import TextCards from "@/components/web/Pages/Collection/id/cardBackCollection/textCards";
-import CollectionBannerId from "@/components/web/Pages/Collection/id/bannerId/banner";
+
+import CollectionBannerId from "@/components/web/views/Collection/banner/banner";
+import TextCardsCollection from "@/components/web/views/Collection/id/card/TextCardsCollection";
+
 
 export default function CollectionIdHero({ params }: any) {
   const router = useRouter();
@@ -33,7 +35,7 @@ export default function CollectionIdHero({ params }: any) {
           <div className="hidden lg:flex lg:w-3/5 xl:w-4/5 h-screen sticky top-0 p-4 flex-col gap-4">
 
             {/* image main */}
-            <div className="relative w-full h-2/3 rounded-2xl overflow-hidden">
+            <div className="relative w-full lg:h-2/3 md:h-1/2 rounded-2xl overflow-hidden">
               <Image
                 src="/images/collection/gradient.png"
                 alt="gradient"
@@ -44,7 +46,7 @@ export default function CollectionIdHero({ params }: any) {
             </div>
 
             {/* image container */}
-            <div className="flex gap-4 w-full h-1/3">
+            <div className="flex gap-4 w-full lg:h-1/3 md:h-1/2">
               <div className="relative w-1/2 h-full rounded-2xl overflow-hidden">
                 <Image
                   src="/images/collection/gradient.png"
@@ -81,7 +83,7 @@ export default function CollectionIdHero({ params }: any) {
           </div>
 
           {/* data content */}
-          <div className="w-full lg:w-2/5 xl:w-1/2 flex flex-col px-6 py-8 lg:px-12 lg:py-15 lg:overflow-y-auto">
+          <div className=" w-full lg:h-220 lg:w-2/5 xl:w-1/2 flex flex-col px-6 py-8 lg:px-12 lg:py-15 lg:overflow-y-auto">
 
             {/* return to previous */}
             <div className="hidden lg:flex w-full mb-6 justify-end">
@@ -161,15 +163,15 @@ export default function CollectionIdHero({ params }: any) {
 
             <CollectionIdSideBar />
           </div>
-          
+
         </div>
         <CollectionBannerId />
-        <TextCards />
-        
+        <TextCardsCollection />
+
       </div>
 
-      
-      
+
+
     </div>
   );
 }
