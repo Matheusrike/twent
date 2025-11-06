@@ -1,10 +1,14 @@
 export interface IImageService {
-	upload(filePath: string, folder: string): Promise<CloudinaryResult>;
+	uploadFile(filePath: string, folder: string): Promise<CloudinaryResult>;
 	delete(publicId: string): Promise<void>;
 	generateUrl(
 		publicId: string,
 		params: GenerateCloudinaryImageUrlParams,
 	): string;
+	uploadFiles(
+		filePaths: string[],
+		folder: string,
+	): Promise<CloudinaryResult[]>;
 }
 
 export interface CloudinaryResult {

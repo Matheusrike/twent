@@ -204,4 +204,29 @@ export async function productRoutes(app: fastifyTypedInstance) {
 			}
 		},
 	);
+
+	app.post(
+		'/:sku/images',
+		{ preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })] },
+		async (request, reply) => {
+			try {
+				const images = await productController.uploadImages(request);
+				return new ApiResponse({
+					statusCode: 201,
+					success: true,
+					message: 'Imagens carregadas com sucesso',
+					data: images,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
 }

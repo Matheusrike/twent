@@ -3,6 +3,7 @@ import { ProductService } from '@/services/Product.service';
 import { CreateProductType, UpdateProductType } from '@/schemas/product.schema';
 import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError, HttpError } from '@/utils/errors.util';
+import { SkuType } from '@/schemas/generic.schema';
 
 export class ProductController {
 	constructor(private productService: ProductService) {}
@@ -167,6 +168,23 @@ export class ProductController {
 				message: 'Internal server error',
 				errorCode: 'INTERNAL_SERVER_ERROR',
 			});
+		}
+	}
+
+	async uploadImages(request: FastifyRequest) {
+		try {
+			const { sku } = request.params as SkuType;
+			const files = await request.saveRequestFiles();
+			const filepaths = files.map((file) => file.filepath);
+
+			const images = await this.productService.uploadImages(
+				sku,
+				filepaths,
+			);
+
+			return images;
+		} catch (error) {
+			console.error(error);
 		}
 	}
 }
