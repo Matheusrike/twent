@@ -5,6 +5,10 @@ export interface IImageService {
 		publicId: string,
 		params: GenerateCloudinaryImageUrlParams,
 	): string;
+	uploadFiles(
+		filePaths: string[],
+		folder: string,
+	): Promise<CloudinaryResult[]>;
 }
 
 export interface CloudinaryResult {

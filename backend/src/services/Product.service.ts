@@ -304,42 +304,38 @@ export class ProductService {
 		});
 	}
 
-	// ----- IMAGES ----
-	async uploadImage(sku: string, filePath: string) {
-		const product = await this.database.product.findUnique({
-			where: { sku },
-		});
+	async uploadImages(sku: string, filesPaths: string[]) {
+		try {
+			const publicIds = await this.imageService
+				.uploadFiles(filesPaths, 'products')
+				.then((res) => res as { publicId: string }[]);
 
-		if (!product) {
-			throw new AppError({
-				message: 'Product not found',
-				errorCode: 'PRODUCT_NOT_FOUND',
+			const existingImages = await this.database.productImage.count({
+				where: { product_id: sku },
 			});
+
+			const images = await this.database.productImage.createMany({
+				data: publicIds.map((img) => ({
+					product_id: sku,
+					public_id: img.publicId,
+					is_primary: existingImages === 0,
+				})),
+			});
+
+			return images;
+		} catch (error) {
+			if (error.code === 'P2003') {
+				throw new AppError({
+					message: 'Product not found',
+					errorCode: 'PRODUCT_NOT_FOUND',
+				});
+			}
 		}
-
-		const { publicId } = await this.imageService.upload(
-			filePath,
-			'products',
-		);
-
-		const existingImages = await this.database.productImage.count({
-			where: { product_id: sku },
-		});
-
-		const image = await this.database.productImage.create({
-			data: {
-				product_id: sku,
-				public_id: publicId,
-				is_primary: existingImages === 0,
-			},
-		});
-
-		return image;
 	}
 
-	async deleteImage(sku: string, imageId: string) {
+	async deleteImage(sku: string, publicId: string) {
 		const image = await this.database.productImage.findFirst({
-			where: { id: imageId, product_id: sku },
+			where: { public_id: publicId, product_id: sku },
 		});
 
 		if (!image) {
@@ -351,7 +347,9 @@ export class ProductService {
 
 		await this.imageService.delete(image.public_id);
 
-		await this.database.productImage.delete({ where: { id: imageId } });
+		await this.database.productImage.delete({
+			where: { public_id: publicId },
+		});
 
 		if (image.is_primary) {
 			const firstImage = await this.database.productImage.findFirst({
@@ -367,7 +365,7 @@ export class ProductService {
 		}
 	}
 
-	async setPrimaryImage(sku: string, imageId: string) {
+	async setPrimaryImage(sku: string, publicId: string) {
 		const image = await this.database.productImage.findFirst({
 			where: { id: imageId, product_id: sku },
 		});
