@@ -34,7 +34,7 @@ export default function CollectionCard({
         {/* Image wrapper */}
         <div className='relative h-60 w-full flex items-center justify-center'>
           <Image
-            src={image}
+            src={image} // está com erro porque o estado de image está null e o react só recebe string 
             alt={title}
             fill
             className='object-contain'

@@ -3,7 +3,7 @@ import Image from "next/image";
 export  const Logo = () => (
     <div>
         <Image
-            src="/img/global/light/horizontalLogolight.svg"
+            src="/img/global/light/horizontalLogoLight.svg"
             width={250}
             height={250}
             alt="Picture of the author"

@@ -1,4 +1,4 @@
-import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
+import { Prata, Work_Sans } from "next/font/google";
 import Navbar from "@/components/web/Global/Navbar/navbar";
 import Footer from "@/components/web/Global/Footer/Footer";
 import DarkModeProvider from "../../utils/theme/themeProvider";
@@ -6,25 +6,19 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 
 
-const notoSansAdlam = Noto_Sans_Adlam({
+const prata = Prata({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-serif",
+});
+
+
+const workSans = Work_Sans({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-sans",
 });
 
-
-const notoSerif = Noto_Serif({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-serif",
-});
-
-
-const robotoMono = Roboto_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-mono",
-});
 
 export const metadata: Metadata = {
   title: "Site Oficial TWENT®",
@@ -43,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br"  className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} `}>
+    <html lang="pt-br" className={`${prata.variable} ${workSans.variable}`}>
       <body cz-shortcut-listen="true" 
       style={{ marginRight: "0px" }}>
         <Navbar />

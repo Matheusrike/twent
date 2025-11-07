@@ -33,7 +33,7 @@ export function AboutImage2() {
 export function MainImage() {
   return (
     <Image
-      src="/img/home/mainClock.png"
+      src="/img/web/home/mainClock.png"
       alt="Picture of the author"
       className="object-cover"
       fill 

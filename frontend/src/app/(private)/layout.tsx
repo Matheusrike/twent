@@ -1,24 +1,18 @@
-import { Noto_Sans_Adlam, Noto_Serif, Roboto_Mono } from "next/font/google";
+import { Playfair_Display, Inter } from "next/font/google";
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import SideBar from "@/components/private/global/sideBar/sideBarLayout";
 
-const notoSansAdlam = Noto_Sans_Adlam({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-sans",
-});
-
-const notoSerif = Noto_Serif({
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-serif",
 });
 
-const robotoMono = Roboto_Mono({
+const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "700"],
-  variable: "--font-mono",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -37,9 +31,9 @@ export default function RootLayout({
   return (
     <html
       lang="pt-br"
-      className={`${notoSansAdlam.variable} ${notoSerif.variable} ${robotoMono.variable} bg-white`}
+      className={`${playfairDisplay.variable} ${inter.variable} bg-white`}
     >
-      <body data-layout="manager"  cz-shortcut-listen="true">
+      <body data-layout="manager" cz-shortcut-listen="true">
         <SideBar>
           {children}
         </SideBar>

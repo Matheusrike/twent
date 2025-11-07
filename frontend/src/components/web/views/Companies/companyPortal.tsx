@@ -79,8 +79,8 @@ function UnitCard({ unit, isPrimary = false }: UnitCardProps) {
           {/* Icon */}
           <div className="relative">
             <div className={`absolute inset-0 ${isPrimary ? 'bg-red-600/20' : 'bg-gray-600/20'} blur-xl rounded-full`} />
-            <div className={`relative ${isPrimary ? 'bg-gradient-to-br from-red-600 to-red-700' : 'bg-gradient-to-br from-gray-600 to-gray-800'} p-5 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-500 shadow-lg`}>
-              <IconComponent className={`w-6 h-6 ${isPrimary ? 'text-white' : 'text-red-600 dark:text-red-500'}`} aria-hidden="true" />
+            <div className={`relative ${isPrimary ? 'bg-gradient-to-br from-red-600 to-red-700' : 'bg-gradient-to-br from-red-600 to-red-700'} p-5 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all duration-500 shadow-lg`}>
+              <IconComponent className="w-6 h-6 text-white" aria-hidden="true" />
             </div>
           </div>
 
