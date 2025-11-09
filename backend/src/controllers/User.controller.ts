@@ -39,6 +39,47 @@ export class UserController {
 			}
 		}
 	}
+
+	async activateUser(request: FastifyRequest) {
+		try {
+			const { id } = request.params as { id: string };
+			const response = await this.userService.activateUser(id);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Usuário ativado com sucesso',
+				data: response,
+			})
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					errorCode: error.errorCode,
+					statusCode: 500,
+				});
+			}
+		}
+	}
+	async deactivateUser(request: FastifyRequest) {
+		try {
+			const { id } = request.params as { id: string };
+			const response = await this.userService.deactivateUser(id);
+			new ApiResponse({
+				statusCode: 200,
+				success: true,
+				message: 'Usuário ativado com sucesso',
+				data: response,
+			})
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					errorCode: error.errorCode,
+					statusCode: 500,
+				});
+			}
+		}
+	}
 	async changeStatus(
 		request: FastifyRequest<{
 			Params: { id: string };

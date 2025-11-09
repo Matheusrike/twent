@@ -17,9 +17,10 @@ import {
 } from '@/schemas/customer.schema';
 import { UnauthorizedUserResponseSchema } from '@/schemas/auth.schema';
 import { EmployeeQuerystringSchema } from '@/schemas/employee.schema';
+import prisma from '@prisma/client';
 
 export function employeeRoute(fastify: FastifyInstance) {
-	const employeeService = new EmployeeService();
+	const employeeService = new EmployeeService(prisma);
 	const employeeController = new EmployeeController(employeeService);
 
 	fastify.post<{
@@ -27,20 +28,20 @@ export function employeeRoute(fastify: FastifyInstance) {
 	}>(
 		'/',
 		{
-			schema: {
-				tags: ['Employee'],
-				summary: 'Cria um novo funcionário',
-				description: 'Cria um novo funcionário',
-                body: EmployeeBodySchema,
-				response: {
-					201: EmployeePostResponseSchema,
-					400: EmployeeBadRequestSchema,
-					401: UnauthorizedUserResponseSchema,
-					500: ApiGenericErrorSchema,
-					502: CustomerBadGatewaySchema,
-					504: CustomerGatewayTimeoutSchema,
-				},
-			},
+			// schema: {
+			// 	tags: ['Employee'],
+			// 	summary: 'Cria um novo funcionário',
+			// 	description: 'Cria um novo funcionário',
+            //     body: EmployeeBodySchema,
+			// 	response: {
+			// 		201: EmployeePostResponseSchema,
+			// 		400: EmployeeBadRequestSchema,
+			// 		401: UnauthorizedUserResponseSchema,
+			// 		500: ApiGenericErrorSchema,
+			// 		502: CustomerBadGatewaySchema,
+			// 		504: CustomerGatewayTimeoutSchema,
+			// 	},
+			// },
 			preHandler: fastify.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
@@ -71,20 +72,20 @@ export function employeeRoute(fastify: FastifyInstance) {
 	fastify.get(
 		'/',
 		{
-			schema: {
-				tags: ['Employee'],
-				summary: 'Busca todos os funcionários',
-				description: 'Busca todos os funcionários, com ou sem filtros',
-                querystring: EmployeeQuerystringSchema,
-				response: {
-					200: EmployeeGetResponseSchema,
-					400: EmployeeBadRequestSchema,
-					401: UnauthorizedUserResponseSchema,
-					500: ApiGenericErrorSchema,
-					502: CustomerBadGatewaySchema,
-					504: CustomerGatewayTimeoutSchema,
-				},
-			},
+			// schema: {
+			// 	tags: ['Employee'],
+			// 	summary: 'Busca todos os funcionários',
+			// 	description: 'Busca todos os funcionários, com ou sem filtros',
+            //     querystring: EmployeeQuerystringSchema,
+			// 	response: {
+			// 		200: EmployeeGetResponseSchema,
+			// 		400: EmployeeBadRequestSchema,
+			// 		401: UnauthorizedUserResponseSchema,
+			// 		500: ApiGenericErrorSchema,
+			// 		502: CustomerBadGatewaySchema,
+			// 		504: CustomerGatewayTimeoutSchema,
+			// 	},
+			// },
 			preHandler: fastify.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
@@ -110,20 +111,20 @@ export function employeeRoute(fastify: FastifyInstance) {
 	}>(
 		'/:id',
 		{
-			schema: {
-				tags: ['Employee'],
-				summary: 'Atualiza um funcionário',
-				description: 'Atualiza um funcionário',
-                body: EmployeeBodySchema.partial(),
-				response: {
-					200: EmployeePutResponseSchema,
-					400: EmployeeBadRequestSchema,
-					401: UnauthorizedUserResponseSchema,
-					500: ApiGenericErrorSchema,
-					502: CustomerBadGatewaySchema,
-					504: CustomerGatewayTimeoutSchema,
-				},
-			},
+			// schema: {
+			// 	tags: ['Employee'],
+			// 	summary: 'Atualiza um funcionário',
+			// 	description: 'Atualiza um funcionário',
+            //     body: EmployeeBodySchema.partial(),
+			// 	response: {
+			// 		200: EmployeePutResponseSchema,
+			// 		400: EmployeeBadRequestSchema,
+			// 		401: UnauthorizedUserResponseSchema,
+			// 		500: ApiGenericErrorSchema,
+			// 		502: CustomerBadGatewaySchema,
+			// 		504: CustomerGatewayTimeoutSchema,
+			// 	},
+			// },
 			preHandler: fastify.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
