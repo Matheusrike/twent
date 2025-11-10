@@ -231,21 +231,17 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.delete(
-		'/:sku/images/:publicId',
+		'/:sku/images',
 		{
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
 			try {
-				console.log(
-					'Deleting image with request params:',
-					request.params,
-				);
-				await productController.deleteImage(request);
+				await productController.deleteImages(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Imagem removida com sucesso',
+					message: 'Imagens removidas com sucesso',
 				}).send(reply);
 			} catch (error) {
 				if (error instanceof HttpError) {
@@ -261,7 +257,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.patch(
-		'/:sku/images/:publicId/primary',
+		'/:sku/images/primary',
 		{
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},

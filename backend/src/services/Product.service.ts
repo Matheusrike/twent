@@ -312,10 +312,7 @@ export class ProductService {
 				where: { product_id: sku },
 			});
 
-			if (
-				existingImages >= MAX_IMAGES_PER_PRODUCT &&
-				filesPaths.length + existingImages > MAX_IMAGES_PER_PRODUCT
-			) {
+			if (filesPaths.length + existingImages > MAX_IMAGES_PER_PRODUCT) {
 				throw new AppError({
 					message: 'Limite de 5 imagens por produto excedido',
 					errorCode: 'PRODUCT_IMAGE_LIMIT_EXCEEDED',
@@ -356,25 +353,39 @@ export class ProductService {
 		}
 	}
 
-	async deleteImage(sku: string, publicId: string) {
-		const image = await this.database.productImage.findFirst({
-			where: { public_id: publicId, product_id: sku },
+	async deleteImages(sku: string, publicIds: string[]) {
+		const images = await this.database.productImage.findMany({
+			where: {
+				public_id: { in: publicIds },
+				product_id: sku,
+			},
 		});
 
-		if (!image) {
+		if (images.length === 0) {
 			throw new AppError({
-				message: 'Image not found',
-				errorCode: 'IMAGE_NOT_FOUND',
+				message: 'Nenhuma imagem encontrada',
+				errorCode: 'IMAGES_NOT_FOUND',
 			});
 		}
 
-		await this.imageService.delete(image.public_id);
+		if (images.length !== publicIds.length) {
+			throw new AppError({
+				message: 'Algumas imagens não foram encontradas',
+				errorCode: 'SOME_IMAGES_NOT_FOUND',
+			});
+		}
 
-		await this.database.productImage.delete({
-			where: { public_id: publicId },
+		await Promise.all(
+			images.map((image) => this.imageService.delete(image.public_id)),
+		);
+
+		await this.database.productImage.deleteMany({
+			where: { public_id: { in: publicIds } },
 		});
 
-		if (image.is_primary) {
+		const hasPrimaryDeleted = images.some((img) => img.is_primary);
+
+		if (hasPrimaryDeleted) {
 			const firstImage = await this.database.productImage.findFirst({
 				where: { product_id: sku },
 			});
@@ -390,7 +401,7 @@ export class ProductService {
 
 	async setPrimaryImage(sku: string, publicId: string) {
 		const image = await this.database.productImage.findFirst({
-			where: { id: publicId, product_id: sku },
+			where: { public_id: publicId, product_id: sku },
 		});
 
 		if (!image) {

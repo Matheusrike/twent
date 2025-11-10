@@ -26,9 +26,6 @@ export async function registerPlugins(
 
 	await app.register(fastifyMultipart, {
 		attachFieldsToBody: true,
-		limits: {
-			fileSize: 5 * 1024 * 1024,
-		},
 	});
 
 	// Plugins de documentação (apenas em ambiente de desenvolvimento)

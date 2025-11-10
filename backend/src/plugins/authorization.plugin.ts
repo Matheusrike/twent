@@ -48,13 +48,22 @@ function authorization(options: IAuthorizationOptions = {}) {
 				}).send(reply);
 			}
 
-			if (error.code === 'FAST_JWT_EXPIRED') {
-				return new ApiResponse({
-					success: false,
-					statusCode: 401,
-					message: 'Token de autenticação expirado',
-					errorCode: 'TOKEN_EXPIRED',
-				}).send(reply);
+			switch (error.code) {
+				case 'FAST_JWT_INVALID_SIGNATURE':
+					return new ApiResponse({
+						success: false,
+						statusCode: 401,
+						message: 'Token de autenticação inválido',
+						errorCode: 'INVALID_TOKEN',
+					}).send(reply);
+
+				case 'FAST_JWT_EXPIRED':
+					return new ApiResponse({
+						success: false,
+						statusCode: 401,
+						message: 'Token de autenticação expirado',
+						errorCode: 'TOKEN_EXPIRED',
+					}).send(reply);
 			}
 			console.error(error);
 			return ApiResponse.genericError(reply);
