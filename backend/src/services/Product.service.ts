@@ -305,21 +305,42 @@ export class ProductService {
 	}
 
 	async uploadImages(sku: string, filesPaths: string[]) {
-		try {
-			const publicIds = await this.imageService
-				.uploadFiles(filesPaths, 'products')
-				.then((res) => res as { publicId: string }[]);
+		const MAX_IMAGES_PER_PRODUCT = 5;
 
+		try {
 			const existingImages = await this.database.productImage.count({
 				where: { product_id: sku },
 			});
 
-			const images = await this.database.productImage.createMany({
+			if (
+				existingImages >= MAX_IMAGES_PER_PRODUCT &&
+				filesPaths.length + existingImages > MAX_IMAGES_PER_PRODUCT
+			) {
+				throw new AppError({
+					message: 'Limite de 5 imagens por produto excedido',
+					errorCode: 'PRODUCT_IMAGE_LIMIT_EXCEEDED',
+				});
+			}
+
+			const publicIds = await this.imageService
+				.uploadFiles(filesPaths, 'products')
+				.then((res) => res as { publicId: string }[]);
+
+			await this.database.productImage.createMany({
 				data: publicIds.map((img) => ({
 					product_id: sku,
 					public_id: img.publicId,
 					is_primary: existingImages === 0,
 				})),
+			});
+
+			const images = await this.database.productImage.findMany({
+				where: { product_id: sku },
+				orderBy: { created_at: 'asc' },
+				select: {
+					public_id: true,
+					is_primary: true,
+				},
 			});
 
 			return images;
@@ -330,6 +351,8 @@ export class ProductService {
 					errorCode: 'PRODUCT_NOT_FOUND',
 				});
 			}
+
+			throw error;
 		}
 	}
 

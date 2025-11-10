@@ -220,6 +220,92 @@ export async function productRoutes(app: fastifyTypedInstance) {
 			} catch (error) {
 				if (error instanceof HttpError) {
 					return new ApiResponse({
+						success: false,
+						statusCode: error.statusCode,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.delete(
+		'/:sku/images/:publicId',
+		{
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				console.log(
+					'Deleting image with request params:',
+					request.params,
+				);
+				await productController.deleteImage(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Imagem removida com sucesso',
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.patch(
+		'/:sku/images/:publicId/primary',
+		{
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				await productController.setPrimaryImage(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Imagem principal definida com sucesso',
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.get(
+		'/:sku/price-history',
+		{
+			preHandler: [
+				app.authorization({ requiredRoles: ['ADMIN', 'MANAGER'] }),
+			],
+		},
+		async (request, reply) => {
+			try {
+				const history =
+					await productController.getPriceHistory(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Histórico de preços recuperado com sucesso',
+					data: history,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
 						statusCode: error.statusCode,
 						success: false,
 						message: error.message,

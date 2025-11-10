@@ -12,7 +12,6 @@ export class ProductController {
 		try {
 			const productData = request.body as CreateProductType;
 			const user = request.user as IJwtAuthPayload;
-			console.log('Usuário que está criando o produto:', user);
 			const newProduct = await this.productService.create(
 				productData,
 				user,
@@ -184,7 +183,97 @@ export class ProductController {
 
 			return images;
 		} catch (error) {
+			if (error instanceof AppError) {
+				switch (error.errorCode) {
+					case 'PRODUCT_NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					case 'PRODUCT_IMAGE_LIMIT_EXCEEDED':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 400,
+							errorCode: error.errorCode,
+						});
+				}
+			}
+
 			console.error(error);
+
+			throw new HttpError({
+				statusCode: 500,
+				message: 'Internal server error',
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async deleteImage(request: FastifyRequest) {
+		try {
+			const { sku, publicId } = request.params as {
+				sku: string;
+				publicId: string;
+			};
+			await this.productService.deleteImage(sku, publicId);
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					statusCode: 404,
+					errorCode: error.errorCode,
+				});
+			}
+			throw new HttpError({
+				statusCode: 500,
+				message: 'Internal server error',
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async setPrimaryImage(request: FastifyRequest) {
+		try {
+			const { sku, publicId } = request.params as {
+				sku: string;
+				publicId: string;
+			};
+			await this.productService.setPrimaryImage(sku, publicId);
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					statusCode: 404,
+					errorCode: error.errorCode,
+				});
+			}
+			throw new HttpError({
+				statusCode: 500,
+				message: 'Internal server error',
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async getPriceHistory(request: FastifyRequest) {
+		try {
+			const { sku } = request.params as { sku: string };
+			const history = await this.productService.getPriceHistory(sku);
+			return history;
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					statusCode: 404,
+					errorCode: error.errorCode,
+				});
+			}
+			throw new HttpError({
+				statusCode: 500,
+				message: 'Internal server error',
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
 		}
 	}
 }
