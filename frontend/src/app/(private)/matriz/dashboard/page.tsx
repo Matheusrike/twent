@@ -1,7 +1,7 @@
 "use client"
 import { ChartBarInteractive } from "@/components/private/views/dashboard/bar-chart"
 import RankingCard from "@/components/private/views/dashboard/ranking-card"
-import { ChartPieDonutText } from "@/components/private/views/dashboard/pie-chart"
+import { StockDonutChart } from "@/components/private/views/dashboard/stockDunutChart"
 
 
 export default function Dashboard() {
@@ -11,7 +11,7 @@ export default function Dashboard() {
       <section className="w-full flex justify-center">
         <div className="w-full   flex flex-col lg:flex-row gap-5 items-stretch">
           <div className="w-full">
-            <ChartPieDonutText />
+            <StockDonutChart />
           </div>
           <div className="w-full ">
             <RankingCard />

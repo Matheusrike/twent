@@ -1,5 +1,7 @@
-export default function Colaboradores(){
-    return(
-        <></>
-    )
+export default function Colaboradores() {
+  return (
+    <section className="">
+
+    </section>
+  );
 }

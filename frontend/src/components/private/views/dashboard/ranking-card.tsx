@@ -13,12 +13,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import {
-  Trophy,
-  TrendingUp,
-  Star,
-  Crown,
-} from "lucide-react";
+import { Trophy, TrendingUp, Star, Crown, Store } from "lucide-react";
 import { useState } from "react";
 
 export default function SalesRankingCard() {
@@ -30,9 +25,8 @@ export default function SalesRankingCard() {
       sales: 147,
       revenue: "R$ 89.500",
       growth: "+23%",
-      avatar: "AS",
       color: "bg-gradient-to-br from-yellow-400 to-yellow-600",
-      rank: 1
+      rank: 1,
     },
     {
       id: 2,
@@ -41,9 +35,8 @@ export default function SalesRankingCard() {
       sales: 132,
       revenue: "R$ 78.200",
       growth: "+18%",
-      avatar: "CM",
       color: "bg-gradient-to-br from-gray-300 to-gray-500",
-      rank: 2
+      rank: 2,
     },
     {
       id: 3,
@@ -52,11 +45,9 @@ export default function SalesRankingCard() {
       sales: 121,
       revenue: "R$ 72.800",
       growth: "+15%",
-      avatar: "BC",
       color: "bg-gradient-to-br from-orange-400 to-orange-600",
-      rank: 3
+      rank: 3,
     },
-
   ]);
 
   const getRankIcon = (rank: any) => {
@@ -92,8 +83,9 @@ export default function SalesRankingCard() {
             {salesData.map((seller, index) => (
               <div
                 key={seller.id}
-                className={`px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted/50 transition-colors ${index === 0 ? "bg-yellow-50/50 dark:bg-yellow-950/20" : ""
-                  }`}
+                className={`px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted/50 transition-colors ${
+                  index === 0 ? "bg-yellow-50/50 dark:bg-yellow-950/20" : ""
+                }`}
               >
                 <Item className="w-full p-0 gap-2 sm:gap-3 ">
                   <div className="flex items-center justify-center w-6 sm:w-8">
@@ -104,12 +96,14 @@ export default function SalesRankingCard() {
                     <div
                       className={`h-10 w-10 sm:h-12 sm:w-12 rounded-full ${seller.color} flex items-center justify-center text-white font-bold text-xs sm:text-sm`}
                     >
-                      {seller.avatar}
+                      <Store />
                     </div>
                   </ItemMedia>
 
                   <ItemContent className="gap-0 flex-1 min-w-0">
-                    <ItemTitle className="text-sm sm:text-base truncate">{seller.name}</ItemTitle>
+                    <ItemTitle className="text-sm sm:text-base truncate">
+                      {seller.name}
+                    </ItemTitle>
                     <ItemDescription className="text-xs hidden sm:block">
                       {seller.username}
                     </ItemDescription>
@@ -131,9 +125,7 @@ export default function SalesRankingCard() {
             ))}
           </div>
         </CardContent>
-        <CardFooter className="h-0.5">
-
-        </CardFooter>
+        <CardFooter className="h-0.5"></CardFooter>
       </Card>
     </div>
   );
