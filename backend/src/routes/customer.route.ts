@@ -53,7 +53,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
-				const reponse = await customerController.get(request, reply);
+				const reponse = await customerController.getCustomers(request, reply);
 				return reponse;
 			} catch (error) {
 				return new ApiResponse({

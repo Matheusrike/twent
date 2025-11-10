@@ -8,7 +8,7 @@ import { TypeGetUserProps } from '@/types/users.types';
 export class CustomerController {
 	constructor(private customerService: CustomerService) {}
 
-	async create(request: FastifyRequest, reply: FastifyReply) {
+	async createCustomer(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const parsed = CustomerBodySchema.safeParse(request.body);
 
@@ -63,7 +63,7 @@ export class CustomerController {
 			}
 		}
 	}
-	async get(request: FastifyRequest, reply: FastifyReply) {
+	async getCustomers(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const { skip, take, ...filters } =
 				request.query as TypeGetUserProps;
@@ -99,7 +99,7 @@ export class CustomerController {
 		}
 	}
 
-	async update(
+	async updateCustomer(
 		request: FastifyRequest<{ Params: { id: string } }>,
 		reply: FastifyReply,
 	) {

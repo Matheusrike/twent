@@ -2,7 +2,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { z } from 'zod';
 import { ApiResponseSchema } from './api-response.schema';
 import {
-	CustomerBodySchema,
+	createCustomerSchema,
 	CustomerQuerystringSchema,
 } from './customer.schema';
 
@@ -67,7 +67,7 @@ export const EmployeeQuerystringSchema = CustomerQuerystringSchema.extend({
 		.meta({ examples: [true] }),
 });
 
-export const EmployeeBodySchema = CustomerBodySchema.extend({
+export const createEmployeeSchema = createCustomerSchema.extend({
 	national_id: z
 		.string()
 		.optional()
@@ -110,6 +110,12 @@ export const EmployeeBodySchema = CustomerBodySchema.extend({
 			description: 'Data de desligamento do funcionário, se aplicável',
 			examples: ['2025-03-01T00:00:00.000Z'],
 		}),
+        position: z
+        .string()
+        .optional()
+        .meta({
+            examples: ['MANAGER_HQ', 'EMPLOYEE_BRANCH'],
+        }),
 	emergency_contact: z
 		.any()
 		.optional()
@@ -133,6 +139,8 @@ export const EmployeeBodySchema = CustomerBodySchema.extend({
         examples: ['CHE999'],
     }).optional()
 });
+
+export type CreateEmployee = z.infer<typeof createEmployeeSchema>;
 
 export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true).meta({

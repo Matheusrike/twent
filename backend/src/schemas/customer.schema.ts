@@ -92,7 +92,7 @@ export const CustomerQuerystringSchema = z.object({
 	take: z.any().optional(),
 });
 
-export const CustomerBodySchema = z.object({
+export const createCustomerSchema = z.object({
 	email: z
 		.email()
 		.meta({
@@ -199,6 +199,8 @@ export const CustomerBodySchema = z.object({
 			description: 'Indica se o usuário está ativo ou não',
 		}),
 });
+
+export type CreateCustomer = z.infer<typeof createCustomerSchema>;
 
 const customerDataSchema = z.object({
 	id: z.string().meta({ examples: ['f47ac10b-58cc-4372-a567-0e02b2c3d479'] }),

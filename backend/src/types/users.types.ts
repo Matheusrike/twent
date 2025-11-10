@@ -21,7 +21,7 @@ export interface IUser {
 }
 
 export type TypeGetUserProps = Prisma.UserWhereInput & {
-	query: {
+	filters: {
 		store_id?: string;
 		first_name?: string;
 		last_name?: string;
