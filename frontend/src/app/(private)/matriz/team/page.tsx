@@ -1,4 +1,4 @@
-export default function Colaboradores() {
+export default function Team() {
   return (
     <section className="">
 

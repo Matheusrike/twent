@@ -44,22 +44,22 @@ const Matrizdata = {
     },
     {
       title: "Filiais",
-      url: "/matriz/filiais",
+      url: "/matriz/branches",
       icon: IconGlobe,
     },
     {
       title: "Financeiro",
-      url: "/matriz/financeiro",
+      url: "/matriz/financial",
       icon: IconChartBar,
     },
     {
       title: "Estoque",
-      url: "/matriz/estoque",
+      url: "/matriz/inventory",
       icon: Container,
     },
     {
       title: "Colaboradores",
-      url: "/matriz/colaboradores",
+      url: "/matriz/team",
       icon: IconUsers,
     },
   ],
