@@ -92,7 +92,7 @@ export const columns: ColumnDef<Branch>[] = [
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="text-left"
       >
-        Código
+        ID
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
