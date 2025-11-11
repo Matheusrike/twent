@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Logo } from "../../../components/private/views/login/logo";
+import { Logo } from "../../../components/private/views/matriz/login/logo";
 import { Button } from "@/components/private/global/ui/button";
 import {
   Form,
@@ -10,7 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/private/views/login/input";
+import { Input } from "@/components/private/views/matriz/login/input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

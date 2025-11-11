@@ -1,34 +1,29 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   IconLayoutDashboard,
-  IconListDetails,
   IconChartBar,
-  IconFolder,
-  IconUsers,
-  IconSettings,
   IconGlobe,
+  IconUsers,
   IconHelp,
-  IconSparkles,
-} from "@tabler/icons-react"
-
-import { Container } from "lucide-react"
-
-import { NavUser } from "@/components/private/global/sideBar/nav-user"
+} from "@tabler/icons-react";
+import { Container } from "lucide-react";
+import { NavUser } from "@/components/private/global/sideBar/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import Image from "next/image"
+  SidebarMenu,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const Matrizdata = {
   user: {
@@ -37,44 +32,25 @@ const Matrizdata = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/matriz/dashboard",
-      icon: IconLayoutDashboard,
-    },
-    {
-      title: "Filiais",
-      url: "/matriz/branches",
-      icon: IconGlobe,
-    },
-    {
-      title: "Financeiro",
-      url: "/matriz/financial",
-      icon: IconChartBar,
-    },
-    {
-      title: "Estoque",
-      url: "/matriz/inventory",
-      icon: Container,
-    },
-    {
-      title: "Colaboradores",
-      url: "/matriz/team",
-      icon: IconUsers,
-    },
+    { title: "Dashboard", url: "/matriz/dashboard", icon: IconLayoutDashboard },
+    { title: "Filiais", url: "/matriz/branches", icon: IconGlobe },
+    { title: "Financeiro", url: "/matriz/financial", icon: IconChartBar },
+    { title: "Estoque", url: "/matriz/inventory", icon: Container },
+    { title: "Colaboradores", url: "/matriz/team", icon: IconUsers },
   ],
-  navSecondary: [
-    {
-      title: "Ajuda",
-      url: "#",
-      icon: IconHelp,
-    },
-   
-  ],
-}
+  navSecondary: [{ title: "Ajuda", url: "#", icon: IconHelp }],
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [activeItem, setActiveItem] = React.useState<string>("Dashboard")
+  const pathname = usePathname();
+  const [isClient, setIsClient] = React.useState(false);
+
+  // ✅ Evita o erro de hydration
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null; // ou um pequeno skeleton se quiser
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r" {...props}>
@@ -97,34 +73,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
 
+      {/* Main Navigation */}
       <SidebarContent className="px-3 py-4">
-        {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Menu
           </SidebarGroupLabel>
+
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               {Matrizdata.navMain.map((item) => {
-                const isActive = activeItem === item.title
-                const Icon = item.icon
-                
+                const Icon = item.icon;
+                const isActive = pathname === item.url;
+
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <Link 
-                      href={item.url} 
-                      className="block w-full"
-                      onClick={() => setActiveItem(item.title)}
-                    >
+                    <Link href={item.url} className="block w-full">
                       <div
-                        className={`
-                          group relative flex items-center gap-3 rounded-lg px-3 py-2.5 
-                          transition-all duration-200 ease-out
-                          ${isActive 
-                            ? 'bg-primary text-primary-foreground shadow-sm' 
-                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                          }
-                        `}
+                        className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-out ${
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        }`}
                       >
                         <Icon className="h-5 w-5 shrink-0" />
                         <span className="flex-1 font-medium text-sm">
@@ -136,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </div>
                     </Link>
                   </SidebarMenuItem>
-                )
+                );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -145,26 +115,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Secondary Navigation */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Suport
+            Suporte
           </SidebarGroupLabel>
+
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               {Matrizdata.navSecondary.map((item) => {
-                const Icon = item.icon
-                
+                const Icon = item.icon;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <a href={item.url} className="block w-full">
-                      <div className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground">
-                        <Icon className="h-5 w-5 shrink-0" />
-                        <span className="flex-1 font-medium text-sm">
-                          {item.title}
-                        </span>
-                      </div>
+                    <a
+                      href={item.url}
+                      className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <Icon className="h-5 w-5 shrink-0" />
+                      <span className="flex-1 font-medium text-sm">
+                        {item.title}
+                      </span>
                     </a>
                   </SidebarMenuItem>
-                  
-                )
+                );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -175,5 +145,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={Matrizdata.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import ProfileContent from "@/components/private/views/profile/profile-content";
-import ProfileHeader from "@/components/private/views/profile/profile-header";
+import ProfileContent from "@/components/private/views/matriz/profile/profile-content";
+import ProfileHeader from "@/components/private/views/matriz/profile/profile-header";
 
 
 export default function Profile() {

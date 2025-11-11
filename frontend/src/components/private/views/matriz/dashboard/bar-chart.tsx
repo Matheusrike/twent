@@ -143,9 +143,9 @@ export function ChartBarInteractive() {
     <Card className="py-0">
       <CardHeader className="flex flex-col items-stretch border-b !p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
-          <CardTitle>Bar Chart - Interactive</CardTitle>
+          <CardTitle>Gráfico de vendas</CardTitle>
           <CardDescription>
-            Showing total visitors for the last 3 months
+            Outubro 2025
           </CardDescription>
         </div>
         <div className="flex">

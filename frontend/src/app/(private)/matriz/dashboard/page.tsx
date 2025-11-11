@@ -1,7 +1,7 @@
 "use client"
-import { ChartBarInteractive } from "@/components/private/views/dashboard/bar-chart"
-import RankingCard from "@/components/private/views/dashboard/ranking-card"
-import { StockDonutChart } from "@/components/private/views/dashboard/inventoryChart"
+import { ChartBarInteractive } from "@/components/private/views/matriz/dashboard/bar-chart"
+import RankingCard from "@/components/private/views/matriz/dashboard/ranking-card"
+import { StockDonutChart } from "@/components/private/views/matriz/dashboard/inventoryChart"
 
 
 export default function Dashboard() {
