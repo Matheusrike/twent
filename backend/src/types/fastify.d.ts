@@ -12,6 +12,7 @@ declare module 'fastify' {
 		user?: {
 			id: string;
 			roles: string[];
+            storeId?: string;
 		};
 	}
 }

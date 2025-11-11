@@ -20,6 +20,6 @@
 			"@prisma/*": ["prisma/*"]
 		}
 	},
-	"include": ["src/**/*", "prisma/client.ts", "prisma/seed.ts"],
+	"include": ["src/**/*", "prisma/client.ts", "prisma/seed.ts", "prisma/mock.ts"],
 	"exclude": ["node_modules", "**/*.config.ts"]
 }

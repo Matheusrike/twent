@@ -10,6 +10,7 @@
 		"start": "node ./dist/src/server.js",
 		"build:start": " tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && node ./dist/src/server.js",
 		"seed": "tsx prisma/seed.ts",
+        "mock": "tsx prisma/mock.ts",
 		"lint": "eslint src/**/*.ts",
 		"lint:fix": "eslint src/**/*.ts --fix",
 		"type-check": "tsc --noEmit"

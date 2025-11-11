@@ -12,6 +12,7 @@ import { collectionRoutes } from './collection.route';
 import { imageRoutes } from './image.route';
 import { productRoutes } from './product.route';
 import authorizationPlugin from '@/plugins/authorization.plugin';
+import { inventoryRoutes } from './inventory.route';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
@@ -45,6 +46,7 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 			await app.register(collectionRoutes, { prefix: '/collection' });
 			await app.register(imageRoutes, { prefix: '/image' });
 			await app.register(productRoutes, { prefix: '/product' });
+			await app.register(inventoryRoutes, { prefix: '/inventory' });
 		},
 		{ prefix: '/api' },
 	);

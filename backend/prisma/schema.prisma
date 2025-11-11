@@ -272,16 +272,6 @@ model Product {
   sale_items          SaleItem[]
   favorites           CustomerFavorite[]
   inventory_movements InventoryMovement[]
-  images              ProductImage[]
-}
-
-model ProductImage {
-  id         String   @id @default(uuid()) @db.Char(36)
-  product_id String
-  public_id  String   @unique
-  is_primary Boolean  @default(false)
-  created_at DateTime @default(now())
-  product    Product  @relation(fields: [product_id], references: [sku], onDelete: Cascade)
 }
 
 model ProductPriceHistory {
