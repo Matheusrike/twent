@@ -1,6 +1,7 @@
 import { AppError } from '@/utils/errors.util';
-import { TypeGetUserProps } from '@/types/users.types';
 import { PrismaClient } from '@prisma/generated/client';
+import { CustomerQuerystring } from '@/schemas/customer.schema';
+import { EmployeeQuerystring } from '@/schemas/employee.schema';
 
 export class UserService {
 	constructor(protected database: PrismaClient) {}
@@ -31,10 +32,14 @@ export class UserService {
 		return true;
 	}
 
-	async get(filters: TypeGetUserProps, skip = 0, take = 10, id?: string) {
+	async get(
+		filters: CustomerQuerystring | EmployeeQuerystring,
+		skip = 0,
+		take = 10,
+		id?: string,
+	) {
 		try {
-			console.log(filters);
-			if (filters?.user_type === 'EMPLOYEE') {
+			if (filters.user_type === 'EMPLOYEE') {
 				const response = await this.database.user.findMany({
 					cursor: id ? { id } : undefined,
 					take: Number(take),
@@ -119,14 +124,68 @@ export class UserService {
 		try {
 			const user = await this.database.user.findUnique({
 				where: { id },
+                omit: { password_hash: true },
+                include: {
+                    sales_created: true,
+                    CustomerFavorite: {
+                        select: {
+                            product: {
+                                select: {
+                                    name: true,
+                                    price: true,  
+                                },
+                            },
+                        }
+                    }
+                }
 			});
+            
+            if (!user) {
+                throw new AppError({
+                    message: 'Usuário não encontrado',
+                    errorCode: 'USER_NOT_FOUND',
+                });
+            }
 
-			if (!user) {
-				throw new AppError({
-					message: 'Usuário não encontrado',
-					errorCode: 'USER_NOT_FOUND',
-				});
-			}
+            if (user?.user_type === 'EMPLOYEE') {
+                const profile = await this.database.user.findUnique({
+                    where: { id },
+                    omit: { password_hash: true },
+                    include: {
+                        employee: {
+                            select: {
+                                position: true,
+                                salary: true,
+                                benefits: true,
+                                hire_date: true,
+                                is_active: true,
+                                leaves: {
+                                    select: {
+                                        type: true,
+                                        start_date: true,
+                                        end_date: true,
+                                    },
+                                }
+                            },
+                        },
+                        user_roles: {
+                            select: {
+                                role: {
+                                    select: { name: true },
+                                },
+                            },
+                        },
+                    }
+                });
+                if (!profile) {
+                    throw new AppError({
+                        message: 'Funcionario nao encontrado',
+                        errorCode: 'USER_NOT_FOUND',
+                    });
+                }
+                return profile;
+            }
+
 			return user;
 		} catch (error) {
 			console.log(error);
@@ -238,7 +297,7 @@ export class UserService {
 					});
 					await tx.employee.update({
 						where: { user_id: id },
-						data: { is_active: true },
+						data: { is_active: false },
 					});
 					return res;
 				});

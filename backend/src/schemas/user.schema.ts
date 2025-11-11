@@ -29,29 +29,6 @@ export const UserGetResponseSchema = ApiResponseSchema.extend({
 	}),
 });
 
-
-export const ChangeStatusBodySchema = z.object({
-	newStatus: z.boolean().meta({
-		examples: [false],
-		description: 'New activation status for the user',
-	}),
-});
-
-export const ChangeStatusResponseSchema = ApiResponseSchema.extend({
-	success: z.literal(true),
-	message: z
-		.string()
-		.meta({ examples: ['User status updated successfully'] }),
-	data: z.object({
-		id: z.string().meta({ examples: ['f7b2e8a3-6a10-4d47-9e0b-6a8792e0d9d1'] }),
-		email: z.string().meta({ examples: ['john.smith@example.com'] }),
-		first_name: z.string().meta({ examples: ['John'] }),
-		last_name: z.string().meta({ examples: ['Smith'] }),
-		user_type: z.enum(UserTypes).meta({ examples: ['EMPLOYEE'] }),
-		is_active: z.boolean().meta({ examples: [false] }),
-	}),
-});
-
 export const ConflictStatusResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(false),
 	message: z

@@ -1,9 +1,8 @@
 import { validateLocation } from '@/helpers/validate-location.helper';
-import { TypeGetUserProps } from '@/types/users.types';
 import { AppError } from '@/utils/errors.util';
 import { UserService } from './User.service';
 import { comparePassword, validatePassword } from '@/utils/password.util';
-import { CreateCustomer } from '@/schemas/customer.schema';
+import { CreateCustomer, CustomerQuerystring } from '@/schemas/customer.schema';
 import { PrismaClient } from '@prisma/generated/client';
 
 export class CustomerService extends UserService {
@@ -45,7 +44,7 @@ export class CustomerService extends UserService {
 		return user;
 	}
 
-	async getCustomers(filters: TypeGetUserProps, skip = 0, take = 10) {
+	async getCustomers(filters: CustomerQuerystring, skip: number, take: number) {
 		filters.user_type = 'CUSTOMER';
 		const response = await super.get(filters, skip, take);
 		return response;

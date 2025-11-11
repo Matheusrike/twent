@@ -7,13 +7,9 @@ export class UserController {
 
 	async getInfo(request: FastifyRequest) {
 		try {
-			const { id } =
-				(request.query as { id: string }).id == undefined || null
-					? (request.user as { id: string })
-					: (request.query as { id: string });
+			const { id } = request.params as { id: string };
 
 			const response = await this.userService.getInfo(id);
-			console.log(response);
 
 			return response;
 		} catch (error) {
@@ -40,7 +36,7 @@ export class UserController {
 		try {
 			const { id } = request.params as { id: string };
 			const response = await this.userService.activateUser(id);
-			return response
+			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw new HttpError({

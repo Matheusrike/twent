@@ -2,13 +2,9 @@ import type { fastifyTypedInstance } from '@/types/types';
 import { UserController } from '@/controllers/User.controller';
 import { UserService } from '@/services/User.service';
 import {
-	ChangeStatusBodySchema,
-	ChangeStatusResponseSchema,
-	ConflictStatusResponseSchema,
 	UserGetResponseSchema,
 } from '@/schemas/user.schema';
 import {
-	UnauthorizedUserResponseSchema,
 	UserNotFoundResponseSchema,
 } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
@@ -20,8 +16,8 @@ export function userRoute(app: fastifyTypedInstance) {
 	const userService = new UserService(prisma);
 	const userController = new UserController(userService);
 
-	app.get<{ Querystring: { id: string } }>(
-		'/profile',
+	app.get(
+		'/profile/:id',
 		{
 			schema: {
 				tags: ['User'],
@@ -34,14 +30,9 @@ export function userRoute(app: fastifyTypedInstance) {
 			},
 			preHandler: app.authorization(),
 		},
-		async (
-			request: FastifyRequest<{ Querystring: { id: string } }>,
-			reply: FastifyReply,
-		) => {
+		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await userController.getInfo(request);
-				console.log(response);
-
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
@@ -74,7 +65,7 @@ export function userRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Usuário ativado com sucesso',
 					data: response,
-				});
+				}).send(reply);;
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
@@ -95,7 +86,12 @@ export function userRoute(app: fastifyTypedInstance) {
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await userController.deactivateUser(request);
-				return response;
+                return new ApiResponse({
+                    statusCode: 200,
+                    success: true,
+                    message: 'Usuário desativado com sucesso',
+                    data: response,
+                }).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,

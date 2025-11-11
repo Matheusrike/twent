@@ -1,172 +1,148 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { CustomerBodySchema } from '@/schemas/customer.schema';
+import { FastifyRequest } from 'fastify';
+import { CreateCustomer, CustomerQuerystring } from '@/schemas/customer.schema';
 import { CustomerService } from '@/services/Customer.service';
-import { HttpError } from '@/utils/errors.util';
-import { ApiResponse } from '@/utils/api-response.util';
-import { TypeGetUserProps } from '@/types/users.types';
+import { AppError, HttpError } from '@/utils/errors.util';
 
 export class CustomerController {
 	constructor(private customerService: CustomerService) {}
 
-	async createCustomer(request: FastifyRequest, reply: FastifyReply) {
+	async createCustomer(request: FastifyRequest) {
 		try {
-			const parsed = CustomerBodySchema.safeParse(request.body);
+			const data = request.body as CreateCustomer;
 
-			if (!parsed.success) {
-				throw new HttpError({
-					message: 'Dados enviados incorretos',
-					errorCode: 'BAD_REQUEST',
-					statusCode: 400,
-				});
-			}
+			const response = await this.customerService.createCustomer(data);
 
-			const response = await this.customerService.create(parsed.data!);
-
-			new ApiResponse({
-				statusCode: 201,
-				success: true,
-				message: 'Usuário cadastrado',
-				data: response,
-			}).send(reply);
+			return response;
 		} catch (error) {
-			switch (error?.errorCode) {
-				case 'CONFLICT':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 409,
-					});
-				case 'BAD_REQUEST':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 400,
-					});
-				case 'BAD_GATEWAY':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 502,
-					});
-				case 'GATEWAY_TIMEOUT':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 504,
-					});
-				default:
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 500,
-					});
+			if (error instanceof AppError) {
+				switch (error?.errorCode) {
+					case 'CONFLICT':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 409,
+						});
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 400,
+						});
+					case 'BAD_GATEWAY':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 502,
+						});
+					case 'GATEWAY_TIMEOUT':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 504,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
 		}
 	}
-	async getCustomers(request: FastifyRequest, reply: FastifyReply) {
+	async getCustomers(request: FastifyRequest) {
 		try {
-			const { skip, take, ...filters } =
-				request.query as TypeGetUserProps;
+			const { skip, take, ...filters } = request.query as {
+				skip: number;
+				take: number;
+			} & CustomerQuerystring;
 
-			const response = await this.customerService.get(
+			const response = await this.customerService.getCustomers(
 				filters,
 				skip,
 				take,
 			);
 
-			new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
-				data: response,
-			}).send(reply);
+			return response;
 		} catch (error) {
-			switch (error?.errorCode) {
-				case 'NOT_FOUND':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 404,
-					});
-				default:
-					console.error(error);
-					throw new HttpError({
-						message: error?.message ?? 'Erro interno',
-						errorCode: 'INTERNAL_SERVER_ERROR',
-						statusCode: 500,
-					});
+			if (error instanceof AppError) {
+				switch (error?.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						console.error(error);
+						throw new HttpError({
+							message: error?.message ?? 'Erro interno',
+							errorCode: 'INTERNAL_SERVER_ERROR',
+							statusCode: 500,
+						});
+				}
 			}
 		}
 	}
 
-	async updateCustomer(
-		request: FastifyRequest<{ Params: { id: string } }>,
-		reply: FastifyReply,
-	) {
+	async updateCustomer(request: FastifyRequest) {
 		try {
-			const id = request.params['id'];
-			const parsed = CustomerBodySchema.partial().safeParse(request.body);
+			const { id } = request.params as { id: string };
 
-			if (!parsed.success) {
-				throw new HttpError({
-					message: 'Dados enviados incorretos',
-					errorCode: 'BAD_REQUEST',
-					statusCode: 400,
-				});
-			}
+			const data = request.body as CreateCustomer;
 
-			const response = await this.customerService.update(id, parsed.data);
+			const response = await this.customerService.updateCustomer(
+				id,
+				data,
+			);
 
-			new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Informação(ões) do usuário atualizada(s)',
-				data: response,
-			}).send(reply);
+			return response;
 		} catch (error) {
-			switch (error.errorCode) {
-				case 'NOT_FOUND':
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 404,
-					});
-				case 'UNAUTHORIZED':
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 401,
-					});
-				case 'BAD_REQUEST':
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 400,
-					});
-				case 'CONFLICT':
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 409,
-					});
-				case 'BAD_GATEWAY':
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 502,
-					});
-				case 'GATEWAY_TIMEOUT':
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 504,
-					});
-				default:
-					throw new HttpError({
-						message: error.message,
-                        errorCode: error.errorCode,
-						statusCode: 500,
-					});
+			if (error instanceof AppError) {
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					case 'UNAUTHORIZED':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 401,
+						});
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 400,
+						});
+					case 'CONFLICT':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 409,
+						});
+					case 'BAD_GATEWAY':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 502,
+						});
+					case 'GATEWAY_TIMEOUT':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 504,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
 		}
 	}

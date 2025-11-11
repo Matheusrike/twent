@@ -1,7 +1,9 @@
 import { FastifyRequest } from 'fastify';
-import { CreateEmployee } from '@/schemas/employee.schema.ts';
+import {
+	CreateEmployee,
+	EmployeeQuerystring,
+} from '@/schemas/employee.schema.ts';
 import { AppError, HttpError } from '@/utils/errors.util.ts';
-import { TypeGetUserProps } from '@/types/users.types.ts';
 import { EmployeeService } from '@/services/Employee.service.ts';
 
 export class EmployeeController {
@@ -63,10 +65,14 @@ export class EmployeeController {
 	}
 	async getEmployee(request: FastifyRequest) {
 		try {
-			const data = request.query as TypeGetUserProps;
-
+			const { skip, take, ...filters } = request.query as {
+				skip: number;
+				take: number;
+			} & EmployeeQuerystring;
 			const response = await this.employeeService.getEmployees(
-				data
+				filters as EmployeeQuerystring,
+				skip,
+				take,
 			);
 
 			return response;

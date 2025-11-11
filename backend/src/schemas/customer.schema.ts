@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ApiResponseSchema } from './api-response.schema';
 import { UserTypes } from './user.schema';
 
-export const CustomerQuerystringSchema = z.object({
+export const customerQuerystringSchema = z.object({
 	first_name: z
 		.string()
 		.optional()
@@ -88,17 +88,15 @@ export const CustomerQuerystringSchema = z.object({
 		}, z.boolean())
 		.optional()
 		.meta({ examples: [true] }),
-	skip: z.any().optional(),
-	take: z.any().optional(),
+	user_type: z.literal('CUSTOMER').optional(),
 });
+export type CustomerQuerystring = z.infer<typeof customerQuerystringSchema>;
 
 export const createCustomerSchema = z.object({
-	email: z
-		.email()
-		.meta({
-			examples: ['emily.watson@example.co.uk'],
-			description: 'Endereço de e-mail do usuário',
-		}),
+	email: z.email().meta({
+		examples: ['emily.watson@example.co.uk'],
+		description: 'Endereço de e-mail do usuário',
+	}),
 	password_hash: z
 		.string()
 		.min(6)
@@ -269,6 +267,8 @@ const customerDataSchema = z.object({
 		.meta({ examples: ['2025-10-23T14:00:00.000Z'] })
 		.optional(),
 });
+
+export type Customer = z.infer<typeof customerDataSchema>;
 
 export const CustomerGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),

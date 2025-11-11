@@ -1,10 +1,9 @@
 import { Prisma } from '@prisma/client/extension';
 import { validateLocation } from '@/helpers/validate-location.helper';
-import { TypeGetUserProps } from '@/types/users.types';
 import { validatePassword } from '@/utils/password.util';
 import { UserService } from './User.service';
 import { AppError } from '@/utils/errors.util';
-import { CreateEmployee } from '@/schemas/employee.schema';
+import { CreateEmployee, EmployeeQuerystring } from '@/schemas/employee.schema';
 import { PrismaClient } from '@prisma/generated/client';
 
 export class EmployeeService extends UserService {
@@ -138,10 +137,10 @@ export class EmployeeService extends UserService {
 		}
 	}
 
-	async getEmployees(data: TypeGetUserProps) {
-		data.user_type = 'EMPLOYEE';
+	async getEmployees(filters: EmployeeQuerystring, skip: number, take: number) {
+		filters.user_type = 'EMPLOYEE';
 
-		const response = await super.get(data);
+		const response = await super.get(filters, skip, take);
 
 		return response;
 	}

@@ -3,10 +3,11 @@ import { z } from 'zod';
 import { ApiResponseSchema } from './api-response.schema';
 import {
 	createCustomerSchema,
-	CustomerQuerystringSchema,
+	customerQuerystringSchema,
 } from './customer.schema';
 
-export const EmployeeQuerystringSchema = CustomerQuerystringSchema.extend({
+export const employeeQuerystringSchema = customerQuerystringSchema.extend({
+	user_type: z.literal('EMPLOYEE').optional(),
 	national_id: z
 		.string()
 		.optional()
@@ -67,6 +68,8 @@ export const EmployeeQuerystringSchema = CustomerQuerystringSchema.extend({
 		.meta({ examples: [true] }),
 });
 
+export type EmployeeQuerystring = z.infer<typeof employeeQuerystringSchema>;
+
 export const createEmployeeSchema = createCustomerSchema.extend({
 	national_id: z
 		.string()
@@ -110,12 +113,12 @@ export const createEmployeeSchema = createCustomerSchema.extend({
 			description: 'Data de desligamento do funcionário, se aplicável',
 			examples: ['2025-03-01T00:00:00.000Z'],
 		}),
-        position: z
-        .string()
-        .optional()
-        .meta({
-            examples: ['MANAGER_HQ', 'EMPLOYEE_BRANCH'],
-        }),
+	position: z
+		.string()
+		.optional()
+		.meta({
+			examples: ['MANAGER_HQ', 'EMPLOYEE_BRANCH'],
+		}),
 	emergency_contact: z
 		.any()
 		.optional()
@@ -134,10 +137,13 @@ export const createEmployeeSchema = createCustomerSchema.extend({
 		description: 'Papel do usuário',
 		examples: ['MANAGER_HQ', 'EMPLOYEE_BRANCH'],
 	}),
-    store_code: z.string().meta({
-        description: 'Código da loja',
-        examples: ['CHE999'],
-    }).optional()
+	store_code: z
+		.string()
+		.meta({
+			description: 'Código da loja',
+			examples: ['CHE999'],
+		})
+		.optional(),
 });
 
 export type CreateEmployee = z.infer<typeof createEmployeeSchema>;

@@ -1,24 +1,13 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { EmployeeController } from '@/controllers/Employee.controller';
 import { EmployeeService } from '@/services/Employee.service';
 import { ApiResponse } from '@/utils/api-response.util';
-import { IEmployeeProps } from '@/types/users.types';
-import {
-	EmployeeBadRequestSchema,
-	EmployeeBodySchema,
-	EmployeeGetResponseSchema,
-	EmployeePostResponseSchema,
-	EmployeePutResponseSchema,
-} from '@/schemas/employee.schema';
-import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
-import {
-	CustomerBadGatewaySchema,
-	CustomerGatewayTimeoutSchema,
-} from '@/schemas/customer.schema';
-import { UnauthorizedUserResponseSchema } from '@/schemas/auth.schema';
-import { EmployeeQuerystringSchema } from '@/schemas/employee.schema';
 import prisma from '@prisma/client';
 import { fastifyTypedInstance } from '@/types/types';
+import { createEmployeeSchema, EmployeeBadRequestSchema, EmployeePostResponseSchema } from '@/schemas/employee.schema';
+import { UnauthorizedUserResponseSchema } from '@/schemas/auth.schema';
+import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
+import { CustomerBadGatewaySchema, CustomerGatewayTimeoutSchema } from '@/schemas/customer.schema';
 
 export function employeeRoute(app: fastifyTypedInstance) {
 	const employeeService = new EmployeeService(prisma);
@@ -31,7 +20,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 			// 	tags: ['Employee'],
 			// 	summary: 'Cria um novo funcionário',
 			// 	description: 'Cria um novo funcionário',
-			//     body: EmployeeBodySchema,
+			//     body: createEmployeeSchema,
 			// 	response: {
 			// 		201: EmployeePostResponseSchema,
 			// 		400: EmployeeBadRequestSchema,
@@ -54,7 +43,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Funcionario criado com sucesso',
 					data: response,
-				});
+				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
@@ -95,7 +84,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Funcionarios encontrados com sucesso',
 					data: response,
-				});
+				}).send(reply);;
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
@@ -137,7 +126,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Funcionario atualizado com sucesso',
 					data: response,
-				});
+				}).send(reply);;
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
