@@ -61,7 +61,7 @@ export class CollectionService {
 				);
 			}
 
-			const { publicId } = await this.imageService.upload(
+			const { publicId } = await this.imageService.uploadFile(
 				filePath,
 				'collections',
 			);
@@ -137,7 +137,7 @@ export class CollectionService {
 				include: {
 					products: {
 						select: {
-							id: true,
+							sku: true,
 							name: true,
 						},
 					},

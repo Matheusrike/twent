@@ -249,24 +249,18 @@ model Collection {
 }
 
 model Product {
-  id               String   @id @default(uuid()) @db.Char(36)
+  sku              String   @id @unique
   collection_id    String
-  sku              String   @unique
   name             String
   description      String?
-  model_number     String?
   limited_edition  Boolean  @default(false)
   production_limit Int?
-  case_material    String?
-  case_diameter    Decimal? @db.Decimal(4, 2)
-  movement_type    String?
-  water_resistance String?
   price            Decimal  @db.Decimal(10, 2)
   currency         String   @default("USD")
   cost_price       Decimal? @db.Decimal(10, 2)
-  images           Json?
   specifications   Json?
   is_active        Boolean  @default(true)
+  created_by       String
   updated_by       String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
@@ -278,6 +272,16 @@ model Product {
   sale_items          SaleItem[]
   favorites           CustomerFavorite[]
   inventory_movements InventoryMovement[]
+  images              ProductImage[]
+}
+
+model ProductImage {
+  id         String   @id @default(uuid()) @db.Char(36)
+  product_id String
+  public_id  String   @unique
+  is_primary Boolean  @default(false)
+  created_at DateTime @default(now())
+  product    Product  @relation(fields: [product_id], references: [sku], onDelete: Cascade)
 }
 
 model ProductPriceHistory {
@@ -289,7 +293,7 @@ model ProductPriceHistory {
   reason     String?
   changed_at DateTime @default(now())
 
-  product   Product @relation(fields: [product_id], references: [id])
+  product   Product @relation(fields: [product_id], references: [sku])
   changedBy User    @relation("ChangedBy", fields: [changed_by], references: [id])
 }
 
@@ -302,7 +306,7 @@ model Inventory {
   updated_at    DateTime @updatedAt
 
   store   Store   @relation(fields: [store_id], references: [id])
-  product Product @relation(fields: [product_id], references: [id])
+  product Product @relation(fields: [product_id], references: [sku])
 
   @@unique([store_id, product_id])
 }
@@ -320,7 +324,7 @@ model InventoryMovement {
   created_at     DateTime     @default(now())
 
   store     Store   @relation(fields: [store_id], references: [id])
-  product   Product @relation(fields: [product_id], references: [id])
+  product   Product @relation(fields: [product_id], references: [sku])
   createdBy User    @relation(fields: [created_by], references: [id])
 }
 
@@ -381,7 +385,7 @@ model SaleItem {
   subtotal   Decimal @db.Decimal(10, 2)
 
   sale    Sale    @relation(fields: [sale_id], references: [id])
-  product Product @relation(fields: [product_id], references: [id])
+  product Product @relation(fields: [product_id], references: [sku])
 }
 
 model CustomerFavorite {
@@ -391,7 +395,7 @@ model CustomerFavorite {
   created_at  DateTime @default(now())
 
   customer User    @relation(fields: [customer_id], references: [id])
-  product  Product @relation(fields: [product_id], references: [id])
+  product  Product @relation(fields: [product_id], references: [sku])
 
   @@unique([customer_id, product_id])
 }
