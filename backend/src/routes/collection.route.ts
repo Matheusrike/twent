@@ -5,9 +5,6 @@ import {
 	UploadCollectionImageBodySchema,
 	CollectionParamsSchema,
 	CollectionQuerySchema,
-    CollectionPostResponseSchema,
-    CollectionBadRequestResponseSchema,
-    CollectionConflictResponseSchema,
 } from '@/schemas/collection.schema';
 import { CollectionService } from '@/services/Collection.service';
 import { ImageService } from '@/services/Image.service';
@@ -28,18 +25,12 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Criação de coleção',
 				tags: ['Collection'],
 				body: CreateCollectionSchema,
-                response: {
-                    201: CollectionPostResponseSchema,
-                    400: CollectionBadRequestResponseSchema,
-                    409: CollectionConflictResponseSchema,
-                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const collection = await collectionController.create(request);
-
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
@@ -126,9 +117,6 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Buscar todas as coleções com filtros e paginação',
 				tags: ['Collection'],
 				querystring: CollectionQuerySchema,
-                response: {
-                    
-                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
