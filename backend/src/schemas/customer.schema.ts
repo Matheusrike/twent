@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ApiResponseSchema } from './api-response.schema';
 import { UserTypes } from './user.schema';
 
-export const CustomerQuerystringSchema = z.object({
+export const customerQuerystringSchema = z.object({
 	first_name: z
 		.string()
 		.optional()
@@ -88,17 +88,15 @@ export const CustomerQuerystringSchema = z.object({
 		}, z.boolean())
 		.optional()
 		.meta({ examples: [true] }),
-	skip: z.any().optional(),
-	take: z.any().optional(),
+	user_type: z.literal('CUSTOMER').optional(),
 });
+export type CustomerQuerystring = z.infer<typeof customerQuerystringSchema>;
 
-export const CustomerBodySchema = z.object({
-	email: z
-		.email()
-		.meta({
-			examples: ['emily.watson@example.co.uk'],
-			description: 'Endereço de e-mail do usuário',
-		}),
+export const createCustomerSchema = z.object({
+	email: z.email().meta({
+		examples: ['emily.watson@example.co.uk'],
+		description: 'Endereço de e-mail do usuário',
+	}),
 	password_hash: z
 		.string()
 		.min(6)
@@ -200,7 +198,9 @@ export const CustomerBodySchema = z.object({
 		}),
 });
 
-const customerDataSchema = z.object({
+export type CreateCustomer = z.infer<typeof createCustomerSchema>;
+
+const customerSchema = z.object({
 	id: z.string().meta({ examples: ['f47ac10b-58cc-4372-a567-0e02b2c3d479'] }),
 	email: z.email().meta({ examples: ['emily.watson@example.co.uk'] }),
 	first_name: z.string().meta({ examples: ['Emily'] }),
@@ -268,24 +268,26 @@ const customerDataSchema = z.object({
 		.optional(),
 });
 
+export type Customer = z.infer<typeof customerSchema>;
+
 export const CustomerGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z
 		.string()
 		.meta({ examples: ['Informações do usuário encontradas'] }),
-	data: z.array(customerDataSchema),
+	data: z.array(customerSchema),
 });
 
 export const CustomerPostResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Usuário cadastrado com sucesso'] }),
-	data: customerDataSchema,
+	data: customerSchema,
 });
 
 export const CustomerPutResponseSchema = z.object({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Usuário atualizado com sucesso'] }),
-	data: customerDataSchema,
+	data: customerSchema,
 });
 
 export const CustomerBadRequestSchema = z.object({

@@ -1,65 +1,87 @@
 import { z } from 'zod';
 import { UserType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export const UserTypes: UserType[] = ['CUSTOMER', 'EMPLOYEE'];
 
-export const UserGetResponseSchema = ApiResponseSchema.extend({
+export const getUserInfoResponse = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z
 		.string()
 		.meta({ examples: ['User information retrieved successfully'] }),
 	data: z.object({
-		id: z.string().meta({ examples: ['f7b2e8a3-6a10-4d47-9e0b-6a8792e0d9d1'] }),
-		email: z.string().meta({ examples: ['jane.doe@example.com'] }),
-		first_name: z.string().meta({ examples: ['Jane'] }),
-		last_name: z.string().meta({ examples: ['Doe'] }),
-		phone: z.string().nullable().meta({ examples: ['+1 202-555-0123'] }),
-		user_type: z.enum(UserTypes).meta({ examples: ['CUSTOMER'] }),
-		document_number: z.string().nullable().meta({ examples: ['A1234567'] }),
-		birth_date: z.string().nullable().meta({ examples: ['1992-03-15T00:00:00.000Z'] }),
-		street: z.string().nullable().meta({ examples: ['221B Baker Street'] }),
-		number: z.string().nullable().meta({ examples: ['221B'] }),
-		district: z.string().nullable().meta({ examples: ['Marylebone'] }),
-		city: z.string().nullable().meta({ examples: ['London'] }),
-		state: z.string().nullable().meta({ examples: ['England'] }),
-		zip_code: z.string().nullable().meta({ examples: ['NW1 6XE'] }),
-		country: z.string().nullable().meta({ examples: ['United Kingdom'] }),
-		is_active: z.boolean().nullable().meta({ examples: [true] }),
+		id: z.string(),
+		store_id: z.union([z.null(), z.string()]),
+		user_type: z.string(),
+		email: z.string(),
+		first_name: z.string(),
+		last_name: z.string(),
+		phone: z.string(),
+		document_number: z.string(),
+		birth_date: z.union([z.coerce.date(), z.null()]),
+		street: z.union([z.null(), z.string()]),
+		number: z.union([z.null(), z.string()]),
+		district: z.union([z.null(), z.string()]),
+		city: z.string(),
+		state: z.string(),
+		zip_code: z.union([z.null(), z.string()]),
+		country: z.string(),
+		reset_token: z.null(),
+		reset_token_expires: z.null(),
+		last_login_at: z.null(),
+		is_active: z.boolean(),
+		created_at: z.coerce.date(),
+		updated_at: z.coerce.date(),
+		employee: z
+			.object({
+				position: z.string(),
+				salary: z
+					.union([z.string(), z.number(), z.instanceof(Decimal)])
+					.transform((val) =>
+						val instanceof Decimal ? val : new Decimal(val),
+					)
+					.meta({
+						description:
+							'Salário do funcionário (convertido em Decimal)',
+						examples: ['4200.75', 5100],
+					})
+					.nullable(),
+				benefits: z.any().nullable(),
+				hire_date: z.coerce.date(),
+				is_active: z.boolean(),
+				leaves: z.array(z.any()),
+			})
+			.optional(),
+		user_roles: z
+			.array(z.object({ role: z.object({ name: z.string() }) }))
+			.optional(),
+		sales_created: z.array(z.any()).optional(),
+		CustomerFavorite: z.array(z.any()).optional(),
 	}),
 });
 
-
-export const ChangeStatusBodySchema = z.object({
-	newStatus: z.boolean().meta({
-		examples: [false],
-		description: 'New activation status for the user',
-	}),
-});
-
-export const ChangeStatusResponseSchema = ApiResponseSchema.extend({
-	success: z.literal(true),
-	message: z
-		.string()
-		.meta({ examples: ['User status updated successfully'] }),
-	data: z.object({
-		id: z.string().meta({ examples: ['f7b2e8a3-6a10-4d47-9e0b-6a8792e0d9d1'] }),
-		email: z.string().meta({ examples: ['john.smith@example.com'] }),
-		first_name: z.string().meta({ examples: ['John'] }),
-		last_name: z.string().meta({ examples: ['Smith'] }),
-		user_type: z.enum(UserTypes).meta({ examples: ['EMPLOYEE'] }),
-		is_active: z.boolean().meta({ examples: [false] }),
-	}),
-});
+export const changeStatusResponseSchema = ApiResponseSchema.extend({
+    success: z.literal(true),
+    message: z
+        .string()
+        .meta({ examples: ['Status alterado com sucesso'] }),
+    data: z.object({
+        id: z.string(),
+        email: z.email(),
+        first_name: z.string(), 
+        last_name: z.string(),
+        user_type: z.enum(UserTypes),
+        is_active: z.boolean(),
+    }),
+})
 
 export const ConflictStatusResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(false),
 	message: z
 		.string()
 		.meta({ examples: ['Usuário já está ativado/desativado'] }),
-	errorCode: z
-		.string()
-		.meta({ examples: ['CONFLICT_STATUS'] }),
+	errorCode: z.string().meta({ examples: ['CONFLICT_STATUS'] }),
 }).meta({
 	description: 'Resposta para alteração de status conflitante (409).',
 });

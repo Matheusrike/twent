@@ -1,25 +1,17 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import { UserService } from '@/services/User.service';
 import { AppError, HttpError } from '@/utils/errors.util';
-import { ApiResponse } from '@/utils/api-response.util';
 
 export class UserController {
 	constructor(private userService: UserService) {}
 
-	async getInfo(
-		request: FastifyRequest<{ Querystring: { id: string } }>,
-		reply: FastifyReply,
-	) {
+	async getInfo(request: FastifyRequest) {
 		try {
-			const id = request.query.id || (request.user as { id: string }).id;
+			const { id } = request.params as { id: string };
 
 			const response = await this.userService.getInfo(id);
-			new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Informações do usuário encontradas',
-				data: response,
-			}).send(reply);
+
+			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
@@ -39,53 +31,34 @@ export class UserController {
 			}
 		}
 	}
-	async changeStatus(
-		request: FastifyRequest<{
-			Params: { id: string };
-			Body: { newStatus: boolean };
-		}>,
-		reply: FastifyReply,
-	) {
-		try {
-			const { id } = request.params;
-			const { newStatus } = request.body;
-			const response = await this.userService.changeStatus(id, newStatus);
 
-			new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message:
-					newStatus == true
-						? 'Usuário:' + id + ' alterado para ativo'
-						: 'Usuário:' + id + ' alterado para inativo',
-				data: response,
-			}).send(reply);
+	async activateUser(request: FastifyRequest) {
+		try {
+			const { id } = request.params as { id: string };
+			const response = await this.userService.activateUser(id);
+			return response;
 		} catch (error) {
-			switch (error.errorCode) {
-				case 'NOT_FOUND':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 404,
-					});
-				case 'UNAUTHORIZED':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 401,
-					});
-				case 'CONFLICT':
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 409,
-					});
-				default:
-					throw new HttpError({
-						message: error.message,
-						errorCode: error.errorCode,
-						statusCode: 500,
-					});
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					errorCode: error.errorCode,
+					statusCode: 500,
+				});
+			}
+		}
+	}
+	async deactivateUser(request: FastifyRequest) {
+		try {
+			const { id } = request.params as { id: string };
+			const response = await this.userService.deactivateUser(id);
+			return response;
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					errorCode: error.errorCode,
+					statusCode: 500,
+				});
 			}
 		}
 	}

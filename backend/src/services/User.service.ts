@@ -1,11 +1,14 @@
 import { AppError } from '@/utils/errors.util';
-import prisma from '@prisma/client';
-import { TypeGetUserProps } from '@/types/users.types';
+import { PrismaClient } from '@prisma/generated/client';
+import { CustomerQuerystring } from '@/schemas/customer.schema';
+import { EmployeeQuerystring } from '@/schemas/employee.schema';
 
-export class  UserService {
+export class UserService {
+	constructor(protected database: PrismaClient) {}
+
 	async validateUser(email?: string, document_number?: string) {
 		if (email !== undefined) {
-			const usedEmail = await prisma.user.findUnique({
+			const usedEmail = await this.database.user.findUnique({
 				where: { email },
 			});
 
@@ -17,7 +20,7 @@ export class  UserService {
 			}
 		}
 		if (document_number === undefined) return true;
-		const usedDocument = await prisma.user.findUnique({
+		const usedDocument = await this.database.user.findUnique({
 			where: { document_number },
 		});
 		if (usedDocument) {
@@ -29,59 +32,64 @@ export class  UserService {
 		return true;
 	}
 
-	async get(params?: TypeGetUserProps, skip = 0, take = 10, id?: string) {
-		let response;
-
-		if (params?.user_type === 'EMPLOYEE') {
-			response = await prisma.user.findMany({
-				cursor: id ? { id } : undefined,
-				take: Number(take),
-				skip: Number(skip),
-				orderBy: { created_at: 'desc' },
-				where: params,
-				select: {
-					id: true,
-					email: true,
-					first_name: true,
-					last_name: true,
-					phone: true,
-					user_type: true,
-					city: true,
-					district: true,
-					state: true,
-                    country: true,
-					street: true,
-					is_active: true,
-					created_at: true,
-					employee: {
-						select: {
-							position: true,
-							salary: true,
-							is_active: true,
+	async get(
+		filters: CustomerQuerystring | EmployeeQuerystring,
+		skip = 0,
+		take = 10,
+		id?: string,
+	) {
+		try {
+			if (filters.user_type === 'EMPLOYEE') {
+				const response = await this.database.user.findMany({
+					cursor: id ? { id } : undefined,
+					take: Number(take),
+					skip: Number(skip),
+					orderBy: { created_at: 'desc' },
+					where: filters,
+					select: {
+						id: true,
+						email: true,
+						first_name: true,
+						last_name: true,
+						phone: true,
+						user_type: true,
+						city: true,
+						district: true,
+						state: true,
+						country: true,
+						street: true,
+						is_active: true,
+						created_at: true,
+						employee: {
+							select: {
+								position: true,
+								salary: true,
+								is_active: true,
+							},
 						},
-					},
-					user_roles: {
-						select: {
-							role: {
-								select: { name: true },
+						user_roles: {
+							select: {
+								role: {
+									select: { name: true },
+								},
+							},
+						},
+						store: {
+							select: {
+								code: true,
+								name: true,
 							},
 						},
 					},
-					store: {
-						select: {
-							code: true,
-							name: true,
-						},
-					},
-				},
-			});
-		} else {
-			response = await prisma.user.findMany({
+				});
+				return response;
+			}
+			const response = await this.database.user.findMany({
 				cursor: id ? { id } : undefined,
 				take: Number(take),
 				skip: Number(skip),
 				orderBy: { created_at: 'desc' },
-				where: params,
+				where: filters,
 				select: {
 					id: true,
 					email: true,
@@ -101,86 +109,218 @@ export class  UserService {
 					created_at: true,
 				},
 			});
-		}
-		if (response.length === 0) {
+
+			return response;
+		} catch (error) {
+			console.log(error);
 			throw new AppError({
-				message: 'Nenhum usuário encontrado',
-				errorCode: 'NOT_FOUND',
+				message: error.message,
+				errorCode: 'INTERNAL_SERVER_ERROR',
 			});
 		}
-
-		return response;
 	}
 
 	async getInfo(id: string) {
-		const user = await prisma.user.findUnique({
-			where: { id },
-		});
+		try {
+			const user = await this.database.user.findUnique({
+				where: { id },
+                omit: { password_hash: true },
+                include: {
+                    sales_created: true,
+                    CustomerFavorite: {
+                        select: {
+                            product: {
+                                select: {
+                                    name: true,
+                                    price: true,  
+                                },
+                            },
+                        }
+                    }
+                }
+			});
+            
+            if (!user) {
+                throw new AppError({
+                    message: 'Usuário não encontrado',
+                    errorCode: 'USER_NOT_FOUND',
+                });
+            }
 
-		if (!user) {
+            if (user?.user_type === 'EMPLOYEE') {
+                const profile = await this.database.user.findUnique({
+                    where: { id },
+                    omit: { password_hash: true },
+                    include: {
+                        employee: {
+                            select: {
+                                position: true,
+                                salary: true,
+                                benefits: true,
+                                hire_date: true,
+                                is_active: true,
+                                leaves: {
+                                    select: {
+                                        type: true,
+                                        start_date: true,
+                                        end_date: true,
+                                    },
+                                }
+                            },
+                        },
+                        user_roles: {
+                            select: {
+                                role: {
+                                    select: { name: true },
+                                },
+                            },
+                        },
+                    }
+                });
+                if (!profile) {
+                    throw new AppError({
+                        message: 'Funcionario nao encontrado',
+                        errorCode: 'USER_NOT_FOUND',
+                    });
+                }
+                return profile;
+            }
+
+			return user;
+		} catch (error) {
 			throw new AppError({
-				message: 'Usuário não encontrado',
-				errorCode: 'USER_NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-		return user;
 	}
 
-	async changeStatus(id: string, newStatus: boolean) {
-		const user = await this.get({ id } as TypeGetUserProps);
-		if (!user) {
-			throw new AppError({
-				message: 'Usuário não encontrado',
-				errorCode: 'NOT_FOUND',
+	async activateUser(id: string) {
+		try {
+			const userExist = await this.database.user.findUnique({
+				where: { id },
 			});
-		}
-
-		if (newStatus === user[0].is_active) {
-			throw new AppError({
-				message:
-					newStatus === true
-						? 'Usuário já ativo'
-						: 'Usuário já inativo',
-				errorCode: 'CONFLICT',
-			});
-		}
-
-		if (user[0].user_type === 'EMPLOYEE') {
-			const employee = await prisma.$transaction(async (tx) => {
-				const res = await tx.user.update({
-					where: { id: id },
-					data: { is_active: newStatus },
-					select: {
-						id: true,
-						email: true,
-						first_name: true,
-						last_name: true,
-						user_type: true,
-						is_active: true,
-					},
+			if (!userExist) {
+				throw new AppError({
+					message: 'Usuário nao encontrado',
+					errorCode: 'USER_NOT_FOUND',
 				});
-				await tx.employee.update({
+			}
+
+			if (userExist.user_type == 'EMPLOYEE') {
+				const employee = await this.database.employee.findUnique({
 					where: { user_id: id },
-					data: { is_active: newStatus },
 				});
-				return res;
+				if (!employee) {
+					throw new AppError({
+						message: 'Funcionario nao encontrado',
+						errorCode: 'USER_NOT_FOUND',
+					});
+				}
+				const user = await this.database.$transaction(async (tx) => {
+					const res = await tx.user.update({
+						where: { id: id },
+						data: { is_active: true },
+						select: {
+							id: true,
+							email: true,
+							first_name: true,
+							last_name: true,
+							user_type: true,
+							is_active: true,
+						},
+					});
+					await tx.employee.update({
+						where: { user_id: id },
+						data: { is_active: true },
+					});
+					return res;
+				});
+				return user;
+			}
+
+			const user = await this.database.user.update({
+				where: { id },
+				data: { is_active: true },
+				select: {
+					id: true,
+					email: true,
+					first_name: true,
+					last_name: true,
+					user_type: true,
+					is_active: true,
+				},
 			});
-			return employee;
+			return user;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
 		}
+	}
+	async deactivateUser(id: string) {
+		try {
+			const userExist = await this.database.user.findUnique({
+				where: { id },
+			});
+			if (!userExist) {
+				throw new AppError({
+					message: 'Usuário nao encontrado',
+					errorCode: 'USER_NOT_FOUND',
+				});
+			}
 
-		const customer = await prisma.user.update({
-			where: { id: id },
-			data: { is_active: newStatus },
-			select: {
-				id: true,
-				email: true,
-				first_name: true,
-				last_name: true,
-				user_type: true,
-				is_active: true,
-			},
-		});
+			if (userExist.user_type == 'EMPLOYEE') {
+				const employee = await this.database.employee.findUnique({
+					where: { user_id: id },
+				});
+				if (!employee) {
+					throw new AppError({
+						message: 'Funcionario nao encontrado',
+						errorCode: 'USER_NOT_FOUND',
+					});
+				}
+				const user = await this.database.$transaction(async (tx) => {
+					const res = await tx.user.update({
+						where: { id: id },
+						data: { is_active: false },
+						select: {
+							id: true,
+							email: true,
+							first_name: true,
+							last_name: true,
+							user_type: true,
+							is_active: true,
+						},
+					});
+					await tx.employee.update({
+						where: { user_id: id },
+						data: { is_active: false },
+					});
+					return res;
+				});
+				return user;
+			}
 
-		return customer;
+			const user = await this.database.user.update({
+				where: { id },
+				data: { is_active: false },
+				select: {
+					id: true,
+					email: true,
+					first_name: true,
+					last_name: true,
+					user_type: true,
+					is_active: true,
+				},
+			});
+			return user;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
+		}
 	}
 }
