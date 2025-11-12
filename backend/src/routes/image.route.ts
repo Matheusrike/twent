@@ -16,6 +16,7 @@ export async function imageRoutes(app: fastifyTypedInstance) {
 		'/url',
 		{
 			schema: {
+                tags: ['Image'],
 				querystring: getImageUrlParams,
 				response: {
 					200: generateImageUrlResponseSchema,

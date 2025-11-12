@@ -13,52 +13,72 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	const productService = new ProductService(prisma);
 	const productController = new ProductController(productService);
 
-	app.get('/public', async (request, reply) => {
-		try {
-			const products = await productController.findAllPublic();
-			return new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Produtos recuperados com sucesso',
-				data: products,
-			}).send(reply);
-		} catch (error) {
-			if (error instanceof HttpError) {
+	app.get(
+		'/public',
+		{
+			schema: {
+				tags: ['Product'],
+				summary: 'Busca todos os produtos publicos',
+			},
+		},
+		async (request, reply) => {
+			try {
+				const products = await productController.findAllPublic();
 				return new ApiResponse({
-					statusCode: error.statusCode,
-					success: false,
-					message: error.message,
-					errorCode: error.errorCode,
+					statusCode: 200,
+					success: true,
+					message: 'Produtos recuperados com sucesso',
+					data: products,
 				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
 			}
-		}
-	});
+		},
+	);
 
-	app.get('/public/:sku', async (request, reply) => {
-		try {
-			const product = await productController.findBySkuPublic(request);
-			return new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Produto recuperado com sucesso',
-				data: product,
-			}).send(reply);
-		} catch (error) {
-			if (error instanceof HttpError) {
+	app.get(
+		'/public/:sku',
+		{
+			schema: {
+				tags: ['Product'],
+				summary: 'Busca um produto publico pelo sku',
+			},
+		},
+		async (request, reply) => {
+			try {
+				const product =
+					await productController.findBySkuPublic(request);
 				return new ApiResponse({
-					statusCode: error.statusCode,
-					success: false,
-					message: error.message,
-					errorCode: error.errorCode,
+					statusCode: 200,
+					success: true,
+					message: 'Produto recuperado com sucesso',
+					data: product,
 				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
 			}
-		}
-	});
+		},
+	);
 
 	app.post(
 		'/',
 		{
 			schema: {
+				tags: ['Product'],
 				body: createProductSchema,
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
@@ -88,6 +108,10 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/',
 		{
+			schema: {
+				tags: ['Product'],
+				summary: 'Busca todos os produtos',
+			},
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
@@ -120,6 +144,10 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/:sku',
 		{
+			schema: {
+				tags: ['Product'],
+				summary: 'Busca um produto pelo sku',
+			},
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
@@ -153,6 +181,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 		'/:sku',
 		{
 			schema: {
+				tags: ['Product'],
 				body: updateProductSchema,
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
@@ -182,6 +211,10 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	app.delete(
 		'/:sku',
 		{
+			schema: {
+				tags: ['Product'],
+				summary: 'Desativa um produto',
+			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -207,7 +240,13 @@ export async function productRoutes(app: fastifyTypedInstance) {
 
 	app.post(
 		'/:sku/images',
-		{ preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })] },
+		{
+			schema: {
+				tags: ['Product'],
+				summary: 'Carrega imagens para um produto',
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
 		async (request, reply) => {
 			try {
 				const images = await productController.uploadImages(request);
@@ -233,6 +272,10 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	app.delete(
 		'/:sku/images',
 		{
+            schema: {
+                tags: ['Product'],
+                summary: 'Remove todas as imagens de um produto',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -259,6 +302,10 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	app.patch(
 		'/:sku/images/primary',
 		{
+            schema: {
+                tags: ['Product'],
+                summary: 'Define uma imagem como principal',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -285,6 +332,10 @@ export async function productRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/:sku/price-history',
 		{
+            schema: {
+              tags: ['Product'],
+              summary: 'Recupera o histórico de preços de um produto',  
+            },
 			preHandler: [
 				app.authorization({ requiredRoles: ['ADMIN', 'MANAGER'] }),
 			],
