@@ -2,11 +2,10 @@ import type { fastifyTypedInstance } from '@/types/types';
 import { UserController } from '@/controllers/User.controller';
 import { UserService } from '@/services/User.service';
 import {
-	UserGetResponseSchema,
+	changeStatusResponseSchema,
+	getUserInfoResponse,
 } from '@/schemas/user.schema';
-import {
-	UserNotFoundResponseSchema,
-} from '@/schemas/auth.schema';
+import { UserNotFoundResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { ApiResponse } from '@/utils/api-response.util';
@@ -23,7 +22,7 @@ export function userRoute(app: fastifyTypedInstance) {
 				tags: ['User'],
 				summary: 'Busca o perfil de um usuário',
 				response: {
-					200: UserGetResponseSchema,
+					200: getUserInfoResponse,
 					404: UserNotFoundResponseSchema,
 					500: ApiGenericErrorSchema,
 				},
@@ -53,6 +52,15 @@ export function userRoute(app: fastifyTypedInstance) {
 	app.patch(
 		'/activate/:id',
 		{
+			schema: {
+				tags: ['User'],
+				summary: 'Ativa um usuário',
+				response: {
+					200: changeStatusResponseSchema,
+					404: UserNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
 			preHandler: app.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
@@ -65,7 +73,7 @@ export function userRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Usuário ativado com sucesso',
 					data: response,
-				}).send(reply);;
+				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
@@ -79,6 +87,15 @@ export function userRoute(app: fastifyTypedInstance) {
 	app.patch(
 		'/deactivate/:id',
 		{
+			schema: {
+				tags: ['User'],
+				summary: 'Desativa um usuário',
+				response: {
+					200: changeStatusResponseSchema,
+					404: UserNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
 			preHandler: app.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
@@ -86,12 +103,12 @@ export function userRoute(app: fastifyTypedInstance) {
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await userController.deactivateUser(request);
-                return new ApiResponse({
-                    statusCode: 200,
-                    success: true,
-                    message: 'Usuário desativado com sucesso',
-                    data: response,
-                }).send(reply);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Usuário desativado com sucesso',
+					data: response,
+				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,

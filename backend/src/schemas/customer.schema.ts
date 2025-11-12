@@ -200,7 +200,7 @@ export const createCustomerSchema = z.object({
 
 export type CreateCustomer = z.infer<typeof createCustomerSchema>;
 
-const customerDataSchema = z.object({
+const customerSchema = z.object({
 	id: z.string().meta({ examples: ['f47ac10b-58cc-4372-a567-0e02b2c3d479'] }),
 	email: z.email().meta({ examples: ['emily.watson@example.co.uk'] }),
 	first_name: z.string().meta({ examples: ['Emily'] }),
@@ -268,26 +268,26 @@ const customerDataSchema = z.object({
 		.optional(),
 });
 
-export type Customer = z.infer<typeof customerDataSchema>;
+export type Customer = z.infer<typeof customerSchema>;
 
 export const CustomerGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z
 		.string()
 		.meta({ examples: ['Informações do usuário encontradas'] }),
-	data: z.array(customerDataSchema),
+	data: z.array(customerSchema),
 });
 
 export const CustomerPostResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Usuário cadastrado com sucesso'] }),
-	data: customerDataSchema,
+	data: customerSchema,
 });
 
 export const CustomerPutResponseSchema = z.object({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Usuário atualizado com sucesso'] }),
-	data: customerDataSchema,
+	data: customerSchema,
 });
 
 export const CustomerBadRequestSchema = z.object({

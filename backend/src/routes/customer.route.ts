@@ -4,9 +4,10 @@ import { CustomerService } from '@/services/Customer.service';
 import { ApiResponse } from '@/utils/api-response.util';
 import { fastifyTypedInstance } from '@/types/types';
 import prisma from '@prisma/client';
-import { CustomerGetResponseSchema, customerQuerystringSchema } from '@/schemas/customer.schema';
+import { createCustomerSchema, CustomerBadGatewaySchema, CustomerBadRequestSchema, CustomerGatewayTimeoutSchema, CustomerGetResponseSchema, CustomerPostResponseSchema, CustomerPutResponseSchema, customerQuerystringSchema } from '@/schemas/customer.schema';
 import { UnauthorizedUserResponseSchema, UserNotFoundResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
+import { ConflictStatusResponseSchema } from '@/schemas/user.schema';
 
 export function customerRoute(fastify: fastifyTypedInstance) {
 	const customerService = new CustomerService(prisma);
@@ -61,20 +62,20 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 	fastify.post(
 		'/',
 		{
-			// schema: {
-			// 	tags: ['Customer'],
-			// 	summary: 'Cria um novo cliente',
-			//     body: CustomerBodySchema,
-			// 	response: {
-			// 		201: CustomerPostResponseSchema,
-			// 		400: CustomerBadRequestSchema,
-			// 		401: UnauthorizedUserResponseSchema,
-			// 		409: ConflictStatusResponseSchema,
-			// 		500: ApiGenericErrorSchema,
-			// 		502: CustomerBadGatewaySchema,
-			// 		504: CustomerGatewayTimeoutSchema,
-			// 	},
-			// },
+			schema: {
+				tags: ['Customer'],
+				summary: 'Cria um novo cliente',
+			    body: createCustomerSchema,
+				response: {
+					201: CustomerPostResponseSchema,
+					400: CustomerBadRequestSchema,
+					401: UnauthorizedUserResponseSchema,
+					409: ConflictStatusResponseSchema,
+					500: ApiGenericErrorSchema,
+					502: CustomerBadGatewaySchema,
+					504: CustomerGatewayTimeoutSchema,
+				},
+			},
 			preHandler: fastify.authorization({
 				requiredRoles: [
 					'ADMIN',
@@ -109,20 +110,20 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 	fastify.put(
 		'/:id',
 		{
-			// schema: {
-			// 	tags: ['Customer'],
-			// 	summary: 'Atualiza as informações de um cliente',
-			//     body: CustomerBodySchema.partial(),
-			// 	response: {
-			// 		200: CustomerPutResponseSchema,
-			// 		400: CustomerBadRequestSchema,
-			// 		401: UnauthorizedUserResponseSchema,
-			// 		404: UserNotFoundResponseSchema,
-			// 		500: ApiGenericErrorSchema,
-			// 		502: CustomerBadGatewaySchema,
-			// 		504: CustomerGatewayTimeoutSchema,
-			// 	},
-			// },
+			schema: {
+				tags: ['Customer'],
+				summary: 'Atualiza as informações de um cliente',
+			    body: createCustomerSchema.partial(),
+				response: {
+					200: CustomerPutResponseSchema,
+					400: CustomerBadRequestSchema,
+					401: UnauthorizedUserResponseSchema,
+					404: UserNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+					502: CustomerBadGatewaySchema,
+					504: CustomerGatewayTimeoutSchema,
+				},
+			},
 			preHandler: fastify.authorization({
 				requiredRoles: ['ADMIN'],
 			}),

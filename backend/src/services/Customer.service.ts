@@ -40,6 +40,7 @@ export class CustomerService extends UserService {
 		}
 		const user = await this.database.user.create({
 			data: { ...data, is_active: true, user_type: 'CUSTOMER' },
+            omit: { password_hash: true },
 		});
 		return user;
 	}

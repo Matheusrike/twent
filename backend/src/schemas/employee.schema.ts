@@ -160,9 +160,9 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 	data: z
 		.array(
 			z.object({
-				id: z.string().meta({ examples: ['emp_7b2f4a8d'] }),
+				id: z.uuid().meta({ examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'] }),
 				email: z
-					.string()
+					.email()
 					.meta({ examples: ['oliver.smith@example.com'] }),
 				first_name: z.string().meta({ examples: ['Oliver'] }),
 				last_name: z.string().meta({ examples: ['Smith'] }),
@@ -235,6 +235,57 @@ export const EmployeePostResponseSchema = z.object({
 	message: z
 		.string()
 		.meta({ examples: ['Funcionário cadastrado com sucesso'] }),
+	data: z.object({
+		user: z.object({
+			id: z.uuid(),
+			store_id: z.uuid(),
+			user_type: z.string(),
+			email: z.string(),
+			first_name: z.string(),
+			last_name: z.string(),
+			phone: z.string(),
+			document_number: z.string(),
+			birth_date: z.coerce.date(),
+			street: z.string(),
+			number: z.string(),
+			district: z.string(),
+			city: z.string(),
+			state: z.string(),
+			zip_code: z.string(),
+			country: z.string(),
+			reset_token: z.null(),
+			reset_token_expires: z.null(),
+			last_login_at: z.null(),
+			is_active: z.boolean(),
+			created_at: z.coerce.date(),
+			updated_at: z.coerce.date(),
+		}),
+		employee: z.object({
+			id: z.uuid(),
+			employee_code: z.string(),
+			national_id: z.string(),
+			position: z.string(),
+			department: z.string(),
+			salary: z
+				.union([z.string(), z.number(), z.instanceof(Decimal)])
+				.transform((val) =>
+					val instanceof Decimal ? val : new Decimal(val),
+				)
+				.meta({
+					description:
+						'Salário do funcionário (convertido em Decimal)',
+					examples: ['4200.75', 5100],
+				}),
+			currency: z.string(),
+			benefits: z.null(),
+			hire_date: z.coerce.date(),
+			termination_date: z.null(),
+			emergency_contact: z.null(),
+			is_active: z.boolean(),
+			created_at: z.coerce.date(),
+			updated_at: z.coerce.date(),
+		}),
+	}),
 });
 
 export const EmployeePutResponseSchema = z.object({

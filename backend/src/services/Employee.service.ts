@@ -98,6 +98,7 @@ export class EmployeeService extends UserService {
 							user_type: 'EMPLOYEE',
 							store_id: store.id,
 						},
+						omit: { password_hash: true },
 					});
 
 					const employee_code = await this.generateEmployeeCodeTx(
@@ -118,6 +119,7 @@ export class EmployeeService extends UserService {
 							hire_date: new Date(),
 							is_active: true,
 						},
+						omit: { user_id: true },
 					});
 					await tx.userRole.create({
 						data: {
@@ -137,7 +139,11 @@ export class EmployeeService extends UserService {
 		}
 	}
 
-	async getEmployees(filters: EmployeeQuerystring, skip: number, take: number) {
+	async getEmployees(
+		filters: EmployeeQuerystring,
+		skip: number,
+		take: number,
+	) {
 		filters.user_type = 'EMPLOYEE';
 
 		const response = await super.get(filters, skip, take);

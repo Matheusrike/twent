@@ -188,10 +188,9 @@ export class UserService {
 
 			return user;
 		} catch (error) {
-			console.log(error);
 			throw new AppError({
 				message: error.message,
-				errorCode: 'INTERNAL_SERVER_ERROR',
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
 	}
