@@ -43,7 +43,7 @@ export const createSupplierSchema = z.object({
 		.min(10, 'O telefone deve ter no mínimo 10 caracteres')
 		.max(20, 'O telefone deve ter no máximo 20 caracteres')
 		.regex(
-			/^\+?(\d{1,3})?[-.\s]?(\(?\d{3}\)?[-.\s]?)?(\d[-.\s]?){6,9}\d$/,
+			/^\+?(\d{1,3})?[-.\s]?(\(?\d{2,3}\)?[-.\s]?)?(\d[-.\s]?){6,9}\d$/,
 			'Formato de telefone inválido',
 		)
 		.meta({
@@ -149,7 +149,7 @@ export const updateSupplierSchema = z.object({
 		.min(10, 'O telefone deve ter no mínimo 10 caracteres')
 		.max(20, 'O telefone deve ter no máximo 20 caracteres')
 		.regex(
-			/^\+?(\d{1,3})?[-.\s]?(\(?\d{3}\)?[-.\s]?)?(\d[-.\s]?){6,9}\d$/,
+			/^\+?(\d{1,3})?[-.\s]?(\(?\d{2,3}\)?[-.\s]?)?(\d[-.\s]?){6,9}\d$/,
 			'Formato de telefone inválido',
 		)
 		.optional(),

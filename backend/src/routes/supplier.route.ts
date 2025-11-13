@@ -136,6 +136,34 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
+	app.patch(
+		'/:id/activate',
+		{
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				const supplier =
+					await supplierController.setActiveStatus(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Fornecedor ativado com sucesso',
+					data: supplier,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
 	app.delete(
 		'/:id',
 		{

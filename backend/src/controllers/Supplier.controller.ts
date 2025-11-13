@@ -136,6 +136,32 @@ export class SupplierController {
 		}
 	}
 
+	async setActiveStatus(request: FastifyRequest) {
+		try {
+			const { id } = request.params as { id: string };
+			const user = request.user as IJwtAuthPayload;
+			const supplier = await this.supplierService.setActiveStatus(
+				id,
+				user,
+			);
+			return supplier;
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					statusCode: 404,
+					errorCode: error.errorCode,
+				});
+			}
+
+			throw new HttpError({
+				statusCode: 500,
+				message: 'Internal server error',
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
 	async delete(request: FastifyRequest) {
 		try {
 			const { id } = request.params as { id: string };

@@ -300,6 +300,39 @@ export class SupplierService {
 		}
 	}
 
+	async setActiveStatus(id: string, user: IJwtAuthPayload) {
+		const supplier = await this.database.supplier.findUnique({
+			where: { id },
+		});
+
+		if (!supplier) {
+			throw new AppError({
+				message: 'Fornecedor não encontrado',
+				errorCode: 'SUPPLIER_NOT_FOUND',
+			});
+		}
+
+		if (!supplier.is_active) {
+			const updatedSupplier = await this.database.supplier.update({
+				where: { id },
+				data: { is_active: true },
+			});
+
+			await this.database.auditLog.create({
+				data: {
+					user_id: user.id,
+					action: 'UPDATE',
+					entity: 'Supplier',
+					entity_id: id,
+					old_value: supplier,
+					new_value: updatedSupplier,
+				},
+			});
+		}
+
+		return supplier;
+	}
+
 	async delete(id: string, user: IJwtAuthPayload) {
 		const supplier = await this.database.supplier.findUnique({
 			where: { id },
@@ -316,22 +349,6 @@ export class SupplierService {
 			throw new AppError({
 				message: 'Fornecedor não encontrado',
 				errorCode: 'SUPPLIER_NOT_FOUND',
-			});
-		}
-
-		const pendingTransactions =
-			await this.database.financialTransaction.count({
-				where: {
-					supplier_id: id,
-					type: 'EXPENSE',
-				},
-			});
-
-		if (pendingTransactions > 0) {
-			throw new AppError({
-				message:
-					'Não é possível desativar fornecedor com transações financeiras registradas',
-				errorCode: 'SUPPLIER_HAS_TRANSACTIONS',
 			});
 		}
 
