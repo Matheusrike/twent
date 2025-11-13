@@ -45,12 +45,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const [isClient, setIsClient] = React.useState(false);
 
-  // ✅ Evita o erro de hydration
+
   React.useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!isClient) return null; // ou um pequeno skeleton se quiser
+  if (!isClient) return null; 
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r" {...props}>
