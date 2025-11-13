@@ -359,7 +359,6 @@ model Sale {
   store_id        String
   cash_session_id String
   customer_id     String?
-  sale_number     String        @unique
   subtotal        Decimal       @db.Decimal(10, 2)
   discount        Decimal       @default(0) @db.Decimal(10, 2)
   total           Decimal       @db.Decimal(10, 2)
