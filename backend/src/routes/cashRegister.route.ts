@@ -112,4 +112,104 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 			}
 		},
 	);
+
+	app.get(
+		'/open-sessions',
+		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await cashRegisterController.getOpenSessions();
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Informações da sessão encontradas',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.get(
+		'/close-sessions',
+		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response =
+					await cashRegisterController.getClosedSessions(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Informações da sessão encontradas',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			}
+		},
+	);
+
+	app.post(
+		'/:cash_register_id/open',
+		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response =
+					await cashRegisterController.openSession(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Caixa aberto com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+					}).send(reply);
+				}
+			}
+		},
+	);
+	app.delete(
+		'/:cash_register_id/close',
+		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response =
+					await cashRegisterController.closeSession(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Caixa fechado com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+					}).send(reply);
+				}
+			}
+		},
+	);
 }
