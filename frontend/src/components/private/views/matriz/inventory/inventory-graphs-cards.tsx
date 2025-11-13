@@ -19,7 +19,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import InventoryPagination from "./details-pagination/pagination";
+import InventoryPagination from "./graph-modal/pagination";
 
 export default function InventoryCards() {
   const [searchTerm, setSearchTerm] = React.useState("");
