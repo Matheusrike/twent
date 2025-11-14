@@ -13,10 +13,10 @@ export function saleRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/',
 		{
-            schema: {
-                tags: ['Sale'],
-                summary: 'Busca todas as vendas',
-            },
+			schema: {
+				tags: ['Sale'],
+				summary: 'Busca todas as vendas',
+			},
 			preHandler: app.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
@@ -44,11 +44,11 @@ export function saleRoutes(app: fastifyTypedInstance) {
 	app.post(
 		'/',
 		{
-            schema: {
-                tags: ['Sale'],
-                summary: 'Cria uma nova venda',
-                body: newSaleSchema,
-            },
+			schema: {
+				tags: ['Sale'],
+				summary: 'Cria uma nova venda',
+				body: newSaleSchema,
+			},
 			preHandler: app.authorization({
 				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
 			}),
@@ -60,6 +60,37 @@ export function saleRoutes(app: fastifyTypedInstance) {
 					statusCode: 201,
 					success: true,
 					message: 'Venda criada com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	app.delete(
+		'/:id',
+		{
+			schema: {
+				tags: ['Sale'],
+				summary: 'cancela uma venda',
+			},
+			preHandler: app.authorization({
+				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
+			}),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await saleController.cancelSale(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Venda cancelada com sucesso',
 					data: response,
 				}).send(reply);
 			} catch (error) {

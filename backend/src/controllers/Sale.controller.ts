@@ -58,4 +58,20 @@ export class SaleController {
 			}
 		}
 	}
+
+	async cancelSale(request: FastifyRequest) {
+		try {
+            const { id } = request.params as { id: string };
+            const response = await this.saleService.cancelSale(id);
+            return response;
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					errorCode: error.errorCode,
+					message: error.message,
+					statusCode: 500,
+				});
+			}
+		}
+	}
 }
