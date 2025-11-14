@@ -104,7 +104,9 @@ export const StoreQuerystringSchema = z.object({
         take: z.any().optional(),
 });
 
-export const StoreBodySchema = z.object({
+export type StoreQuerystring = z.infer<typeof StoreQuerystringSchema>;
+
+export const createStore = z.object({
 	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
 	type: z.enum(storeType),
 	email: z
@@ -185,6 +187,8 @@ export const StoreBodySchema = z.object({
 		),
 });
 
+export type CreateStore = z.infer<typeof createStore>;
+
 export const StoreGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true).meta({
 		description: 'Indica se a requisição foi bem-sucedida',
@@ -245,7 +249,7 @@ export const StoreChangeStatusResponseSchema = ApiResponseSchema.extend({
     success: z.literal(true),
     message: z
         .string()
-        .meta({ examples: ['Status da loja atualizado com sucesso'] }),
+        .meta({ examples: ['Status da loja alterado com sucesso'] }),
 })
 export const StoreNotFoundSchema = ApiResponseSchema.extend({
 	success: z.literal(false),

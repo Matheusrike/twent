@@ -1,16 +1,15 @@
-import prisma from '@prisma/client';
-import {
-	IStoreProps,
-	OpeningHours,
-	TypeGetStoreProps,
-} from '@/types/store.types';
+import { StoreQuerystring } from '@/schemas/store.schema';
+import { IStoreProps, OpeningHours } from '@/types/store.types';
 import { AppError } from '@/utils/errors.util';
 import { generateStoreCode } from '@/utils/generate-store-code.util';
+import { PrismaClient } from '@prisma/generated/client';
 
 export class StoreService {
+	constructor(private database: PrismaClient) {}
+
 	private async validateStore(email?: string, street?: string) {
 		if (email) {
-			const emailExists = await prisma.store.findFirst({
+			const emailExists = await this.database.store.findFirst({
 				where: { email },
 			});
 			if (emailExists) {
@@ -21,7 +20,7 @@ export class StoreService {
 			}
 		}
 		if (street) {
-			const streetExists = await prisma.store.findFirst({
+			const streetExists = await this.database.store.findFirst({
 				where: { street },
 			});
 			if (streetExists) {
@@ -33,90 +32,134 @@ export class StoreService {
 		}
 	}
 
-	async get(where?: TypeGetStoreProps, skip = 0, take = 10) {
-  
-		const response = await prisma.store.findMany({
-			take: Number(take) || 10,
-			skip: Number(skip) || 0,
-			where,
-		});
+	async get(where: StoreQuerystring, skip: number, take: number) {
+		try {
+			const response = await this.database.store.findMany({
+				take,
+				skip,
+				where,
+			});
 
-		return response;
+			return response;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
 	}
 
 	async create(storeData: IStoreProps) {
-		await this.validateStore(storeData.email, storeData.street);
-		const storeCode = await generateStoreCode(storeData.country);
-		const prismaData = {
-			...storeData,
-		};
-		const response = await prisma.store.create({
-			data: { ...prismaData, code: storeCode },
-		});
+		try {
+			await this.validateStore(storeData.email, storeData.street);
+			const storeCode = await generateStoreCode(storeData.country);
+			const prismaData = {
+				...storeData,
+			};
+			const response = await this.database.store.create({
+				data: { ...prismaData, code: storeCode },
+			});
 
-		return response;
+			return response;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
 	}
 
 	async update(id: string, storeData: Partial<IStoreProps>) {
-		await this.validateStore(storeData.email, storeData.street);
+		try {
+			await this.validateStore(storeData.email, storeData.street);
 
-		const store = await this.get({ id } as TypeGetStoreProps);
-        
-		if (!store || store.length === 0) {
+			const store = await this.database.store.findMany({
+				where: { id },
+			});
+
+			if (!store) {
+				throw new AppError({
+					message: 'Filial não encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+
+			const currentData = store[0];
+
+			if (storeData.opening_hours) {
+				const currentOpeningHours = Array.isArray(
+					currentData.opening_hours,
+				)
+					? (currentData.opening_hours as OpeningHours[])
+					: [];
+
+				const openingHoursMap: Record<string, OpeningHours> = {};
+
+				for (const item of currentOpeningHours) {
+					if (item?.day) openingHoursMap[item.day] = item;
+				}
+
+				for (const newDay of storeData.opening_hours as OpeningHours[]) {
+					if (newDay?.day) openingHoursMap[newDay.day] = newDay;
+				}
+
+				storeData.opening_hours = Object.values(openingHoursMap);
+			}
+			const response = await this.database.store.update({
+				where: { id },
+				data: storeData,
+			});
+
+			return response;
+		} catch (error) {
 			throw new AppError({
-				message: 'Filial não encontrada',
-				errorCode: 'NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-
-		const currentData = store[0];
-
-		if (storeData.opening_hours) {
-			const currentOpeningHours = Array.isArray(currentData.opening_hours)
-				? (currentData.opening_hours as OpeningHours[])
-				: [];
-
-			const openingHoursMap: Record<string, OpeningHours> = {};
-
-			for (const item of currentOpeningHours) {
-				if (item?.day) openingHoursMap[item.day] = item;
-			}
-
-			for (const newDay of storeData.opening_hours as OpeningHours[]) {
-				if (newDay?.day) openingHoursMap[newDay.day] = newDay;
-			}
-
-			storeData.opening_hours = Object.values(openingHoursMap);
-		}
-		const response = await prisma.store.update({
-			where: { id },
-			data: storeData,
-		});
-
-		return response;
 	}
 
-	async changeStatus(id: string, newStatus: boolean) {
-		const store = await this.get({ id } as TypeGetStoreProps);
-		if (!store || store.length === 0) {
+	async activateStore(id: string) {
+		try {
+			const response = await this.database.store.update({
+				where: { id },
+				data: { is_active: true },
+			});
+
+			if (!response) {
+				throw new AppError({
+					message: 'Filial nao encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			return response;
+		} catch (error) {
 			throw new AppError({
-				message: 'Filial não encontrada',
-				errorCode: 'NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-		if (newStatus === store[0].is_active) {
+	}
+
+	async deactivateStore(id: string) {
+		try {
+			const response = await this.database.store.update({
+				where: { id },
+				data: { is_active: false },
+			});
+
+			if (!response) {
+				throw new AppError({
+					message: 'Filial nao encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			return response;
+		} catch (error) {
 			throw new AppError({
-				message:
-					newStatus === true
-						? 'Filial já ativa'
-						: 'Filial já inativa',
-				errorCode: 'BAD_REQUEST',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-		const response = await prisma.store.update({
-			where: { id },
-			data: { is_active: newStatus },
-		});
-		return response;
 	}
 }
