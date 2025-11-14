@@ -1,0 +1,83 @@
+{
+  "menu": [
+    {
+      "label": "Início",
+      "url": "/"
+    },
+    {
+      "label": "Nossa Coleção",
+      "url": "/colletion"
+    },
+    {
+      "label": "Conheça a Twent",
+      "url": "/about"
+    },
+    {
+      "label": "Portal Empresarial",
+      "url": "/companies"
+    },
+    {
+      "label": "FAQ",
+      "url": "/faq"
+    },
+
+    {
+      "label": "Maps",
+      "url": "/maps"
+    }
+  ],
+  "sections": [
+    {
+      "title": "Contato",
+      "items": [
+        {
+          "label": "noreply.twent@gmail.com",
+          "url": "https://mail.google.com/mail/?view=cm&fs=1&to=noreply.twent@gmail.com"
+        },
+        {
+          "label": "tel: +55 11 94323-2348",
+          "url": "tel:+5511943232348"
+        }
+      ]
+    },
+    {
+      "title": "Localização",
+      "items": [
+        {
+          "label": "Conheça nossas boutiques!",
+          "url": "/maps"
+        }
+      ]
+    },
+    {
+      "title": "Redes Sociais",
+      "items": [
+        {
+          "label": "LinkedIn",
+          "url": "#"
+        }
+      ]
+    },
+    {
+      "title": "Desenvolvedores",
+      "items": [
+        {
+          "label": "Gustavo Torelli",
+          "url": "https://github.com/GustavoTorelli"
+        },
+        {
+          "label": "Lucas Soalheiro",
+          "url": "https://github.com/libre917"
+        },
+        {
+          "label": "Lucas Toledo",
+          "url": "https://github.com/ToledoP"
+        },
+        {
+          "label": "Matheus Ramos",
+          "url": "https://github.com/Matheusrike"
+        }
+      ]
+    }
+  ]
+}

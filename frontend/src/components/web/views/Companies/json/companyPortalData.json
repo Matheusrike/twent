@@ -1,0 +1,68 @@
+{
+  "units": [
+    {
+      "id": "1",
+      "title": "Matriz",
+      "description": "Descrição da matriz",
+      "badge": "MATRIZ CORPORATIVA",
+      "icon": "Building2",
+      "href": "/login",
+      "features": [
+        "Acesso Administrativo Completo",
+        "Catálogo de Coleção Completo",
+        "Ferramentas de Gestão de Filiais",
+        "Dashboard de Relatórios Executivos",
+        "Edições Limitadas Exclusivas"
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Filial",
+      "description": "Descrição da filial",
+      "badge": "FILIAL AUTORIZADA",
+      "icon": "Building",
+      "href": "/login",
+      "features": [
+        "Acesso à Coleção Regional",
+        "Gestão de Inventário Local",
+        "Ferramentas de Atendimento ao Cliente",
+        "Análise de Performance de Vendas",
+        "Catálogo de Coleção Padrão"
+      ]
+    }
+  ],
+  "content": {
+    "hero": {
+      "title": "Portal",
+      "subtitle": "Empresarial",
+      "description": "Acesse nossa plataforma exclusiva através do seu portal corporativo designado",
+      "cta": "SELECIONE SEU NÍVEL DE ACESSO"
+    },
+    "selection": {
+      "title": "Escolha Seu Portal Empresarial",
+      "subtitle": "Selecione a unidade que deseja acessar"
+    },
+    "features": {
+      "title": "Excelência Empresarial",
+      "subtitle": "Criado para sofisticação corporativa e sucesso nos negócios",
+      "items": [
+        {
+          "icon": "Shield",
+          "title": "Acesso Seguro",
+          "description": "Protocolos de segurança de nível empresarial protegendo seus investimentos"
+        },
+        {
+          "icon": "TrendingUp",
+          "title": "Dashboard de Análises",
+          "description": "Insights abrangentes e métricas de desempenho para decisões informadas"
+        },
+        {
+          "icon": "Headphones",
+          "title": "Suporte Premium",
+          "description": "Gestão de conta dedicada e serviços de suporte empresarial 24/7"
+        }
+      ]
+    },
+    "help": "Precisa de ajuda? Entre em contato com o suporte da sua unidade."
+  }
+}

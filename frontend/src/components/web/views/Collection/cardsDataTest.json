@@ -1,0 +1,193 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "href": "/collection/1",
+      "image": "/img/web/collection/prestige.jpg",
+      "title": "Aurum Prestige",
+      "description": "O Aurum Prestige representa o auge da sofisticação relojoeira, combinando tradição artesanal com um design refinado e contemporâneo. Cada detalhe foi meticulosamente pensado para refletir a elegância atemporal e o requinte de quem aprecia o que há de melhor na relojoaria de luxo.",
+      "badge": "New",
+      "value": 12500,
+      "reference": "110.30.42.10.01.001",
+      "material": "Ouro rosé 18K e aço inoxidável",
+      "movement": "Automático suíço calibre 8800",
+      "diameter": "42mm",
+      "waterResistance": "100m",
+      "features": [
+        "Mostrador preto escovado com índices em ouro",
+        "Cristal de safira antirreflexo",
+        "Reserva de marcha de 55 horas",
+        "Bracelete híbrido de aço e couro italiano"
+      ],
+      "available": true
+    },
+    {
+      "id": "2",
+      "href": "/collection/2",
+      "image": "/img/web/collection/sport.jpg",
+      "title": "Vortex Chrono Sport",
+      "description": "Desenvolvido para o ritmo intenso da vida moderna, o Vortex Chrono Sport une precisão técnica e resistência em um design dinâmico. Ideal para atletas e aventureiros, este cronógrafo traduz o espírito competitivo em cada componente de sua construção robusta.",
+      "badge": "Hot",
+      "value": 8700,
+      "reference": "310.92.44.51.01.003",
+      "material": "Titânio escovado de alta resistência",
+      "movement": "Cronógrafo automático calibre 9900",
+      "diameter": "44mm",
+      "waterResistance": "300m",
+      "features": [
+        "Função cronógrafo de 12 horas",
+        "Mostrador preto com subesferas prateadas",
+        "Luneta giratória unidirecional",
+        "Pulseira de borracha esportiva"
+      ],
+      "available": true
+    },
+    {
+      "id": "3",
+      "href": "/collection/3",
+      "image": "/img/web/collection/classic.jpg",
+      "title": "Heritage Classic 1960",
+      "description": "Inspirado nos relógios icônicos dos anos 60, o Heritage Classic 1960 homenageia a elegância minimalista e o charme vintage da relojoaria tradicional. Seu visual atemporal é complementado por um movimento preciso e acabamentos de primeira linha.",
+      "badge": "Classic",
+      "value": 6400,
+      "reference": "135.10.39.21.01.002",
+      "material": "Aço inoxidável polido",
+      "movement": "Mecânico de corda manual",
+      "diameter": "39mm",
+      "waterResistance": "50m",
+      "features": [
+        "Mostrador branco com ponteiros azuis",
+        "Vidro de safira com tratamento antirreflexo",
+        "Fundo transparente com gravação histórica",
+        "Pulseira de couro legítimo marrom"
+      ],
+      "available": true
+    },
+    {
+      "id": "4",
+      "href": "/collection/4",
+      "image": "/img/web/collection/modern.jpg",
+      "title": "Eclipse Modern",
+      "description": "O Eclipse Modern redefine o conceito de estilo contemporâneo com suas linhas geométricas e acabamento metálico sofisticado. Uma peça ousada, criada para quem busca se destacar com personalidade e inovação no pulso.",
+      "badge": "Trend",
+      "value": 7200,
+      "reference": "220.12.41.21.03.004",
+      "material": "Aço inoxidável escovado com acabamento DLC",
+      "movement": "Automático de alta precisão calibre 8900",
+      "diameter": "41mm",
+      "waterResistance": "150m",
+      "features": [
+        "Mostrador azul safira com índices luminescentes",
+        "Data às 6 horas",
+        "Coroa rosqueada com logo gravado",
+        "Pulseira metálica ajustável"
+      ],
+      "available": true
+    },
+    {
+      "id": "5",
+      "href": "/collection/5",
+      "image": "/img/web/collection/vintage.jpg",
+      "title": "Legacy Vintage 1945",
+      "description": "O Legacy Vintage 1945 é um tributo à era dourada da relojoaria, resgatando o charme e a autenticidade dos clássicos de meados do século XX. Cada componente é trabalhado com precisão para unir a nostalgia do passado à excelência contemporânea.",
+      "badge": "Retro",
+      "value": 9300,
+      "reference": "220.10.41.21.02.001",
+      "material": "Aço inoxidável",
+      "movement": "Automático",
+      "diameter": "41mm",
+      "waterResistance": "150m",
+      "features": [
+        "Mostrador prateado",
+        "Ponteiro central de segundos laranja",
+        "Data às 6 horas",
+        "Bracelete em aço inoxidável"
+      ],
+      "available": true
+    },
+    {
+      "id": "6",
+      "href": "/collection/6",
+      "image": "/img/web/collection/limited.jpg",
+      "title": "Eminence Limited Edition",
+      "description": "Com produção limitada a poucas unidades, o Eminence Limited Edition é uma verdadeira obra de arte. Sua estética refinada e movimento de alta complexidade fazem deste relógio uma joia de colecionador, símbolo de exclusividade e prestígio.",
+      "badge": "Limited",
+      "value": 15800,
+      "reference": "215.92.46.22.01.001",
+      "material": "Cerâmica preta e titânio escovado",
+      "movement": "Automático com escape coaxial",
+      "diameter": "46mm",
+      "waterResistance": "600m",
+      "features": [
+        "Edição numerada no fundo da caixa",
+        "Reserva de marcha de 60 horas",
+        "Luneta de cerâmica unidirecional",
+        "Pulseira em borracha texturizada"
+      ],
+      "available": false
+    },
+    {
+      "id": "7",
+      "href": "/collection/7",
+      "image": "/img/web/collection/automatic.jpg",
+      "title": "Axis Automatic",
+      "description": "O Axis Automatic é uma celebração da engenharia mecânica moderna. Seu movimento automático de alta precisão garante desempenho excepcional, enquanto o design equilibrado reflete a harmonia entre tecnologia e tradição.",
+      "badge": "Auto",
+      "value": 9800,
+      "reference": "250.30.42.10.01.005",
+      "material": "Aço inoxidável escovado",
+      "movement": "Automático calibre 8906",
+      "diameter": "42mm",
+      "waterResistance": "200m",
+      "features": [
+        "Indicador de reserva de marcha",
+        "Mostrador preto texturizado",
+        "Fundo transparente com rotor gravado",
+        "Pulseira metálica ajustável"
+      ],
+      "available": true
+    },
+    {
+      "id": "8",
+      "href": "/collection/8",
+      "image": "/img/web/collection/chronograph.jpg",
+      "title": "Tempus Chronograph",
+      "description": "Feito para quem busca precisão e desempenho, o Tempus Chronograph combina tecnologia de ponta com design esportivo. Cada detalhe foi projetado para oferecer confiabilidade absoluta em situações de alta performance.",
+      "badge": "Pro",
+      "value": 11200,
+      "reference": "320.32.44.51.01.001",
+      "material": "Aço inoxidável com luneta cerâmica",
+      "movement": "Cronógrafo automático calibre 9904",
+      "diameter": "44mm",
+      "waterResistance": "300m",
+      "features": [
+        "Função cronógrafo de 12 horas e 60 minutos",
+        "Mostrador preto com marcadores luminosos",
+        "Janela de data às 6 horas",
+        "Pulseira de couro esportiva perfurada"
+      ],
+      "available": true
+    },
+    {
+      "id": "9",
+      "href": "/collection/9",
+      "image": "/img/web/collection/royal.jpg",
+      "title": "Imperial Royal",
+      "description": "O Imperial Royal combina luxo e tradição em um design majestoso, concebido para os verdadeiros apreciadores da alta relojoaria. Cada exemplar é montado à mão, refletindo séculos de excelência e atenção a cada detalhe.",
+      "badge": "Elite",
+      "value": 18900,
+      "reference": "435.53.41.21.05.001",
+      "material": "Ouro amarelo 18K com mostrador em madrepérola",
+      "movement": "Automático de manufatura suíça calibre 8801",
+      "diameter": "41mm",
+      "waterResistance": "100m",
+      "features": [
+        "Mostrador em madrepérola com índices de diamante",
+        "Fundo transparente com rotor dourado",
+        "Pulseira de couro legítimo italiano",
+        "Caixa com acabamento polido espelhado"
+      ],
+      "available": true
+    }
+  ]
+}

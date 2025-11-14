@@ -1,0 +1,39 @@
+[
+        {
+          "icon": "HeartHandshake",
+          "title": "Integridade",
+          "description":
+            "Agimos com transparência, ética e respeito em todas as relações, construindo confiança duradoura."
+        },
+        {
+          "icon": "Lightbulb",
+          "title": "Inovação",
+          "description":
+            "Buscamos constantemente novas ideias e soluções criativas para gerar impacto positivo."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Responsabilidade",
+          "description":
+            "Assumimos nossos compromissos com seriedade e responsabilidade, entregando sempre o nosso melhor."
+        },
+        {
+          "icon": "Users",
+          "title": "Colaboração",
+          "description":
+            "Valorizamos o trabalho em equipe, pois acreditamos que juntos alcançamos resultados maiores."
+        },
+        {
+          "icon": "Leaf",
+          "title": "Sustentabilidade",
+          "description":
+            "Atuamos com consciência ambiental e social, cuidando das pessoas e do planeta."
+        },
+        {
+          "icon": "Target",
+          "title": "Excelência",
+          "description":
+            "Buscamos superar expectativas e entregar resultados consistentes com qualidade e dedicação."
+        }
+]
+    

@@ -1,0 +1,30 @@
+{
+  "navLinks": [
+    {
+      "name": "Inicio",
+      "url": "/"
+    },
+    {
+      "name": "Nossa Coleção",
+      "url": "/collection"
+    },
+    {
+      "name": "Conheça a Twent",
+      "url": "/about"
+    },
+    {
+      "name": "Portal Empresarial",
+      "url": "/companies"
+    }
+  ],
+  "footerLinks": [
+    {
+      "name": "faq",
+      "url": "/faq"
+    },
+    {
+      "name": "maps",
+      "url": "/maps"
+    }
+  ]
+}
