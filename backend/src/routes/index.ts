@@ -14,6 +14,7 @@ import { productRoutes } from './product.route';
 import authorizationPlugin from '@/plugins/authorization.plugin';
 import { inventoryRoutes } from './inventory.route';
 import { cashRegisterRoutes } from './cashRegister.route';
+import { saleRoutes } from './sale.routes';
 
 export async function registerRoutes(app: fastifyTypedInstance) {
 	app.register(
@@ -49,6 +50,7 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 			await app.register(productRoutes, { prefix: '/product' });
 			await app.register(inventoryRoutes, { prefix: '/inventory' });
             await app.register(cashRegisterRoutes, { prefix: '/cash-register' });
+            await app.register(saleRoutes, { prefix: '/sale' });
 		},
 		{ prefix: '/api' },
 	);
