@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"rootDir": "./",
+		"outDir": "./dist",
+		"strict": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"useUnknownInCatchVariables": false,
+		"declaration": true,
+		"sourceMap": true,
+		"removeComments": true,
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["src/*"],
+			"@prisma/*": ["prisma/*"]
+		}
+	},
+	"tsc-alias": {
+		"resolveFullPaths": true
+	},
+	"include": ["src/**/*", "prisma/client.ts", "prisma/seed.ts"],
+	"exclude": ["node_modules", "**/*.config.ts", "**/*.test.ts"]
+}

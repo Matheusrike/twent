@@ -38,7 +38,7 @@ Hoje, a TWENT representa o **equilíbrio raro** entre **tradição e modernidade
 
 ### Logotipo
 
-O logotipo da TWENT traduz o **espírito híbrido da marca** e combina tradição com modernidade. Ele é composto por um símbolo abstrato e pela tipografia do nome. O símbolo, em **vermelho intenso** (`#DE1A26`), representa uma **silhueta elegante de um flamingo estilizado** com **formas fluidas e orgânicas**. Essa escolha sugere **graça, elegância e exclusividade**, atributos centrais da identidade da TWENT. O flamingo simboliza **sofisticação natural e distinção**, enquanto o vermelho destaca-se em meio à paleta neutra, transmitindo **paixão e luxo**.
+O logotipo da TWENT traduz o **espírito híbrido da marca** e combina tradição com modernidade. Ele é composto por um símbolo abstrato e pela tipografia do nome. O símbolo, em **vermelho intenso** (`#DE1A26`), remete simultaneamente a uma **chama estilizada** e à **silhueta de um pinguim**. Essa dualidade sugere **energia, resiliência e sofisticação**, atributos centrais da identidade da TWENT. O vermelho destaca-se em meio à paleta neutra, transmitindo **paixão e ousadia**.
 
 Já o nome **TWENT** aparece em **caixa alta**, utilizando uma fonte serifada clássica. Essa escolha reforça **autoridade, tradição e luxo**, enquanto o preto profundo (`#0F0F0F`) assegura **contraste e sobriedade** em qualquer aplicação.
 

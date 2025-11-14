@@ -1,0 +1,23 @@
+import z from 'zod';
+
+export const UuidSchema = z.object({
+	id: z.uuid('ID ser um UUID válido').meta({
+		description: 'ID da coleção',
+		examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+	}),
+});
+
+export const SkuSchema = z.object({
+	sku: z
+		.string()
+		.min(1)
+		.max(100)
+		.regex(/^TW-\d{4}-\d+$/, 'O SKU deve seguir o formato TW-YYYY-NNNNN')
+		.meta({
+			description: 'SKU do produto',
+			examples: ['ABC123', 'XYZ789'],
+		}),
+});
+
+export type UuidType = z.infer<typeof UuidSchema>;
+export type SkuType = z.infer<typeof SkuSchema>;

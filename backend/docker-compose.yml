@@ -1,0 +1,15 @@
+name: twent-backend
+services:
+    database:
+        container_name: twent-database
+        image: mysql:8.0
+        environment:
+            MYSQL_DATABASE: twent
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+            - 3306:3306
+        volumes:
+            - database:/var/lib/mysql
+
+volumes:
+    database:

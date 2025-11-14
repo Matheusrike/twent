@@ -11,7 +11,7 @@
 -   Consulta de produtos disponíveis (catálogo geral ou por loja).
 -   Localização de lojas/boutiques no mapa.
 -   Agendamento de visitas em loja.
--   (Opcional) Criação de conta de cliente para salvar favoritos, histórico e agendamentos.
+-   Criação de conta de cliente para salvar favoritos, histórico e agendamentos.
 
 ---
 
@@ -30,6 +30,14 @@
     -   Cadastrar novas filiais.
     -   Editar e desativar filiais.
     -   Associar funcionários a cada filial.
+
+-   **Gestão de Funcionários (Matriz e Filiais):**
+
+    -   Cadastro e edição de dados dos funcionários de todas as lojas.
+    -   Gestão de remuneração (sem comissionamento).
+    -   Controle de férias e afastamentos.
+    -   Acompanhamento dos custos totais de cada funcionário (salário, encargos, benefícios).
+    -   Relatórios consolidados de despesas com pessoal.
 
 -   **Gestão Financeira Global:**
 
@@ -66,6 +74,13 @@
 
     -   Controle de funcionários da filial.
     -   Atribuição de funções e permissões.
+
+-   **Gestão de Funcionários (Filial):**
+
+    -   Cadastro e edição de dados apenas dos funcionários da própria filial.
+    -   Gestão de remuneração (sem comissionamento).
+    -   Controle de férias e afastamentos.
+    -   Relatórios de custos de pessoal da filial.
 
 -   **Gestão de Estoque:**
 
@@ -151,15 +166,16 @@
 
 ## 5. Quadro Comparativo de Permissões
 
-| Função/Seção           | Matriz (Administrador)                            | Funcionário da Matriz                           | Gerente da Filial                                       | Funcionário da Filial                      | PDV (Caixa/Vendedor)                     |
-| ---------------------- | ------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------- | ------------------------------------------ | ---------------------------------------- |
-| **Gestão de Lojas**    | Cadastrar, editar e desativar filiais             | Consultar informações de filiais já cadastradas | Gerenciar apenas dados da própria filial                | Sem acesso                                 | Sem acesso                               |
-| **Gestão de Usuários** | Criar/editar/excluir qualquer usuário             | Criar e editar usuários internos da matriz      | Criar e editar usuários apenas da própria filial        | Acessar apenas seus próprios dados         | Sem acesso                               |
-| **Gestão Financeira**  | Fluxo de caixa consolidado + relatórios completos | Visualizar relatórios financeiros da matriz     | Visualizar e gerenciar fluxo de caixa da filial         | Registrar pequenas despesas locais         | Registrar vendas                         |
-| **Gestão de Estoque**  | Visualizar e gerenciar estoque global             | Consultar relatórios de estoque da matriz       | Controlar estoque da filial (entradas, saídas, alertas) | Registrar entradas/saídas manuais simples  | Baixa automática de produtos vendidos    |
-| **Relatórios**         | Relatórios globais e comparativos entre filiais   | Relatórios da matriz                            | Relatórios detalhados da própria filial                 | Relatórios básicos (desempenho individual) | Relatório simplificado de vendas diárias |
-| **Catálogo/Produtos**  | Criar, editar e bloquear produtos globalmente     | Consultar catálogo global                       | Ajustar preços dentro do limite definido pela matriz    | Consultar catálogo da filial               | Aplicar preços já definidos              |
-| **Operações PDV**      | Aprovar, auditar e supervisionar                  | Sem acesso                                      | Autorizar inicialização do PDV da filial                | Operar PDV quando autorizado pelo gerente  | Operar PDV (venda e fechamento de caixa) |
+| Função/Seção               | Matriz (Administrador)                            | Funcionário da Matriz                                | Gerente da Filial                                       | Funcionário da Filial                         | PDV (Caixa/Vendedor)                     |
+| -------------------------- | ------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------- | ---------------------------------------- |
+| **Gestão de Lojas**        | Cadastrar, editar e desativar filiais             | Consultar informações de filiais já cadastradas      | Gerenciar apenas dados da própria filial                | Sem acesso                                    | Sem acesso                               |
+| **Gestão de Usuários**     | Criar/editar/excluir qualquer usuário             | Criar e editar usuários internos da matriz           | Criar e editar usuários apenas da própria filial        | Acessar apenas seus próprios dados            | Sem acesso                               |
+| **Gestão de Funcionários** | Acompanhar custos de todos os funcionários        | Visualizar custos e dados dos funcionários da matriz | Visualizar e gerenciar funcionários da filial           | Consultar e editar apenas seus próprios dados | Sem acesso                               |
+| **Gestão Financeira**      | Fluxo de caixa consolidado + relatórios completos | Visualizar relatórios financeiros da matriz          | Visualizar e gerenciar fluxo de caixa da filial         | Registrar pequenas despesas locais            | Registrar vendas                         |
+| **Gestão de Estoque**      | Visualizar e gerenciar estoque global             | Consultar relatórios de estoque da matriz            | Controlar estoque da filial (entradas, saídas, alertas) | Registrar entradas/saídas manuais simples     | Baixa automática de produtos vendidos    |
+| **Relatórios**             | Relatórios globais e comparativos entre filiais   | Relatórios da matriz                                 | Relatórios detalhados da própria filial                 | Relatórios básicos (desempenho individual)    | Relatório simplificado de vendas diárias |
+| **Catálogo/Produtos**      | Criar, editar e bloquear produtos globalmente     | Consultar catálogo global                            | Ajustar preços dentro do limite definido pela matriz    | Consultar catálogo da filial                  | Aplicar preços já definidos              |
+| **Operações PDV**          | Aprovar, auditar e supervisionar                  | Sem acesso                                           | Autorizar inicialização do PDV da filial                | Operar PDV quando autorizado pelo gerente     | Operar PDV (venda e fechamento de caixa) |
 
 ---
 
