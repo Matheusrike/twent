@@ -1,11 +1,11 @@
+import { NewSale } from '@/schemas/sale.schema';
 import { AppError } from '@/utils/errors.util';
 import { PrismaClient } from '@prisma/generated/client';
 
 export class SaleService {
 	constructor(private database: PrismaClient) {}
 
-    //TODO: Need to finish
-	async newSale(data: any) {
+	async newSale(data: NewSale) {
 		try {
 			const response = await this.database.sale.create({
 				data,
