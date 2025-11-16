@@ -13,13 +13,18 @@ export class StoreController {
 				take: number;
 			} & StoreQuerystring;
 
-			const response = await this.storeService.get(filters, skip, take);
+			const response = await this.storeService.get(
+				filters,
+				Number(skip),
+				Number(take),
+			);
 
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
+					errorCode: error.errorCode,
 					statusCode: 500,
 				});
 			}
@@ -42,12 +47,6 @@ export class StoreController {
 							statusCode: 409,
 							errorCode: error.errorCode,
 						});
-					case 'BAD_REQUEST':
-						throw new HttpError({
-							message: error.message,
-							statusCode: 400,
-							errorCode: error.errorCode,
-						});
 					default:
 						throw new HttpError({
 							message: error.message,
@@ -56,6 +55,7 @@ export class StoreController {
 						});
 				}
 			}
+			throw error;
 		}
 	}
 
@@ -82,12 +82,6 @@ export class StoreController {
 							statusCode: 409,
 							errorCode: error.errorCode,
 						});
-					case 'BAD_REQUEST':
-						throw new HttpError({
-							message: error.message,
-							statusCode: 400,
-							errorCode: error.errorCode,
-						});
 					default:
 						throw new HttpError({
 							message: error.message,
@@ -106,11 +100,20 @@ export class StoreController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 500,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
 		}
 	}
@@ -121,11 +124,20 @@ export class StoreController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 500,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
 		}
 	}

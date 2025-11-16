@@ -1,5 +1,5 @@
-import { StoreQuerystring } from '@/schemas/store.schema';
-import { IStoreProps, OpeningHours } from '@/types/store.types';
+import { CreateStore, StoreQuerystring } from '@/schemas/store.schema';
+import { OpeningHours } from '@/types/store.types';
 import { AppError } from '@/utils/errors.util';
 import { generateStoreCode } from '@/utils/generate-store-code.util';
 import { PrismaClient } from '@prisma/generated/client';
@@ -7,36 +7,11 @@ import { PrismaClient } from '@prisma/generated/client';
 export class StoreService {
 	constructor(private database: PrismaClient) {}
 
-	private async validateStore(email?: string, street?: string) {
-		if (email) {
-			const emailExists = await this.database.store.findFirst({
-				where: { email },
-			});
-			if (emailExists) {
-				throw new AppError({
-					message: 'E-mail de filial já cadastrado',
-					errorCode: 'CONFLICT',
-				});
-			}
-		}
-		if (street) {
-			const streetExists = await this.database.store.findFirst({
-				where: { street },
-			});
-			if (streetExists) {
-				throw new AppError({
-					message: 'Endereço de filial já cadastrada',
-					errorCode: 'CONFLICT',
-				});
-			}
-		}
-	}
-
 	async get(where: StoreQuerystring, skip: number, take: number) {
 		try {
 			const response = await this.database.store.findMany({
-				take,
-				skip,
+				take: take || 10,
+				skip: skip || 0,
 				where,
 			});
 
@@ -49,19 +24,25 @@ export class StoreService {
 		}
 	}
 
-	async create(storeData: IStoreProps) {
+	async create(storeData: CreateStore) {
 		try {
-			await this.validateStore(storeData.email, storeData.street);
 			const storeCode = await generateStoreCode(storeData.country);
-			const prismaData = {
-				...storeData,
-			};
+			console.log(storeCode);
+
 			const response = await this.database.store.create({
-				data: { ...prismaData, code: storeCode },
+				data: { ...storeData, code: storeCode },
 			});
+			console.log(response);
 
 			return response;
 		} catch (error) {
+			console.log(error.meta);
+			if (error.code === 'P2002') {
+				throw new AppError({
+					message: 'Dados conflitantes: ' + error.meta.target,
+					errorCode: 'CONFLICT',
+				});
+			}
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -69,15 +50,13 @@ export class StoreService {
 		}
 	}
 
-	async update(id: string, storeData: Partial<IStoreProps>) {
+	async update(id: string, storeData: Partial<CreateStore>) {
 		try {
-			await this.validateStore(storeData.email, storeData.street);
-
 			const store = await this.database.store.findMany({
 				where: { id },
 			});
 
-			if (!store) {
+			if (store.length === 0) {
 				throw new AppError({
 					message: 'Filial não encontrada',
 					errorCode: 'NOT_FOUND',
@@ -112,10 +91,23 @@ export class StoreService {
 
 			return response;
 		} catch (error) {
-			throw new AppError({
-				message: error.message,
-				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
-			});
+			switch (error.code) {
+				case 'P2002':
+					throw new AppError({
+						message: 'Dados conflitantes: ' + error.meta.target,
+						errorCode: 'CONFLICT',
+					});
+				case 'P2025':
+					throw new AppError({
+						message: 'Filial nao encontrada',
+						errorCode: 'NOT_FOUND',
+					});
+				default:
+					throw new AppError({
+						message: error.message,
+						errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+					});
+			}
 		}
 	}
 
@@ -126,14 +118,14 @@ export class StoreService {
 				data: { is_active: true },
 			});
 
-			if (!response) {
+			return response;
+		} catch (error) {
+			if (error.code === 'P2025') {
 				throw new AppError({
 					message: 'Filial nao encontrada',
 					errorCode: 'NOT_FOUND',
 				});
 			}
-			return response;
-		} catch (error) {
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -148,14 +140,14 @@ export class StoreService {
 				data: { is_active: false },
 			});
 
-			if (!response) {
+			return response;
+		} catch (error) {
+			if (error.code === 'P2025') {
 				throw new AppError({
 					message: 'Filial nao encontrada',
 					errorCode: 'NOT_FOUND',
 				});
 			}
-			return response;
-		} catch (error) {
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',

@@ -4,7 +4,7 @@ import { StoreController } from '@/controllers/Store.controller';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import {
-	StoreBadRequestSchema,
+	createStoreSchema,
 	StoreChangeStatusResponseSchema,
 	StoreConflictSchema,
 	StoreGetResponseSchema,
@@ -63,9 +63,9 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 				tags: ['Store'],
 				summary: 'Cria uma nova loja',
 				description: 'Cria uma nova loja',
+				body: createStoreSchema,
 				response: {
 					201: StorePostResponseSchema,
-					400: StoreBadRequestSchema,
 					409: StoreConflictSchema,
 					500: ApiGenericErrorSchema,
 				},
@@ -77,6 +77,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await storeController.create(request);
+
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
@@ -100,9 +101,9 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 				tags: ['Store'],
 				summary: 'Atualiza uma loja',
 				description: 'Atualiza uma loja',
+                body: createStoreSchema.partial(),
 				response: {
 					200: StorePutResponseSchema,
-					400: StoreBadRequestSchema,
 					404: StoreNotFoundSchema,
 					409: StoreConflictSchema,
 					500: ApiGenericErrorSchema,
@@ -118,7 +119,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
-					message: 'Loja criada com sucesso',
+					message: 'Loja atualizada com sucesso',
 					data: response,
 				}).send(reply);
 			} catch (error) {
@@ -132,15 +133,14 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 		},
 	);
 	fastify.patch(
-		'/:id',
+		'/:id/activate',
 		{
 			schema: {
 				tags: ['Store'],
 				summary: 'Ativa o status de uma loja',
-				description: 'Atualiza o status de uma loja',
+				description: 'Altera o status de uma loja',
 				response: {
 					200: StoreChangeStatusResponseSchema,
-					400: StoreBadRequestSchema,
 					404: StoreNotFoundSchema,
 					500: ApiGenericErrorSchema,
 				},
@@ -155,7 +155,43 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
-					message: 'Loja criada com sucesso',
+					message: 'Loja ativada com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+	fastify.patch(
+		'/:id/deactivate',
+		{
+			schema: {
+				tags: ['Store'],
+				summary: 'Ativa o status de uma loja',
+				description: 'Altera o status de uma loja',
+				response: {
+					200: StoreChangeStatusResponseSchema,
+					404: StoreNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: fastify.authorization({
+				requiredRoles: ['ADMIN', 'MANAGER_HQ'],
+			}),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await storeController.deactivateStore(request);
+				return new ApiResponse({
+					statusCode: 201,
+					success: true,
+					message: 'Loja desativada com sucesso',
 					data: response,
 				}).send(reply);
 			} catch (error) {
