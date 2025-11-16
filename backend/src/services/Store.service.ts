@@ -27,16 +27,13 @@ export class StoreService {
 	async create(storeData: CreateStore) {
 		try {
 			const storeCode = await generateStoreCode(storeData.country);
-			console.log(storeCode);
 
 			const response = await this.database.store.create({
 				data: { ...storeData, code: storeCode },
 			});
-			console.log(response);
 
 			return response;
 		} catch (error) {
-			console.log(error.meta);
 			if (error.code === 'P2002') {
 				throw new AppError({
 					message: 'Dados conflitantes: ' + error.meta.target,
