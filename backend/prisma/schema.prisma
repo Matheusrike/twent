@@ -5,8 +5,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_DIRECT_URL")
 }
 
 enum StoreType {
@@ -86,7 +87,7 @@ enum AuditAction {
 }
 
 model Store {
-  id            String    @id @default(uuid()) @db.Char(36)
+  id            String    @id @default(uuid())
   name          String
   code          String    @unique
   type          StoreType @default(BRANCH)
@@ -116,7 +117,7 @@ model Store {
 }
 
 model Supplier {
-  id              String   @id @default(uuid()) @db.Char(36)
+  id              String   @id @default(uuid())
   name            String
   contact_name    String
   email           String   @unique
@@ -137,7 +138,7 @@ model Supplier {
 }
 
 model Role {
-  id          String   @id @default(uuid()) @db.Char(36)
+  id          String   @id @default(uuid())
   name        String   @unique
   description String?
   created_at  DateTime @default(now())
@@ -146,7 +147,7 @@ model Role {
 }
 
 model User {
-  id                  String    @id @default(uuid()) @db.Char(36)
+  id                  String    @id @default(uuid())
   store_id            String?
   user_type           UserType
   email               String    @unique
@@ -187,7 +188,7 @@ model User {
 }
 
 model UserRole {
-  id         String   @id @default(uuid()) @db.Char(36)
+  id         String   @id @default(uuid())
   user_id    String
   role_id    String
   created_at DateTime @default(now())
@@ -199,7 +200,7 @@ model UserRole {
 }
 
 model Employee {
-  id                String    @id @default(uuid()) @db.Char(36)
+  id                String    @id @default(uuid())
   user_id           String    @unique
   employee_code     String    @unique
   national_id       String?
@@ -220,7 +221,7 @@ model Employee {
 }
 
 model EmployeeLeave {
-  id          String      @id @default(uuid()) @db.Char(36)
+  id          String      @id @default(uuid())
   employee_id String
   type        LeaveType
   start_date  DateTime
@@ -234,7 +235,7 @@ model EmployeeLeave {
 }
 
 model Collection {
-  id              String       @id @default(uuid()) @db.Char(36)
+  id              String       @id @default(uuid())
   name            String       @unique
   description     String?
   launch_year     Int?
@@ -277,7 +278,7 @@ model Product {
 }
 
 model ProductImage {
-  id         String   @id @default(uuid()) @db.Char(36)
+  id         String   @id @default(uuid())
   product_id String
   public_id  String   @unique
   is_primary Boolean  @default(false)
@@ -286,7 +287,7 @@ model ProductImage {
 }
 
 model ProductPriceHistory {
-  id         String   @id @default(uuid()) @db.Char(36)
+  id         String   @id @default(uuid())
   product_id String
   old_price  Decimal  @db.Decimal(10, 2)
   new_price  Decimal  @db.Decimal(10, 2)
@@ -299,7 +300,7 @@ model ProductPriceHistory {
 }
 
 model Inventory {
-  id            String   @id @default(uuid()) @db.Char(36)
+  id            String   @id @default(uuid())
   store_id      String
   product_id    String
   quantity      Int      @default(0)
@@ -313,7 +314,7 @@ model Inventory {
 }
 
 model InventoryMovement {
-  id             String       @id @default(uuid()) @db.Char(36)
+  id             String       @id @default(uuid())
   store_id       String
   product_id     String
   movement_type  MovementType
@@ -330,7 +331,7 @@ model InventoryMovement {
 }
 
 model CashRegister {
-  id         String   @id @default(uuid()) @db.Char(36)
+  id         String   @id @default(uuid())
   store_id   String
   name       String
   is_active  Boolean  @default(true)
@@ -341,7 +342,7 @@ model CashRegister {
 }
 
 model CashSession {
-  id               String            @id @default(uuid()) @db.Char(36)
+  id               String            @id @default(uuid())
   cash_register_id String
   user_id          String
   opening_amount   Decimal           @default(0) @db.Decimal(10, 2)
@@ -356,7 +357,7 @@ model CashSession {
 }
 
 model Sale {
-  id              String        @id @default(uuid()) @db.Char(36)
+  id              String        @id @default(uuid())
   store_id        String
   cash_session_id String
   customer_id     String?
@@ -376,7 +377,7 @@ model Sale {
 }
 
 model SaleItem {
-  id         String  @id @default(uuid()) @db.Char(36)
+  id         String  @id @default(uuid())
   sale_id    String
   product_id String
   quantity   Int
@@ -389,7 +390,7 @@ model SaleItem {
 }
 
 model CustomerFavorite {
-  id          String   @id @default(uuid()) @db.Char(36)
+  id          String   @id @default(uuid())
   customer_id String
   product_id  String
   created_at  DateTime @default(now())
@@ -401,7 +402,7 @@ model CustomerFavorite {
 }
 
 model Appointment {
-  id               String            @id @default(uuid()) @db.Char(36)
+  id               String            @id @default(uuid())
   store_id         String
   customer_id      String?
   customer_name    String
@@ -417,7 +418,7 @@ model Appointment {
 }
 
 model FinancialTransaction {
-  id               String          @id @default(uuid()) @db.Char(36)
+  id               String          @id @default(uuid())
   store_id         String
   supplier_id      String?
   type             TransactionType
@@ -437,7 +438,7 @@ model FinancialTransaction {
 }
 
 model SystemSetting {
-  id          String   @id @default(uuid()) @db.Char(36)
+  id          String   @id @default(uuid())
   key_name    String   @unique
   key_value   String?
   description String?
@@ -445,7 +446,7 @@ model SystemSetting {
 }
 
 model AuditLog {
-  id         String      @id @default(uuid()) @db.Char(36)
+  id         String      @id @default(uuid())
   user_id    String?
   action     AuditAction
   entity     String
