@@ -1,122 +1,157 @@
-import prisma from '@prisma/client';
-import {
-	IStoreProps,
-	OpeningHours,
-	TypeGetStoreProps,
-} from '@/types/store.types';
+import { CreateStore, StoreQuerystring } from '@/schemas/store.schema';
+import { OpeningHours } from '@/types/store.types';
 import { AppError } from '@/utils/errors.util';
 import { generateStoreCode } from '@/utils/generate-store-code.util';
+import { PrismaClient } from '@prisma/generated/client';
 
 export class StoreService {
-	private async validateStore(email?: string, street?: string) {
-		if (email) {
-			const emailExists = await prisma.store.findFirst({
-				where: { email },
+	constructor(private database: PrismaClient) {}
+
+	async get(where: StoreQuerystring, skip: number, take: number) {
+		try {
+			const response = await this.database.store.findMany({
+				take: take || 10,
+				skip: skip || 0,
+				where,
 			});
-			if (emailExists) {
+
+			return response;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async create(storeData: CreateStore) {
+		try {
+			const storeCode = await generateStoreCode(storeData.country);
+			console.log(storeCode);
+
+			const response = await this.database.store.create({
+				data: { ...storeData, code: storeCode },
+			});
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log(error.meta);
+			if (error.code === 'P2002') {
 				throw new AppError({
-					message: 'E-mail de filial já cadastrado',
+					message: 'Dados conflitantes: ' + error.meta.target,
 					errorCode: 'CONFLICT',
 				});
 			}
-		}
-		if (street) {
-			const streetExists = await prisma.store.findFirst({
-				where: { street },
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
-			if (streetExists) {
+		}
+	}
+
+	async update(id: string, storeData: Partial<CreateStore>) {
+		try {
+			const store = await this.database.store.findMany({
+				where: { id },
+			});
+
+			if (store.length === 0) {
 				throw new AppError({
-					message: 'Endereço de filial já cadastrada',
-					errorCode: 'CONFLICT',
+					message: 'Filial não encontrada',
+					errorCode: 'NOT_FOUND',
 				});
 			}
-		}
-	}
 
-	async get(where?: TypeGetStoreProps, skip = 0, take = 10) {
-  
-		const response = await prisma.store.findMany({
-			take: Number(take) || 10,
-			skip: Number(skip) || 0,
-			where,
-		});
+			const currentData = store[0];
 
-		return response;
-	}
+			if (storeData.opening_hours) {
+				const currentOpeningHours = Array.isArray(
+					currentData.opening_hours,
+				)
+					? (currentData.opening_hours as OpeningHours[])
+					: [];
 
-	async create(storeData: IStoreProps) {
-		await this.validateStore(storeData.email, storeData.street);
-		const storeCode = await generateStoreCode(storeData.country);
-		const prismaData = {
-			...storeData,
-		};
-		const response = await prisma.store.create({
-			data: { ...prismaData, code: storeCode },
-		});
+				const openingHoursMap: Record<string, OpeningHours> = {};
 
-		return response;
-	}
+				for (const item of currentOpeningHours) {
+					if (item?.day) openingHoursMap[item.day] = item;
+				}
 
-	async update(id: string, storeData: Partial<IStoreProps>) {
-		await this.validateStore(storeData.email, storeData.street);
+				for (const newDay of storeData.opening_hours as OpeningHours[]) {
+					if (newDay?.day) openingHoursMap[newDay.day] = newDay;
+				}
 
-		const store = await this.get({ id } as TypeGetStoreProps);
-        
-		if (!store || store.length === 0) {
-			throw new AppError({
-				message: 'Filial não encontrada',
-				errorCode: 'NOT_FOUND',
-			});
-		}
-
-		const currentData = store[0];
-
-		if (storeData.opening_hours) {
-			const currentOpeningHours = Array.isArray(currentData.opening_hours)
-				? (currentData.opening_hours as OpeningHours[])
-				: [];
-
-			const openingHoursMap: Record<string, OpeningHours> = {};
-
-			for (const item of currentOpeningHours) {
-				if (item?.day) openingHoursMap[item.day] = item;
+				storeData.opening_hours = Object.values(openingHoursMap);
 			}
+			const response = await this.database.store.update({
+				where: { id },
+				data: storeData,
+			});
 
-			for (const newDay of storeData.opening_hours as OpeningHours[]) {
-				if (newDay?.day) openingHoursMap[newDay.day] = newDay;
+			return response;
+		} catch (error) {
+			switch (error.code) {
+				case 'P2002':
+					throw new AppError({
+						message: 'Dados conflitantes: ' + error.meta.target,
+						errorCode: 'CONFLICT',
+					});
+				case 'P2025':
+					throw new AppError({
+						message: 'Filial nao encontrada',
+						errorCode: 'NOT_FOUND',
+					});
+				default:
+					throw new AppError({
+						message: error.message,
+						errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+					});
 			}
-
-			storeData.opening_hours = Object.values(openingHoursMap);
 		}
-		const response = await prisma.store.update({
-			where: { id },
-			data: storeData,
-		});
-
-		return response;
 	}
 
-	async changeStatus(id: string, newStatus: boolean) {
-		const store = await this.get({ id } as TypeGetStoreProps);
-		if (!store || store.length === 0) {
+	async activateStore(id: string) {
+		try {
+			const response = await this.database.store.update({
+				where: { id },
+				data: { is_active: true },
+			});
+
+			return response;
+		} catch (error) {
+			if (error.code === 'P2025') {
+				throw new AppError({
+					message: 'Filial nao encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 			throw new AppError({
-				message: 'Filial não encontrada',
-				errorCode: 'NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-		if (newStatus === store[0].is_active) {
+	}
+
+	async deactivateStore(id: string) {
+		try {
+			const response = await this.database.store.update({
+				where: { id },
+				data: { is_active: false },
+			});
+
+			return response;
+		} catch (error) {
+			if (error.code === 'P2025') {
+				throw new AppError({
+					message: 'Filial nao encontrada',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 			throw new AppError({
-				message:
-					newStatus === true
-						? 'Filial já ativa'
-						: 'Filial já inativa',
-				errorCode: 'BAD_REQUEST',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-		const response = await prisma.store.update({
-			where: { id },
-			data: { is_active: newStatus },
-		});
-		return response;
 	}
 }

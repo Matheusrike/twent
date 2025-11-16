@@ -1,9 +1,31 @@
 import { z } from 'zod';
-import { Decimal } from '@prisma/client/runtime/library';
 import { StoreType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
 
-const storeType = StoreType;
+export const isoCountries = [
+	'BR',
+	'US',
+	'CA',
+	'ME',
+	'AR',
+	'CH',
+	'CO',
+	'GB',
+	'DE',
+	'FR',
+	'ES',
+	'IT',
+	'NL',
+	'CH',
+	'CH',
+	'IN',
+	'JP',
+	'AU',
+	'SG',
+	'KO',
+	'AR',
+	'VA',
+];
 
 const openingDays = [
 	'Monday',
@@ -27,7 +49,7 @@ export const StoreQuerystringSchema = z.object({
 		.optional()
 		.meta({ examples: ['Example Twent'] }),
 	type: z
-		.enum(storeType)
+		.enum(StoreType)
 		.optional()
 		.meta({ examples: ['BRANCH'] }),
 	email: z
@@ -100,43 +122,69 @@ export const StoreQuerystringSchema = z.object({
 		}, z.boolean())
 		.optional()
 		.meta({ examples: [true] }),
-        skip: z.any().optional(),
-        take: z.any().optional(),
+	skip: z.any().optional(),
+	take: z.any().optional(),
 });
 
-export const StoreBodySchema = z.object({
-	name: z.string().max(100, 'Nome da loja deve ter menos de 100 caracteres'),
-	type: z.enum(storeType),
+export type StoreQuerystring = z.infer<typeof StoreQuerystringSchema>;
+
+export const createStoreSchema = z.object({
+	name: z
+		.string()
+		.min(3, 'Nome deve ter pelo menos 3 caracteres.')
+		.max(100, 'Nome da loja deve ter no máximo 100 caracteres')
+		.meta({ examples: ['Twent Store'] }),
+
+	type: z
+		.enum(StoreType, { message: 'Tipo de loja inválido' })
+		.meta({ examples: ['BRANCH'] }),
+
 	email: z
-		.email()
-		.max(100, 'E-mail da loja deve ter menos de 100 caracteres'),
-	phone: z.string(),
-	street: z.string().max(100, 'Rua da loja deve ter menos de 100 caracteres'),
+		.email('Formato de e-mail inválido.')
+		.toLowerCase()
+		.max(100, 'E-mail da loja deve ter no máximo 100 caracteres')
+		.meta({ examples: ['email@example.com'] }),
+
+	phone: z
+		.string()
+		.regex(
+			/^\+55 \d{2} 9?\d{4}-\d{4}$/,
+			'Telefone deve seguir o padrão: +55 XX 9XXXX-XXXX',
+		)
+		.optional()
+		.meta({ examples: ['+55 11 99999-8888', '+55 11 3003-0000'] }),
+
+	street: z
+		.string()
+		.max(100, 'Rua da loja deve ter no máximo 100 caracteres')
+		.meta({ examples: ['Rua Haddock Lobo'] }),
 	number: z
 		.string()
-		.max(100, 'Número da loja deve ter menos de 100 caracteres'),
+		.max(10, 'Número deve ter no máximo 10 caracteres')
+		.meta({ examples: ['123', 'S/N', '123A'] }),
 	district: z
 		.string()
-		.max(100, 'Bairro da loja deve ter menos de 100 caracteres'),
+		.max(100, 'Bairro/Região deve ter no máximo 100 caracteres')
+		.meta({ examples: ['Jardins', 'Manhattan'] }),
 	city: z
 		.string()
-		.max(100, 'Cidade da loja deve ter menos de 100 caracteres'),
+		.max(100, 'Cidade da loja deve ter no máximo 100 caracteres')
+		.meta({ examples: ['São Paulo', 'New York'] }),
+
 	state: z
 		.string()
-		.max(100, 'Estado da loja deve ter menos de 100 caracteres'),
+		.max(100, 'Estado/Província deve ter no máximo 100 caracteres')
+		.meta({ examples: ['SP', 'NY', 'California'] }),
+
 	zip_code: z
 		.string()
-		.max(50, 'zip_code da loja deve ter menos de 50 caracteres'),
-	country: z
-		.string()
-		.max(100, 'País da loja deve ter menos de 100 caracteres'),
-	latitude: z
-		.union([z.string(), z.number()])
-		.transform((val) => new Decimal(val)),
-	longitude: z
-		.union([z.string(), z.number()])
-		.transform((val) => new Decimal(val)),
+		.max(20, 'O código postal deve ter no máximo 20 caracteres.')
+		.min(2, 'O código postal não pode ser muito curto.')
+		.regex(/^[a-z0-9\s-]+$/i, 'Código postal inválido.')
+		.trim()
+		.meta({ examples: ['SW1A 0AA', '10001'] }),
 
+	country: z.enum(isoCountries).meta({ examples: ['BR', 'US', 'GB'] }),
 	opening_hours: z
 		.array(
 			z
@@ -149,13 +197,15 @@ export const StoreBodySchema = z.object({
 						.regex(
 							timeRegex,
 							'Horário de abertura deve estar no formato HH:mm (00:00–23:59)',
-						),
+						)
+						.meta({ examples: ['09:00'] }),
 					close: z
 						.string()
 						.regex(
 							timeRegex,
 							'Horário de fechamento deve estar no formato HH:mm (00:00–23:59)',
-						),
+						)
+						.meta({ examples: ['18:00'] }),
 				})
 				.refine(
 					({ open, close }) => {
@@ -163,7 +213,6 @@ export const StoreBodySchema = z.object({
 						const [closeH, closeM] = close.split(':').map(Number);
 						const openTotal = openH * 60 + openM;
 						const closeTotal = closeH * 60 + closeM;
-
 						return openTotal < closeTotal;
 					},
 					{
@@ -182,8 +231,16 @@ export const StoreBodySchema = z.object({
 				message:
 					'Não é permitido repetir dias da semana em opening_hours.',
 			},
-		),
+		)
+		.meta({
+			examples: [
+				{ day: 'MONDAY', open: '09:00', close: '18:00' },
+				{ day: 'SATURDAY', open: '10:00', close: '14:00' },
+			],
+		}),
 });
+
+export type CreateStore = z.infer<typeof createStoreSchema>;
 
 export const StoreGetResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true).meta({
@@ -201,9 +258,12 @@ export const StoreGetResponseSchema = ApiResponseSchema.extend({
 				.meta({ examples: ['61ba0e5e-59e5-403b-bb76-e317011f7399'] }),
 			name: z.string().meta({ examples: ['Example Twent'] }),
 			code: z.string().meta({ examples: ['EXA001'] }),
-			type: z.enum(storeType).meta({ examples: ['BRANCH'] }),
+			type: z.enum(StoreType).meta({ examples: ['BRANCH'] }),
 			email: z.string().meta({ examples: ['example@twent.com.br'] }),
-			phone: z.string().meta({ examples: ['+55 11 9999-8888'] }),
+			phone: z
+				.string()
+				.meta({ examples: ['+55 11 9999-8888'] })
+				.nullable(),
 			street: z.string().meta({ examples: ['St. Example'] }),
 			number: z.string().meta({ examples: ['500'] }),
 			district: z.string().meta({ examples: ['Manhattan'] }),
@@ -211,8 +271,14 @@ export const StoreGetResponseSchema = ApiResponseSchema.extend({
 			state: z.string().meta({ examples: ['NY'] }),
 			zip_code: z.string().meta({ examples: ['01000-000'] }),
 			country: z.string().meta({ examples: ['US'] }),
-			latitude: z.any().meta({ examples: ['-23.56019'] }),
-			longitude: z.any().meta({ examples: ['-46.67812'] }),
+			latitude: z
+				.any()
+				.meta({ examples: ['-23.56019'] })
+				.nullable(),
+			longitude: z
+				.any()
+				.meta({ examples: ['-46.67812'] })
+				.nullable(),
 			opening_hours: z.array(
 				z.object({
 					day: z.enum(openingDays).meta({ examples: ['Monday'] }),
@@ -234,19 +300,51 @@ export const StoreGetResponseSchema = ApiResponseSchema.extend({
 export const StorePostResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Filial criada com sucesso'] }),
+	data: z.object({
+		id: z
+			.string()
+			.meta({ examples: ['61ba0e5e-59e5-403b-bb76-e317011f7399'] }),
+		name: z.string().meta({ examples: ['Example Twent'] }),
+		code: z.string().meta({ examples: ['EXA001'] }),
+		type: z.enum(StoreType).meta({ examples: ['BRANCH'] }),
+		email: z.string().meta({ examples: ['example@twent.com.br'] }),
+		phone: z
+			.string()
+			.meta({ examples: ['+55 11 9999-8888'] })
+			.nullable(),
+		street: z.string().meta({ examples: ['St. Example'] }),
+		number: z.string().meta({ examples: ['500'] }),
+		district: z.string().meta({ examples: ['Manhattan'] }),
+		city: z.string().meta({ examples: ['New York'] }),
+		state: z.string().meta({ examples: ['NY'] }),
+		zip_code: z.string().meta({ examples: ['01000-000'] }),
+		country: z.string().meta({ examples: ['US'] }),
+		latitude: z.any().meta({ examples: ['-23.56019'] }),
+		longitude: z.any().meta({ examples: ['-46.67812'] }),
+		opening_hours: z.array(
+			z.object({
+				day: z.enum(openingDays).meta({ examples: ['Monday'] }),
+				open: z.string().meta({ examples: ['10:00'] }),
+				close: z.string().meta({ examples: ['19:00'] }),
+			}),
+		),
+		is_active: z.boolean().meta({ examples: [true] }),
+		created_at: z.date().meta({ examples: ['2025-10-07T18:55:04.196Z'] }),
+		updated_at: z.date().meta({ examples: ['2025-10-09T19:23:48.922Z'] }),
+	}),
 });
 
-export const StorePutResponseSchema =  ApiResponseSchema.extend({
-    success: z.literal(true),
-    message: z.string().meta({ examples: ['Loja atualizada com sucesso'] }),
-})
+export const StorePutResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true),
+	message: z.string().meta({ examples: ['Loja atualizada com sucesso'] }),
+});
 
 export const StoreChangeStatusResponseSchema = ApiResponseSchema.extend({
-    success: z.literal(true),
-    message: z
-        .string()
-        .meta({ examples: ['Status da loja atualizado com sucesso'] }),
-})
+	success: z.literal(true),
+	message: z
+		.string()
+		.meta({ examples: ['Status da loja alterado com sucesso'] }),
+});
 export const StoreNotFoundSchema = ApiResponseSchema.extend({
 	success: z.literal(false),
 	message: z.string().meta({ examples: ['Loja nao encontrada'] }),
