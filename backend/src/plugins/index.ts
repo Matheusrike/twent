@@ -4,6 +4,7 @@ import jwt from '@fastify/jwt';
 import fastifyMultipart from '@fastify/multipart';
 import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
+import { fastifyHelmet } from '@fastify/helmet';
 import { jsonSchemaTransform } from 'fastify-type-provider-zod';
 import authorizationPlugin from './authorization.plugin';
 import type { IAppConfig } from '@/types/types';
@@ -21,6 +22,8 @@ export async function registerPlugins(
 	await app.register(jwt, {
 		secret: config.jwtSecret,
 	});
+
+    await app.register(fastifyHelmet);
 
 	await app.register(authorizationPlugin);
 
