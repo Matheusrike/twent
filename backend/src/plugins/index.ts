@@ -23,6 +23,7 @@ export async function registerPlugins(
 		secret: config.jwtSecret,
 	});
 
+
     await app.register(fastifyHelmet);
 
 	await app.register(authorizationPlugin);
