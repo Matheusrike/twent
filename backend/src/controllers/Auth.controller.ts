@@ -21,20 +21,14 @@ export class AuthController {
 					data: { token },
 					success: true,
 					statusCode: 200,
-				}).send(reply);
+				}).send(reply.setCookie('auth_token', token, {}));
 			}
-
-			reply.setCookie('token', token, {
-				httpOnly: true,
-				sameSite: 'lax',
-				maxAge: 60 * 60 * 24 * 7,
-			});
 
 			return new ApiResponse({
 				message: 'Login realizado com sucesso',
 				success: true,
 				statusCode: 200,
-			});
+			}).send(reply.setCookie('auth_token', token, {}));
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
