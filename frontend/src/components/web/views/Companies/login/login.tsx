@@ -7,7 +7,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/private/views/matriz/login/input";
@@ -17,8 +16,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import companyPortalData from "../json/companyPortalData.json";
-import { Shield, Sparkles } from "lucide-react";
+import { Shield } from "lucide-react";
 import { useState } from "react";
+
 
 const ICON_MAP: Record<string, any> = {
   shield: Shield,
@@ -47,18 +47,41 @@ const Login = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      console.log(data);
+  
+      const response = await fetch("/response/api/auth/login", {
+        method: "POST",
+        credentials: "include", // ESSENCIAL
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!response.ok) {
+        const err = await response.json().catch(() => null);
+        const message =
+          err?.message || "Credenciais inválidas. Verifique seu email e senha.";
+  
+        form.setError("root", { message });
+  
+        return;
+      }
+  
+      router.push("/matriz/dashboard");
     } catch (error) {
-      console.error("Login failed:", error);
+      form.setError("root", {
+        message: "Erro de conexão. Tente novamente mais tarde.",
+      });
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col">
       <section className="min-h-screen flex items-center justify-center py-12 px-4">
-        <div className=" transition-all duration-200">
+        <div className="transition-all duration-200">
           <div className="mx-auto flex items-center space-y-4 py-16 px-12 font-semibold text-gray-500 flex-col">
             <Logo />
 
@@ -67,7 +90,7 @@ const Login = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-full space-y-4 flex flex-col"
+                className="w-100 space-y-4 flex flex-col z-20"
               >
                 <FormField
                   control={form.control}
@@ -77,7 +100,7 @@ const Login = () => {
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="seu@email.com"
+                          placeholder="Digite seu e-mail"
                           disabled={isLoading}
                           {...field}
                         />
@@ -95,7 +118,7 @@ const Login = () => {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="••••••••"
+                          placeholder="Digite sua senha"
                           disabled={isLoading}
                           {...field}
                         />
@@ -114,6 +137,13 @@ const Login = () => {
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
+
+     
+                {form.formState.errors.root && (
+                  <p className="text-red-500 text-sm text-center">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
               </form>
             </Form>
 
@@ -131,7 +161,7 @@ const Login = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-6 bg-gray-50 dark:bg-background border-t border-gray-200 ">
+      <section className="py-24 px-6 bg-gray-50 dark:bg-background z-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
@@ -148,7 +178,7 @@ const Login = () => {
               return (
                 <div
                   key={index}
-                  className="group relative p-8 rounded-2xl  hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-500 hover:border-red-500/50 dark:hover:border-red-500/50 hover:-translate-y-2"
+                  className="group relative p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-500 hover:border-red-500/50 dark:hover:border-red-500/50 hover:-translate-y-2"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -171,7 +201,7 @@ const Login = () => {
       </section>
 
       {/* Help Section */}
-      <footer className="py-16 px-6 border-t border-gray-200  ">
+      <footer className="py-16 px-6 border-t border-gray-200">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-12 h-1 bg-gradient-to-r from-red-600 to-red-800 rounded-full" />

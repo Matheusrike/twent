@@ -2,6 +2,16 @@ import { Playfair_Display, Inter } from "next/font/google";
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import SideBar from "@/components/private/global/sideBar/sideBarLayout";
+import { redirect } from "next/navigation";
+import { getAuthToken } from "@/lib/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Portal Empresarial TWENT®",
+  description: "",
+  icons: {
+    icon: "/img/global/dark/iconDark.svg",
+  },
+};
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -15,28 +25,27 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  title: "Portal Empresarial TWENT®",
-  description: "",
-  icons: {
-    icon: "/img/global/dark/iconDark.svg",
-  },
-};
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const token = getAuthToken();
+
+  console.log("TOKEN NO LAYOUT:", token);
+
+  if (!token) {
+    console.log("Nenhum token encontrado. Redirecionando…");
+    redirect("/companies/login");
+  }
+
   return (
     <html
       lang="pt-br"
       className={`${playfairDisplay.variable} ${inter.variable} bg-white`}
     >
-      <body data-layout="manager" cz-shortcut-listen="true">
-        <SideBar>
-          {children}
-        </SideBar>
+      <body data-layout="manager">
+        <SideBar>{children}</SideBar>
       </body>
     </html>
   );

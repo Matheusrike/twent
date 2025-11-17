@@ -6,7 +6,6 @@ export default function Companies() {
             className="relative w-full min-h-screen flex flex-col items-center justify-center">
             <div className="w-full z-10">
                 <Login/>
-               
             </div>
         </div>
     )
