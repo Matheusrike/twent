@@ -4,10 +4,20 @@ import { EmployeeService } from '@/services/Employee.service';
 import { ApiResponse } from '@/utils/api-response.util';
 import prisma from '@prisma/client';
 import { fastifyTypedInstance } from '@/types/types';
-import { createEmployeeSchema, EmployeeBadRequestSchema, EmployeeGetResponseSchema, EmployeePostResponseSchema, EmployeePutResponseSchema, employeeQuerystringSchema } from '@/schemas/employee.schema';
+import {
+	createEmployeeSchema,
+	EmployeeBadRequestSchema,
+	EmployeeGetResponseSchema,
+	EmployeePostResponseSchema,
+	EmployeePutResponseSchema,
+	employeeQuerystringSchema,
+} from '@/schemas/employee.schema';
 import { UnauthorizedUserResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
-import { CustomerBadGatewaySchema, CustomerGatewayTimeoutSchema } from '@/schemas/customer.schema';
+import {
+	CustomerBadGatewaySchema,
+	CustomerGatewayTimeoutSchema,
+} from '@/schemas/customer.schema';
 
 export function employeeRoute(app: fastifyTypedInstance) {
 	const employeeService = new EmployeeService(prisma);
@@ -20,7 +30,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 				tags: ['Employee'],
 				summary: 'Cria um novo funcionário',
 				description: 'Cria um novo funcionário',
-			    body: createEmployeeSchema,
+				body: createEmployeeSchema,
 				response: {
 					201: EmployeePostResponseSchema,
 					400: EmployeeBadRequestSchema,
@@ -38,16 +48,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 			try {
 				const response =
 					await employeeController.createEmployee(request);
-                    const payload =  new ApiResponse({
-                        statusCode: 201,
-                        success: true,
-                        message: 'Funcionario criado com sucesso',
-                        data: response,
-                    })
-                    const parse =  EmployeePostResponseSchema.safeParse(payload);
-                    if (!parse.success) {
-                        console.log(parse.error)
-                    }
+
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
@@ -72,7 +73,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 				tags: ['Employee'],
 				summary: 'Busca todos os funcionários',
 				description: 'Busca todos os funcionários, com ou sem filtros',
-			    querystring: employeeQuerystringSchema,
+				querystring: employeeQuerystringSchema,
 				response: {
 					200: EmployeeGetResponseSchema,
 					400: EmployeeBadRequestSchema,
@@ -94,7 +95,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Funcionarios encontrados com sucesso',
 					data: response,
-				}).send(reply);;
+				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
@@ -113,7 +114,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 				tags: ['Employee'],
 				summary: 'Atualiza um funcionário',
 				description: 'Atualiza um funcionário',
-			    body: createEmployeeSchema.partial(),
+				body: createEmployeeSchema.partial(),
 				response: {
 					200: EmployeePutResponseSchema,
 					400: EmployeeBadRequestSchema,
@@ -136,7 +137,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					success: true,
 					message: 'Funcionario atualizado com sucesso',
 					data: response,
-				}).send(reply);;
+				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,

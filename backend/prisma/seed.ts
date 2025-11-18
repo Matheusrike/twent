@@ -45,15 +45,10 @@ async function rolesSeed(tx: Prisma.TransactionClient) {
 		},
 	];
 
-	for (const role of roles) {
-		await tx.role.upsert({
-			where: {
-				name: role.name,
-			},
-			update: {},
-			create: role,
-		});
-	}
+	await tx.role.createMany({
+		data: roles,
+		skipDuplicates: true,
+	});
 
 	console.log('✔ Roles seeded successfully');
 }
@@ -115,20 +110,15 @@ async function headquarterSeed(tx: Prisma.TransactionClient) {
 }
 
 async function adminSeed(tx: Prisma.TransactionClient) {
-    const store = await tx.store.findFirst({
-        where: {
-            type: 'HEADQUARTERS',
-        },
-    });
 	if (!process.env.ADMIN_PASSWORD) {
 		throw new Error('✖ ADMIN_PASSWORD not found in .env');
 	}
 
-    const storeHeadquarter = await tx.store.findFirst({
-        where: {
-            type: 'HEADQUARTERS',
-        },
-    });
+	const storeHeadquarter = await tx.store.findFirst({
+		where: {
+			type: 'HEADQUARTERS',
+		},
+	});
 
 	const admin = await tx.user.upsert({
 		where: {
@@ -137,12 +127,11 @@ async function adminSeed(tx: Prisma.TransactionClient) {
 		update: {},
 		create: {
 			user_type: UserType.EMPLOYEE,
-            store_id: store.id,
 			email: 'admin@twent.ch',
 			password_hash: await hashPassword(process.env.ADMIN_PASSWORD),
 			first_name: 'Super',
 			last_name: 'Admin',
-            store_id: storeHeadquarter.id
+			store_id: storeHeadquarter.id,
 		},
 	});
 

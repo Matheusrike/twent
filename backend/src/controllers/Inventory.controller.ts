@@ -58,7 +58,6 @@ export class InventoryController {
 		try {
 			const { product_id, quantity, store_id, minimum_stock } =
 				request.body as CreateInventoryType;
-                console.log(store_id, request.user);
                 
 
 			const newInventory = await this.inventoryService.newInventory({
@@ -182,7 +181,6 @@ export class InventoryController {
 			return result;
 		} catch (error) {
             console.log(error);
-            
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
 					case 'NOT_FOUND':

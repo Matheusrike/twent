@@ -13,6 +13,8 @@ import { imageRoutes } from './image.route';
 import { productRoutes } from './product.route';
 import authorizationPlugin from '@/plugins/authorization.plugin';
 import { inventoryRoutes } from './inventory.route';
+import { cashRegisterRoutes } from './cashRegister.route';
+import { saleRoutes } from './sale.routes';
 import { supplierRoutes } from './supplier.route';
 import { financialTransactionRoutes } from './financial-transactions.route';
 
@@ -49,6 +51,8 @@ export async function registerRoutes(app: fastifyTypedInstance) {
 			await app.register(imageRoutes, { prefix: '/image' });
 			await app.register(productRoutes, { prefix: '/product' });
 			await app.register(inventoryRoutes, { prefix: '/inventory' });
+            await app.register(cashRegisterRoutes, { prefix: '/cash-register' });
+            await app.register(saleRoutes, { prefix: '/sale' });
 			await app.register(supplierRoutes, { prefix: '/supplier' });
 			await app.register(financialTransactionRoutes, {
 				prefix: '/financial-transaction',
