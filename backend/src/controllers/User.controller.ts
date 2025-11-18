@@ -9,11 +9,8 @@ export class UserController {
 	async getInfo(request: FastifyRequest) {
 		try {
 			const id =
-				(request.params as { id: string }).id !== undefined || null
-					? (request.params as { id: string }).id
-					: (request.user as IJwtAuthPayload).id;
-
-			console.log(id);
+				(request.params as { id: string }).id ||
+				(request.user as IJwtAuthPayload).id;
 
 			const response = await this.userService.getInfo(id);
 
