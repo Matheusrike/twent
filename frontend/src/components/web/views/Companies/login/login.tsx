@@ -25,7 +25,7 @@ const ICON_MAP: Record<string, any> = {
 };
 
 const formSchema = z.object({
-  email: z.string().email("Email inválido"),
+  email: z.email("Email inválido"),
   password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
 });
 
@@ -50,7 +50,6 @@ const Login = () => {
   
       const response = await fetch("/response/api/auth/login", {
         method: "POST",
-        credentials: "include", // ESSENCIAL
         headers: {
           "Content-Type": "application/json",
         },
