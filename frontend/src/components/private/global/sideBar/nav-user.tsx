@@ -22,6 +22,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export function NavUser({
@@ -35,6 +36,30 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
+  const router = useRouter(); 
+
+  const logout = async () => {
+    try {
+      await fetch("/response/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      return true;
+    } catch (err) {
+      console.error("Erro ao fazer logout:", err);
+      return false;
+    }
+  };
+
+  const handleLogout = async () => {
+    const ok = await logout();
+
+    if (ok) router.push("/companies/login");
+  };
+
+  
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -45,7 +70,7 @@ export function NavUser({
               className="group hover:bg-accent transition-all duration-200 data-[state=open]:bg-accent"
             >
               <Avatar className="h-9 w-9 rounded-full border-none transition-all duration-200 ">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                 <AvatarFallback className="rounded-xl bg-gradient-to-br from-red-500 to-red-700 text-white font-semibold">
                   {user.name
                     .split(" ")
@@ -99,7 +124,6 @@ export function NavUser({
             <DropdownMenuSeparator />
 
             <div className="p-1">
-
               <Link href="/matriz/profile">
                 <DropdownMenuItem className="cursor-pointer rounded-lg py-2.5 transition-colors">
                   <IconUserCircle className="h-4 w-4" />
@@ -109,7 +133,10 @@ export function NavUser({
 
               <DropdownMenuSeparator className="my-1" />
 
-              <DropdownMenuItem className="cursor-pointer rounded-lg py-2.5 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950 transition-colors">
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="cursor-pointer rounded-lg py-2.5 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950 transition-colors"
+              >
                 <IconLogout className="h-4 w-4" />
                 <span className="font-medium">Sair</span>
               </DropdownMenuItem>
