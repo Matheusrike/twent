@@ -15,6 +15,40 @@ export function userRoute(app: fastifyTypedInstance) {
 	const userService = new UserService(prisma);
 	const userController = new UserController(userService);
 
+    app.get(
+		'/me',
+		{
+			schema: {
+				tags: ['User'],
+				summary: 'Busca o perfil do usuário logado',
+				response: {
+					200: getUserInfoResponse,
+					404: UserNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization(),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await userController.getInfo(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Informação(ões) do(s) usuário(s) encontrada(s)',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
 	app.get(
 		'/profile/:id',
 		{

@@ -1,13 +1,14 @@
 import { FastifyRequest } from 'fastify';
 import { UserService } from '@/services/User.service';
 import { AppError, HttpError } from '@/utils/errors.util';
+import { IJwtAuthPayload } from '@/types/authorization.types';
 
 export class UserController {
 	constructor(private userService: UserService) {}
 
 	async getInfo(request: FastifyRequest) {
 		try {
-			const { id } = request.params as { id: string };
+			const { id } = request.user as IJwtAuthPayload || request.params as { id: string }
 
 			const response = await this.userService.getInfo(id);
 

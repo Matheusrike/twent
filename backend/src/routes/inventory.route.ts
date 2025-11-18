@@ -13,6 +13,10 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 		'/all',
 		{
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			schema: {
+				tags: ['Inventory'],
+				summary: 'Busca todos os inventários',
+			},
 		},
 		async (request, reply) => {
 			try {
@@ -39,6 +43,10 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/store',
 		{
+			schema: {
+				tags: ['Inventory'],
+				summary: 'Busca o inventário da loja',
+			},
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'STORE_MANAGER'],
@@ -70,7 +78,13 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 
 	app.post(
 		'/',
-		{ preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })] },
+		{
+			schema: {
+				tags: ['Inventory'],
+				summary: 'Cria um novo inventário',
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
 		async (request, reply) => {
 			try {
 				const newInventory =
@@ -95,53 +109,79 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 		},
 	);
 
-	app.patch('/add/:inventoryId', async (request, reply) => {
-		try {
-			const updatedInventory =
-				await inventoryController.addToInventory(request);
-			return new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Inventário atualizado com sucesso',
-				data: updatedInventory,
-			}).send(reply);
-		} catch (error) {
-			if (error instanceof HttpError) {
+	app.patch(
+		'/add/:inventoryId',
+		{
+			schema: {
+				tags: ['Inventory'],
+				summary: 'Adiciona um item ao inventário',
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				const updatedInventory =
+					await inventoryController.addToInventory(request);
 				return new ApiResponse({
-					statusCode: error.statusCode,
-					success: false,
-					message: error.message,
-					errorCode: error.errorCode,
+					statusCode: 200,
+					success: true,
+					message: 'Inventário atualizado com sucesso',
+					data: updatedInventory,
 				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
 			}
-		}
-	});
+		},
+	);
 
-	app.patch('/remove/:inventoryId', async (request, reply) => {
-		try {
-			const updatedInventory =
-				await inventoryController.removeFromInventory(request);
-			return new ApiResponse({
-				statusCode: 200,
-				success: true,
-				message: 'Inventário atualizado com sucesso',
-				data: updatedInventory,
-			}).send(reply);
-		} catch (error) {
-			if (error instanceof HttpError) {
+	app.patch(
+		'/remove/:inventoryId',
+		{
+			schema: {
+				tags: ['Inventory'],
+				summary: 'Remove um item ao inventário',
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
+		async (request, reply) => {
+			try {
+				const updatedInventory =
+					await inventoryController.removeFromInventory(request);
 				return new ApiResponse({
-					statusCode: error.statusCode,
-					success: false,
-					message: error.message,
-					errorCode: error.errorCode,
+					statusCode: 200,
+					success: true,
+					message: 'Inventário atualizado com sucesso',
+					data: updatedInventory,
 				}).send(reply);
+			} catch (error) {
+				if (error instanceof HttpError) {
+					return new ApiResponse({
+						statusCode: error.statusCode,
+						success: false,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
 			}
-		}
-	});
+		},
+	);
 
 	app.patch(
 		'/transaction/:productId',
-		{ preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })] },
+		{
+			schema: {
+				tags: ['Inventory'],
+				summary: 'Transação de inventário',
+			},
+			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+		},
 		async (request, reply) => {
 			try {
 				const updatedInventory =
