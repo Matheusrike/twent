@@ -32,7 +32,7 @@ export default async function RootLayout({
 }) {
   const token = getAuthToken();
 
-  console.log("TOKEN NO LAYOUT:", token);
+  console.log("TOKEN AUTENTICADO:", token);
 
   if (!token) {
     console.log("Nenhum token encontrado. Redirecionando…");

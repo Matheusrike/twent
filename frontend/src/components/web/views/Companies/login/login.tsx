@@ -50,7 +50,7 @@ const Login = () => {
   
       const response = await fetch("/response/api/auth/login", {
         method: "POST",
-        credentials: "include", // ESSENCIAL
+        credentials: "include", 
         headers: {
           "Content-Type": "application/json",
         },
