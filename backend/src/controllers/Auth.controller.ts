@@ -7,7 +7,7 @@ import { ILoginInput } from '@/types/authorization.types';
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-	async login(request: FastifyRequest, reply: FastifyReply) {
+	async login(request: FastifyRequest) {
 		try {
 			const { email, password } = request.body as ILoginInput;
 			const token = await this.authService.login({
@@ -15,20 +15,7 @@ export class AuthController {
 				password,
 			});
 
-			if (process.env.NODE_ENV === 'dev') {
-				return new ApiResponse({
-					message: 'Login realizado com sucesso',
-					data: { token },
-					success: true,
-					statusCode: 200,
-				}).send(reply.setCookie('auth_token', token, {}));
-			}
-
-			return new ApiResponse({
-				message: 'Login realizado com sucesso',
-				success: true,
-				statusCode: 200,
-			}).send(reply.setCookie('auth_token', token, {}));
+			return token;
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {

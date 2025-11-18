@@ -36,8 +36,12 @@ export async function authRoutes(app: fastifyTypedInstance) {
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
-				const response = await authController.login(request, reply);
-				response?.send(reply);
+				const token = await authController.login(request);
+				return new ApiResponse({
+                    success: true,
+                    statusCode: 200,
+                    message: 'Login realizado com sucesso',
+                }).send(reply.setCookie('token', token!));
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
