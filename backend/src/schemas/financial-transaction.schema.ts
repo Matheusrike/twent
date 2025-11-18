@@ -86,7 +86,7 @@ export const createFinancialTransactionSchema = z.object({
 			examples: ['SALE-2025-001', 'INV-123456'],
 		}),
 
-	transaction_date: z
+	transaction_date: z.iso
 		.date('Data deve estar no formato ISO 8601')
 		.transform((str) => new Date(str))
 		.meta({
@@ -134,9 +134,8 @@ export const updateFinancialTransactionSchema = z.object({
 		.max(255, 'ID de referência deve ter no máximo 255 caracteres')
 		.optional(),
 
-	transaction_date: z
-		.string()
-		.datetime('Data deve estar no formato ISO 8601')
+	transaction_date: z.iso
+		.date('Data deve estar no formato ISO 8601')
 		.transform((str) => new Date(str))
 		.optional(),
 });
