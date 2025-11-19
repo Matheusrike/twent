@@ -153,4 +153,17 @@ export function userRoute(app: fastifyTypedInstance) {
 			}
 		},
 	);
+
+    app.patch('/change-password', { preHandler: app.authorization() }, async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            
+        } catch (error) {
+            return new ApiResponse({
+                success: false,
+                statusCode: error.statusCode,
+                message: error.message,
+                errorCode: error.errorCode,
+            }).send(reply)
+        }
+    });
 }

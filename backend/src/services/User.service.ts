@@ -2,6 +2,8 @@ import { AppError } from '@/utils/errors.util';
 import { PrismaClient } from '@prisma/generated/client';
 import { CustomerQuerystring } from '@/schemas/customer.schema';
 import { EmployeeQuerystring } from '@/schemas/employee.schema';
+import bcrypt from 'bcryptjs';
+import { comparePassword } from '@/utils/password.util';
 
 export class UserService {
 	constructor(protected database: PrismaClient) {}
@@ -323,4 +325,36 @@ export class UserService {
 			});
 		}
 	}
+
+    async changePassword(id: string, password: string) {
+        try {
+            const user = await this.database.user.findUnique({
+                where: { id },
+            });
+            if (!user) {
+                throw new AppError({
+                    message: 'Usuário nao encontrado',
+                    errorCode: 'USER_NOT_FOUND',
+                });
+            }
+         
+            const isValid =  await comparePassword(password, user.password_hash);
+            if (!isValid) {
+                throw new AppError({
+                    message: 'Senha incorreta',
+                    errorCode: 'BAD_REQUEST',
+                });
+            }
+            const response = await this.database.user.update({
+                where: { id },
+                data: { password_hash: password },
+            });
+            return response;
+        } catch (error) {
+            throw new AppError({
+                message: error.message,
+                errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+            });
+        }
+    }
 }

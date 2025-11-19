@@ -65,4 +65,36 @@ export class UserController {
 			}
 		}
 	}
+
+    async changePassword(request: FastifyRequest) {
+        try {
+            const { id } = request.params as { id: string }
+            const { password } = request.body as { password: string }
+            const response = await this.userService.changePassword(id, password);
+            return response;
+        } catch (error) {
+            if (error instanceof AppError) {
+                switch (error.errorCode) {
+                    case 'USER_NOT_FOUND':
+                        throw new HttpError({
+                            message: error.message,
+                            errorCode: error.errorCode,
+                            statusCode: 404,
+                        });
+                    case 'NOT_FOUND':
+                        throw new HttpError({
+                            message: error.message,
+                            errorCode: error.errorCode,
+                            statusCode: 400,
+                        });
+                    default:
+                        throw new HttpError({
+                            message: 'Erro interno do servidor',
+                            errorCode: 'INTERNAL_SERVER_ERROR',
+                            statusCode: 500,
+                        });
+                }
+            }
+        }
+    }
 }
