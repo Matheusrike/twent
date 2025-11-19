@@ -8,6 +8,7 @@ import { fastifyHelmet } from '@fastify/helmet';
 import { jsonSchemaTransform } from 'fastify-type-provider-zod';
 import authorizationPlugin from './authorization.plugin';
 import type { IAppConfig } from '@/types/types';
+import fastifyCors from '@fastify/cors';
 
 export async function registerPlugins(
 	app: FastifyInstance,
@@ -23,8 +24,12 @@ export async function registerPlugins(
 		secret: config.jwtSecret,
 	});
 
+	await app.register(fastifyCors, {
+		origin: ['http://localhost:3000'],
+		credentials: true,
+	});
 
-    await app.register(fastifyHelmet);
+	await app.register(fastifyHelmet);
 
 	await app.register(authorizationPlugin);
 

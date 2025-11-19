@@ -38,10 +38,18 @@ export async function authRoutes(app: fastifyTypedInstance) {
 			try {
 				const token = await authController.login(request);
 				return new ApiResponse({
-                    success: true,
-                    statusCode: 200,
-                    message: 'Login realizado com sucesso',
-                }).send(reply.setCookie('token', token!));
+					success: true,
+					statusCode: 200,
+					message: 'Login realizado com sucesso',
+				}).send(
+					reply.setCookie('token', token as string, {
+						httpOnly: true,
+						secure: true,
+						sameSite: 'none',
+						path: '/',
+						maxAge: 60 * 60 * 24,
+					}),
+				);
 			} catch (error) {
 				return new ApiResponse({
 					success: false,
