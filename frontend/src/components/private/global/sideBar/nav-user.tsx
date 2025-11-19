@@ -36,7 +36,7 @@ export function NavUser({}) {
     first_name: "",
     last_name: "",
     email: "",
-    avatar: "",
+   
   });
 
   useEffect(() => {
@@ -49,13 +49,13 @@ export function NavUser({}) {
 
         if (!res.ok) return;
 
-        const data = await res.json();
+        const {data} = await res.json();
 
         setUser({
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
-          avatar: data.avatar,
+        
         });
       } catch (err) {
         console.error("Erro ao buscar dados do usuário", err);
@@ -96,13 +96,11 @@ export function NavUser({}) {
               className="group hover:bg-accent transition-all duration-200 data-[state=open]:bg-accent"
             >
               <Avatar className="h-9 w-9 rounded-full border-none transition-all duration-200">
-                {user.avatar ? (
-                  <AvatarImage src={user.avatar} alt="Avatar" />
-                ) : (
+          
                   <AvatarFallback className="rounded-xl bg-gradient-to-br from-red-500 to-red-700 text-white font-semibold">
-                    {(user.first_name[0] + user.last_name[0])}
+                  {(user?.first_name?.[0] ?? "") + (user?.last_name?.[0] ?? "")}
                   </AvatarFallback>
-                )}
+        
               </Avatar>
 
               <div className="flex flex-1 flex-col text-left">
@@ -127,13 +125,9 @@ export function NavUser({}) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-3 p-3 bg-accent/50 rounded-t-xl">
                 <Avatar className="h-12 w-12 rounded-full">
-                  {user.avatar ? (
-                    <AvatarImage src={user.avatar} alt="Avatar" />
-                  ) : (
                     <AvatarFallback className="rounded-xl bg-gradient-to-br from-red-500 to-red-700 text-white font-semibold text-base">
-                          {(user.first_name[0] + user.last_name[0])}
+                    {(user?.first_name?.[0] ?? "") + (user?.last_name?.[0] ?? "")}
                     </AvatarFallback>
-                  )}
                 </Avatar>
 
                 <div className="flex flex-1 flex-col min-w-0">
