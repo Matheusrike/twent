@@ -177,6 +177,11 @@ export class UserService {
                                 },
                             },
                         },
+						store: {
+							select: {
+								name: true
+							}
+						}
                     }
                 });
                 if (!profile) {

@@ -33,6 +33,9 @@ export const getUserInfoResponse = ApiResponseSchema.extend({
 		is_active: z.boolean(),
 		created_at: z.coerce.date(),
 		updated_at: z.coerce.date(),
+		store: z.object({
+			name: z.string(),
+		}).optional().nullable(),
 		employee: z
 			.object({
 				position: z.string(),
