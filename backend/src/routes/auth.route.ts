@@ -88,6 +88,28 @@ export async function authRoutes(app: fastifyTypedInstance) {
 			}
 		},
 	);
+    	app.patch(
+			'/change-password',
+			{ preHandler: app.authorization() },
+			async (request: FastifyRequest, reply: FastifyReply) => {
+				try {
+					await authController.changePassword(request);
+
+					return new ApiResponse({
+						success: true,
+						statusCode: 200,
+						message: 'Senha alterada com sucesso',
+					}).send(reply);
+				} catch (error) {
+					return new ApiResponse({
+						success: false,
+						statusCode: error.statusCode,
+						message: error.message,
+						errorCode: error.errorCode,
+					}).send(reply);
+				}
+			},
+		);
 
 	return app;
 }

@@ -6,6 +6,7 @@ import type {
 } from '@/types/authorization.types';
 import { AppError } from '@/utils/errors.util';
 import bcrypt from 'bcryptjs';
+import { comparePassword, validatePassword } from '@/utils/password.util';
 
 export class AuthService {
 	constructor(
@@ -79,5 +80,39 @@ export class AuthService {
 		};
 
 		return this.jwtProvider.sign(token, { expiresIn: '1d' });
+	}
+	async changePassword(id: string, password: string, newPassword: string) {
+		try {
+			const user = await this.database.user.findUnique({
+				where: { id },
+			});
+			if (!user) {
+				throw new AppError({
+					message: 'Usuário nao encontrado',
+					errorCode: 'USER_NOT_FOUND',
+				});
+			}
+
+			const isValid = await comparePassword(password, user.password_hash);
+			if (!isValid) {
+				throw new AppError({
+					message: 'Senha incorreta',
+					errorCode: 'BAD_REQUEST',
+				});
+			}
+
+			const hashedPassword = await validatePassword(newPassword);
+			await this.database.user.update({
+				where: { id },
+				data: { password_hash: hashedPassword },
+			});
+			return;
+		} catch (error) {
+			console.log(error);
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
 	}
 }

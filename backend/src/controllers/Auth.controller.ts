@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthService } from '@/services/Auth.service';
 import { ApiResponse } from '@/utils/api-response.util';
 import { AppError, HttpError } from '@/utils/errors.util';
-import { ILoginInput } from '@/types/authorization.types';
+import { IJwtAuthPayload, ILoginInput } from '@/types/authorization.types';
 
 export class AuthController {
 	constructor(private authService: AuthService) {}
@@ -57,5 +57,52 @@ export class AuthController {
 			success: true,
 			statusCode: 200,
 		});
+	}
+	async changePassword(request: FastifyRequest) {
+		try {
+			const { id } = request.user as IJwtAuthPayload;
+			const { password, newPassword } = request.body as {
+				password: string;
+				newPassword: string;
+			};
+			if (password === newPassword) {
+				throw new HttpError({
+					message: 'A nova senha deve ser diferente da senha atual',
+					errorCode: 'BAD_REQUEST',
+					statusCode: 400,
+				});
+			}
+			await this.authService.changePassword(id, password, newPassword);
+			return;
+		} catch (error) {
+			if (error instanceof AppError) {
+				switch (error.errorCode) {
+					case 'USER_NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 400,
+						});
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 400,
+						});
+					default:
+						throw new HttpError({
+							message: 'Erro interno do servidor',
+							errorCode: 'INTERNAL_SERVER_ERROR',
+							statusCode: 500,
+						});
+				}
+			}
+		}
 	}
 }
