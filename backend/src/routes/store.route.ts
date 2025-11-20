@@ -5,6 +5,7 @@ import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import {
 	createStoreSchema,
+	StoreBadRequestSchema,
 	StoreChangeStatusResponseSchema,
 	StoreConflictSchema,
 	StoreGetResponseSchema,
