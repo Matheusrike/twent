@@ -40,17 +40,21 @@ export class CashRegisterController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 400,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
-			throw new HttpError({
-				message: error.message,
-				statusCode: 500,
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
@@ -62,11 +66,20 @@ export class CashRegisterController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
 		}
 	}
@@ -78,11 +91,20 @@ export class CashRegisterController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
 		}
 	}
@@ -95,7 +117,7 @@ export class CashRegisterController {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
-					statusCode: 400,
+					statusCode: 500,
 					errorCode: error.errorCode,
 				});
 			}
@@ -117,7 +139,7 @@ export class CashRegisterController {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
-					statusCode: 400,
+					statusCode: 500,
 					errorCode: error.errorCode,
 				});
 			}
@@ -163,7 +185,7 @@ export class CashRegisterController {
 			const { closing_amount } = request.body as {
 				closing_amount: number;
 			};
-            
+
 			const response = await this.cashRegisterService.closeSession(
 				cash_register_id,
 				closing_amount,
@@ -171,17 +193,21 @@ export class CashRegisterController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
-			throw new HttpError({
-				message: error.message,
-				statusCode: 500,
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 }

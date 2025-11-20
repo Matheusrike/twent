@@ -77,6 +77,12 @@ export class CashRegisterService {
 			});
 			return response;
 		} catch (error) {
+             if (error.code === 'P2025') {
+					throw new AppError({
+						message: 'Caixa nao encontrado',
+						errorCode: 'NOT_FOUND',
+					});
+				}
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
