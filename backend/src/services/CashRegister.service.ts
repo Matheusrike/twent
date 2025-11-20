@@ -53,12 +53,12 @@ export class CashRegisterService {
 			});
 			return response;
 		} catch (error) {
-            if (error.code === 'P2025') {
-                throw new AppError({
-                    message: "Caixa nao encontrado",
-                    errorCode: 'NOT_FOUND',
-                });
-            }
+			if (error.code === 'P2025') {
+				throw new AppError({
+					message: 'Caixa nao encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -77,12 +77,12 @@ export class CashRegisterService {
 			});
 			return response;
 		} catch (error) {
-             if (error.code === 'P2025') {
-					throw new AppError({
-						message: 'Caixa nao encontrado',
-						errorCode: 'NOT_FOUND',
-					});
-				}
+			if (error.code === 'P2025') {
+				throw new AppError({
+					message: 'Caixa nao encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -103,6 +103,7 @@ export class CashRegisterService {
 					},
 					user: {
 						select: {
+                            id: true,
 							first_name: true,
 							last_name: true,
 						},
@@ -154,6 +155,23 @@ export class CashRegisterService {
 
 	async openSession(cash_register_id: string, user_id: string) {
 		try {
+			const cashRegister = await this.database.cashRegister.findUnique({
+				where: { id: cash_register_id },
+			});
+
+			if (!cashRegister) {
+				throw new AppError({
+					message: 'Caixa não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+
+			if (cashRegister.is_active === false) {
+				throw new AppError({
+					message: 'Caixa não ativo',
+					errorCode: 'CONFLICT',
+				});
+			}
 			const alreadyOpenSession =
 				await this.database.cashSession.findFirst({
 					where: { cash_register_id, status: 'OPEN' },
@@ -176,9 +194,22 @@ export class CashRegisterService {
 						(pastCashSession?.closing_amount as Decimal) || 0,
 					status: 'OPEN',
 				},
+                select: {
+                    id: true,
+                    cash_register_id: true,
+                    user_id: true,
+                    opening_amount: true,
+                    opened_at: true
+                }
 			});
 			return response;
 		} catch (error) {
+			if (error.code === 'P2003') {
+				throw new AppError({
+					message: 'Caixa nao encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -186,7 +217,7 @@ export class CashRegisterService {
 		}
 	}
 
-	async closeSession(sessionId: string, reportedClosingAmount: number) {
+	async closeSession(sessionId: string) {
 		try {
 			const session = await this.database.cashSession.findUnique({
 				where: { id: sessionId },
@@ -211,24 +242,24 @@ export class CashRegisterService {
 				0,
 			);
 
-			const expectedClosing =
+			const closing_amount =
 				Number(session.opening_amount) + totalCashSales;
-			const difference = reportedClosingAmount - expectedClosing;
 
 			const closedSession = await this.database.cashSession.update({
 				where: { id: sessionId },
 				data: {
-					closing_amount: reportedClosingAmount,
+					closing_amount,
 					closed_at: new Date(),
 					status: 'CLOSED',
 				},
+                omit: {
+                    status: true
+                }
 			});
 
 			return {
 				...closedSession,
 				totalCashSales,
-				expectedClosing,
-				difference,
 			};
 		} catch (error) {
 			throw new AppError({
