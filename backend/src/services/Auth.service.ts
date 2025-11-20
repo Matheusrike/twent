@@ -89,7 +89,7 @@ export class AuthService {
 			if (!user) {
 				throw new AppError({
 					message: 'Usuário nao encontrado',
-					errorCode: 'USER_NOT_FOUND',
+					errorCode: 'NOT_FOUND',
 				});
 			}
 
@@ -97,7 +97,7 @@ export class AuthService {
 			if (!isValid) {
 				throw new AppError({
 					message: 'Senha incorreta',
-					errorCode: 'BAD_REQUEST',
+					errorCode: 'UNAUTHORIZED',
 				});
 			}
 
@@ -108,7 +108,6 @@ export class AuthService {
 			});
 			return;
 		} catch (error) {
-			console.log(error);
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',

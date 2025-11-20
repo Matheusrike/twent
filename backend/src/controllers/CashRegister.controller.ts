@@ -17,7 +17,7 @@ export class CashRegisterController {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
-					statusCode: 400,
+					statusCode: 500,
 					errorCode: error.errorCode,
 				});
 			}

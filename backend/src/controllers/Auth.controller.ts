@@ -66,10 +66,9 @@ export class AuthController {
 				newPassword: string;
 			};
 			if (password === newPassword) {
-				throw new HttpError({
+				throw new AppError({
 					message: 'A nova senha deve ser diferente da senha atual',
 					errorCode: 'BAD_REQUEST',
-					statusCode: 400,
 				});
 			}
 			await this.authService.changePassword(id, password, newPassword);
@@ -77,17 +76,17 @@ export class AuthController {
 		} catch (error) {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
-					case 'USER_NOT_FOUND':
+					case 'NOT_FOUND':
 						throw new HttpError({
 							message: error.message,
 							errorCode: error.errorCode,
 							statusCode: 404,
 						});
-					case 'NOT_FOUND':
+					case 'UNAUTHORIZED':
 						throw new HttpError({
 							message: error.message,
 							errorCode: error.errorCode,
-							statusCode: 400,
+							statusCode: 401,
 						});
 					case 'BAD_REQUEST':
 						throw new HttpError({

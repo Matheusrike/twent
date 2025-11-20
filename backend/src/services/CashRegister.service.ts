@@ -46,9 +46,19 @@ export class CashRegisterService {
 			const response = await this.database.cashRegister.update({
 				where: { id },
 				data: { is_active: true },
+				select: {
+					name: true,
+					is_active: true,
+				},
 			});
 			return response;
 		} catch (error) {
+            if (error.code === 'P2025') {
+                throw new AppError({
+                    message: "Caixa nao encontrado",
+                    errorCode: 'NOT_FOUND',
+                });
+            }
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -60,6 +70,10 @@ export class CashRegisterService {
 			const response = await this.database.cashRegister.update({
 				where: { id },
 				data: { is_active: false },
+				select: {
+					name: true,
+					is_active: true,
+				},
 			});
 			return response;
 		} catch (error) {
@@ -118,9 +132,9 @@ export class CashRegisterService {
 						},
 					},
 					opening_amount: true,
-                    closing_amount: true,
+					closing_amount: true,
 					opened_at: true,
-                    closed_at: true,
+					closed_at: true,
 				},
 			});
 			return response;
