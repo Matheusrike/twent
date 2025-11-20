@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { StoreType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
+import { BadRequestResponseSchema, ConflictResponseSchema, NotFoundResponseSchema } from './generic.schema';
 
 export const isoCountries = [
 	'BR',
@@ -345,20 +346,14 @@ export const StoreChangeStatusResponseSchema = ApiResponseSchema.extend({
 		.string()
 		.meta({ examples: ['Status da loja alterado com sucesso'] }),
 });
-export const StoreNotFoundSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const StoreNotFoundSchema = NotFoundResponseSchema.extend({
 	message: z.string().meta({ examples: ['Loja nao encontrada'] }),
-	errorCode: z.string().meta({ examples: ['STORE_NOT_FOUND'] }),
 });
 
-export const StoreBadRequestSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const StoreBadRequestSchema = BadRequestResponseSchema.extend({
 	message: z.string().meta({ examples: ['Dados da loja inválidos'] }),
-	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
 });
 
-export const StoreConflictSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const StoreConflictSchema = ConflictResponseSchema.extend({
 	message: z.string().meta({ examples: ['Dados da loja conflitantes'] }),
-	errorCode: z.string().meta({ examples: ['STORE_CONFLICT'] }),
 });

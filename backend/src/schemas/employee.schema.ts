@@ -160,7 +160,11 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 	data: z
 		.array(
 			z.object({
-				id: z.uuid().meta({ examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'] }),
+				id: z
+					.uuid()
+					.meta({
+						examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+					}),
 				email: z
 					.email()
 					.meta({ examples: ['oliver.smith@example.com'] }),
@@ -293,10 +297,4 @@ export const EmployeePutResponseSchema = z.object({
 	message: z
 		.string()
 		.meta({ examples: ['Funcionário atualizado com sucesso'] }),
-});
-
-export const EmployeeBadRequestSchema = z.object({
-	success: z.literal(false),
-	message: z.string().meta({ examples: ['Dados do funcionário inválidos'] }),
-	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
 });
