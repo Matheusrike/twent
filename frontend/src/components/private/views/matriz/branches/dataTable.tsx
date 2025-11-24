@@ -45,44 +45,47 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { useEffect, useState } from "react";
+
 export type Branch = {
   id: string;
-  nome: string;
-  cidade: string;
-  cnpj: string;
-  status: "ativa" | "inativa";
+  name: string;
+  city: string;
+  code: string;
+  is_active: true | false;
 };
 
-const branches: Branch[] = [
-  {
-    id: "1",
-    nome: "Filial Itaquera",
-    cidade: "São Paulo",
-    cnpj: "12.345.678/0001-00",
-    status: "ativa",
-  },
-  {
-    id: "2",
-    nome: "Filial Mooca",
-    cidade: "São Paulo",
-    cnpj: "98.765.432/0001-00",
-    status: "inativa",
-  },
-  {
-    id: "3",
-    nome: "Filial Santos",
-    cidade: "Santos",
-    cnpj: "11.222.333/0001-44",
-    status: "ativa",
-  },
-  {
-    id: "4",
-    nome: "Filial Guarulhos",
-    cidade: "Guarulhos",
-    cnpj: "77.888.999/0001-22",
-    status: "ativa",
-  },
-];
+// Dados mockados (caso a API falhe)
+// const mockBranches: Branch[] = [
+//   {
+//     id: "1",
+//     name: "Filial Itaquera",
+//     city: "São Paulo",
+//     code: "12.345.678/0001-00",
+//     status: "ativa",
+//   },
+//   {
+//     id: "2",
+//     name: "Filial Mooca",
+//     city: "São Paulo",
+//     code: "98.765.432/0001-00",
+//     status: "inativa",
+//   },
+//   {
+//     id: "3",
+//     name: "Filial Santos",
+//     city: "Santos",
+//     code: "11.222.333/0001-44",
+//     status: "ativa",
+//   },
+//   {
+//     id: "4",
+//     name: "Filial Guarulhos",
+//     city: "Guarulhos",
+//     code: "77.888.999/0001-22",
+//     status: "ativa",
+//   },
+// ];
 
 export const columns: ColumnDef<Branch>[] = [
   {
@@ -100,7 +103,7 @@ export const columns: ColumnDef<Branch>[] = [
     cell: ({ row }) => <div className="font-medium">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "nome",
+    accessorKey: "name",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -112,33 +115,34 @@ export const columns: ColumnDef<Branch>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("nome")}</div>
+      <div className="font-medium">{row.getValue("name")}</div>
     ),
   },
   {
-    accessorKey: "cidade",
+    accessorKey: "city",
     header: "Cidade",
-    cell: ({ row }) => <div>{row.getValue("cidade")}</div>,
+    cell: ({ row }) => <div>{row.getValue("city")}</div>,
   },
   {
-    accessorKey: "cnpj",
+    accessorKey: "code",
     header: "CNPJ",
     cell: ({ row }) => (
-      <div className="font-mono text-xs">{row.getValue("cnpj")}</div>
+      <div className="font-mono text-xs">{row.getValue("code")}</div>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "is_active",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as Branch["status"];
+      const status = row.getValue("is_active") as Branch["is_active"];
+      console.log(status)
       return (
         <div className="flex justify-center">
           <Badge
-            variant={status === "ativa" ? "default" : "secondary"}
+            variant={status === true ? "default" : "secondary"}
             className="w-24 justify-center"
           >
-            {status === "ativa" ? (
+            {status === true? (
               <div className="flex items-center gap-1">
                 <CheckCircle2 className="h-4 w-4 text-white" />
                 Ativa
@@ -171,12 +175,12 @@ export const columns: ColumnDef<Branch>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="flex items-center gap-2"
-              onClick={() => navigator.clipboard.writeText(filial.cnpj)}
+              onClick={() => navigator.clipboard.writeText(filial.code)}
             >
               <Pencil className="h-4 w-4" /> Copiar CNPJ
             </DropdownMenuItem>
             <DropdownMenuItem className="flex items-center gap-2">
-              <Eye className="h-4 w-4" /> Vizualizar
+              <Eye className="h-4 w-4" /> Visualizar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -186,25 +190,62 @@ export const columns: ColumnDef<Branch>[] = [
 ];
 
 export function BranchesTable() {
+  const [branches, setBranches] = useState<Branch[] >([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  useEffect(() => {
+    async function fetchBranches() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch("/response/api/store", {
+          method: "GET",
+          credentials: "include",
+        });
+        
+        console.log("Status da API:", response.status)
+
+        if (!response.ok) {
+          throw new Error(`Erro: ${response.status}`);
+        }
+
+        const {data} = await response.json();
+        console.log(data);
+        setBranches(data);
+      }  catch (error: any) {
+        console.error("Erro ao buscar filiais:", error);
+        setError(error.message);
+        // setBranches(mockBranches);
+      }
+      
+       finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBranches();
+    
+  }, []);
+  
+
   const filterValue =
-    (columnFilters.find((f) => f.id === "nome")?.value as string) ?? "";
+    (columnFilters.find((f) => f.id === "name")?.value as string) ?? "";
 
   const filteredData = React.useMemo(() => {
     return branches.filter(
       (branch) =>
-        branch.nome.toLowerCase().includes(filterValue.toLowerCase()) ||
+        branch.name.toLowerCase().includes(filterValue.toLowerCase()) ||
         branch.id.toLowerCase().includes(filterValue.toLowerCase()) ||
-        branch.cnpj.toLowerCase().includes(filterValue.toLowerCase())
+        branch.code.toLowerCase().includes(filterValue.toLowerCase())
     );
-  }, [filterValue]);
+  }, [filterValue, branches]);
 
   const table = useReactTable({
     data: filteredData,
@@ -224,15 +265,23 @@ export function BranchesTable() {
       rowSelection,
     },
   });
+  
 
   return (
+    
     <div className="w-full">
+      {error && (
+        <div className="mb-4 p-2 bg-yellow-100 text-yellow-800 rounded">
+          {error}
+        </div>
+      )}
+      
       <div className="flex items-center py-4">
         <Input
           placeholder="Buscar por nome..."
           value={filterValue}
           onChange={(event) =>
-            table.getColumn("nome")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -256,16 +305,13 @@ export function BranchesTable() {
                   {column.id}
                 </DropdownMenuCheckboxItem>
               ))}
-
-            
           </DropdownMenuContent>
         </DropdownMenu>
         <Button variant="default" className="ml-2 flex items-center gap-2">
-              <Plus className="h-4 w-4" /> Novo
-            </Button>
+          <Plus className="h-4 w-4" /> Novo
+        </Button>
       </div>
 
-      {/* Table */}
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -275,9 +321,9 @@ export function BranchesTable() {
                   <TableHead
                     key={header.id}
                     className={
-                      header.id === "nome" ||
-                      header.id === "cidade" ||
-                      header.id === "cnpj"
+                      header.id === "name" ||
+                      header.id === "city" ||
+                      header.id === "code"
                         ? "text-left"
                         : "text-center"
                     }
@@ -294,16 +340,22 @@ export function BranchesTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Carregando...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={
-                        cell.column.id === "nome" ||
-                        cell.column.id === "cidade" ||
-                        cell.column.id === "cnpj"
+                        cell.column.id === "name" ||
+                        cell.column.id === "city" ||
+                        cell.column.id === "code"
                           ? "text-left"
                           : "text-center"
                       }
