@@ -29,7 +29,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Busca todos os caixas da loja',
 				responses: {
 					200: CashRegisterGetResponseSchema,
@@ -65,7 +65,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Cria um novo caixa',
 				responses: {
 					201: CashRegisterPostResponseSchema,
@@ -101,7 +101,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/:id/activate',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Ativa o caixa',
 				params: CashRegisterParamsSchema,
 				responses: {
@@ -137,7 +137,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/:id/deactivate',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Desativa o caixa',
 				params: CashRegisterParamsSchema,
 				responses: {
@@ -176,7 +176,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/sessions/open',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Busca caixas com sessões abertas',
 				responses: {
 					200: CashSessionGetResponseSchema,
@@ -211,7 +211,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/sessions/closed',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Busca sessões fechadas de caixas',
 				querystring: CashSessionQueryStringSchema,
 				responses: {
@@ -248,7 +248,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/:id/open',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Abre uma sessão de caixa',
 				params: CashRegisterParamsSchema,
 				responses: {
@@ -285,7 +285,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		'/:id/close',
 		{
 			schema: {
-				tags: ['CashRegister'],
+				tags: ['Cash Register'],
 				summary: 'Fecha a sessão de caixa',
 				params: CashRegisterParamsSchema,
 				responses: {

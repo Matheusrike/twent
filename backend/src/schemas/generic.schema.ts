@@ -8,6 +8,15 @@ export const UuidSchema = z.object({
 	}),
 });
 
+export const PaginationSchema = z.object({
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean(),
+});
+
 export const BadRequestResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(false),
 	message: z.string().meta({ examples: ['Informações inválidas'] }),

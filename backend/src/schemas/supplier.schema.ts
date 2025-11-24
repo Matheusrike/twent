@@ -1,14 +1,18 @@
 import { z } from 'zod';
+import { PaginationSchema } from './generic.schema';
+import { ApiResponseSchema } from './api-response.schema';
 
-export interface ISupplierFilters {
-	name?: string;
-	email?: string;
-	contact_name?: string;
-	city?: string;
-	state?: string;
-	country?: string;
-	is_active?: boolean;
-}
+export const SupplierFiltersSchema = z.object({
+	name: z.string().optional(),
+	email: z.string().optional(),
+	contact_name: z.string().optional(),
+	city: z.string().optional(),
+	state: z.string().optional(),
+	country: z.string().optional(),
+	is_active: z.boolean().optional(),
+});
+
+export type SupplierFilters = z.infer<typeof SupplierFiltersSchema>;
 
 export const createSupplierSchema = z.object({
 	name: z
@@ -201,3 +205,36 @@ export const updateSupplierSchema = z.object({
 
 export type CreateSupplierType = z.infer<typeof createSupplierSchema>;
 export type UpdateSupplierType = z.infer<typeof updateSupplierSchema>;
+
+export const SupplierGetResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true),
+	message: z
+		.string()
+		.meta({ examples: ['Informações dos fornecedores encontradas'] }),
+	data: z.object({
+		suppliers: z.array(
+			z.object({
+				id: z.uuid(),
+				name: z.string(),
+				contact_name: z.string(),
+				email: z.email(),
+				phone: z.string(),
+				document_number: z.string(),
+				street: z.string(),
+				number: z.string(),
+				district: z.string(),
+				city: z.string(),
+				state: z.string(),
+				zip_code: z.string(),
+				country: z.string(),
+				is_active: z.boolean(),
+				created_at: z.coerce.date(),
+				updated_at: z.coerce.date(),
+				_count: z.object({
+					financial_transactions: z.number(),
+				}),
+			}),
+		),
+		pagination: PaginationSchema,
+	}),
+});

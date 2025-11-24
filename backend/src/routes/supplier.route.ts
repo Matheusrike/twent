@@ -3,6 +3,8 @@ import { SupplierController } from '@/controllers/Supplier.controller';
 import { SupplierService } from '@/services/Supplier.service';
 import {
 	createSupplierSchema,
+	SupplierFiltersSchema,
+	SupplierGetResponseSchema,
 	updateSupplierSchema,
 } from '@/schemas/supplier.schema';
 import prisma from '@prisma/client';
@@ -17,7 +19,12 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 		'/',
 		{
 			schema: {
+                tags: ['Supplier'],
+                summary: 'Cria um novo fornecedor',
 				body: createSupplierSchema,
+                response : {
+
+                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
@@ -46,6 +53,14 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Busca todos os fornecedores',
+                querystring: SupplierFiltersSchema,
+                response: {
+                    200:SupplierGetResponseSchema
+                }
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
