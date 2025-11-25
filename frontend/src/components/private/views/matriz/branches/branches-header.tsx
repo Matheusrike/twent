@@ -50,7 +50,6 @@ export function BranchesHeader() {
     fetchBranches();
   }, []);
 
-  // Contagem dinâmica
   const activeCount = branches.filter((b) => b.is_active).length;
   const inactiveCount = branches.filter((b) => !b.is_active).length;
 

@@ -1,5 +1,5 @@
 "use client";
-
+import CreateModal from "./form-modals/create-modal";
 import * as React from "react";
 import {
   ColumnDef,
@@ -47,6 +47,8 @@ import {
 } from "@/components/ui/table";
 
 import { useEffect, useState } from "react";
+
+
 
 export type Branch = {
   id: string;
@@ -177,7 +179,7 @@ export function BranchesTable() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+const [modalOpen, setModalOpen] = useState(false)
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -186,33 +188,34 @@ export function BranchesTable() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  useEffect(() => {
-    async function fetchBranches() {
-      try {
-        setLoading(true);
-        setError(null);
+  
+  const fetchBranches = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const response = await fetch("/response/api/store", {
-          method: "GET",
-          credentials: "include",
-        });
+      const response = await fetch("/response/api/store", {
+        method: "GET",
+        credentials: "include",
+      });
 
-        if (!response.ok) {
-          throw new Error(`Erro: ${response.status}`);
-        }
-
-        const { data } = await response.json();
-        setBranches(data);
-      } catch (error: any) {
-        console.error("Erro ao buscar filiais:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(`Erro: ${response.status}`);
       }
-    }
 
-    fetchBranches();
+      const { data } = await response.json();
+      setBranches(data);
+    } catch (error: any) {
+      console.error("Erro ao buscar filiais:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchBranches();
+  }, [fetchBranches]);
 
   const filterValue =
     (columnFilters.find((f) => f.id === "name")?.value as string) ?? "";
@@ -290,7 +293,11 @@ export function BranchesTable() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="default" className="ml-2 flex items-center gap-2">
+        <Button
+          variant="default"
+          className="ml-2 flex items-center gap-2"
+          onClick={() => setModalOpen(true)}
+        >
           <Plus className="h-4 w-4" /> Novo
         </Button>
       </div>
@@ -387,6 +394,14 @@ export function BranchesTable() {
           Próximo
         </Button>
       </div>
+
+      <CreateModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onCreated={fetchBranches} 
+      />
     </div>
+
+    
   );
 }
