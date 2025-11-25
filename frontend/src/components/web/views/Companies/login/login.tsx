@@ -51,37 +51,42 @@ const Login = () => {
 
   // Handle form submission
   const onSubmit = async (data: FormData) => {
-    try {
-      setIsLoading(true);
+  try {
+    setIsLoading(true);
 
-      const response = await fetch("/response/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    const response = await fetch("/response/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => null);
-        const message =
-          err?.message || "Credenciais inválidas. Verifique seu email e senha.";
+    const result = await response.json().catch(() => null);
 
-        form.setError("root", { message });
-        return;
-      }
-
-      // Redirect after login
-      router.push("/matriz/dashboard");
-    } catch (error) {
-      // Connection error fallback
-      form.setError("root", {
-        message: "Erro de conexão. Tente novamente mais tarde.",
-      });
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      const message =
+        result?.message || "Credenciais inválidas. Verifique seu email e senha.";
+      form.setError("root", { message });
+      return;
     }
-  };
+
+
+    if (!result?.token) {
+      form.setError("root", { message: "Login falhou: token não recebido." });
+      return;
+    }
+
+    router.push("/matriz/dashboard");
+  } catch (error) {
+    form.setError("root", {
+      message: "Erro de conexão. Tente novamente mais tarde.",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex flex-col">

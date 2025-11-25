@@ -36,6 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import {
   Table,
   TableBody,
@@ -50,58 +51,29 @@ import { useEffect, useState } from "react";
 export type Branch = {
   id: string;
   name: string;
-  city: string;
   code: string;
-  is_active: true | false;
+  zip_code: string;
+  country: string;
+  email: string;
+  is_active: boolean;
 };
-
-// Dados mockados (caso a API falhe)
-// const mockBranches: Branch[] = [
-//   {
-//     id: "1",
-//     name: "Filial Itaquera",
-//     city: "São Paulo",
-//     code: "12.345.678/0001-00",
-//     status: "ativa",
-//   },
-//   {
-//     id: "2",
-//     name: "Filial Mooca",
-//     city: "São Paulo",
-//     code: "98.765.432/0001-00",
-//     status: "inativa",
-//   },
-//   {
-//     id: "3",
-//     name: "Filial Santos",
-//     city: "Santos",
-//     code: "11.222.333/0001-44",
-//     status: "ativa",
-//   },
-//   {
-//     id: "4",
-//     name: "Filial Guarulhos",
-//     city: "Guarulhos",
-//     code: "77.888.999/0001-22",
-//     status: "ativa",
-//   },
-// ];
 
 export const columns: ColumnDef<Branch>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "code",
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="text-left"
       >
-        ID
+        Código
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="font-medium">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="font-medium">{row.getValue("code")}</div>,
   },
+
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -118,31 +90,40 @@ export const columns: ColumnDef<Branch>[] = [
       <div className="font-medium">{row.getValue("name")}</div>
     ),
   },
+
   {
-    accessorKey: "city",
-    header: "Cidade",
-    cell: ({ row }) => <div>{row.getValue("city")}</div>,
+    accessorKey: "country",
+    header: "País",
+    cell: ({ row }) => <div>{row.getValue("country")}</div>,
   },
+
   {
-    accessorKey: "code",
-    header: "CNPJ",
+    accessorKey: "zip_code",
+    header: "ZIP Code",
     cell: ({ row }) => (
-      <div className="font-mono text-xs">{row.getValue("code")}</div>
+      <div className="font-mono text-xs">{row.getValue("zip_code")}</div>
     ),
   },
+
+  {
+    accessorKey: "email",
+    header: "E-mail",
+    cell: ({ row }) => <div className="text-xs">{row.getValue("email")}</div>,
+  },
+
   {
     accessorKey: "is_active",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("is_active") as Branch["is_active"];
-      console.log(status)
+      const status = row.getValue("is_active") as boolean;
+
       return (
         <div className="flex justify-center">
           <Badge
-            variant={status === true ? "default" : "secondary"}
+            variant={status ? "default" : "secondary"}
             className="w-24 justify-center"
           >
-            {status === true? (
+            {status ? (
               <div className="flex items-center gap-1">
                 <CheckCircle2 className="h-4 w-4 text-white" />
                 Ativa
@@ -158,6 +139,7 @@ export const columns: ColumnDef<Branch>[] = [
       );
     },
   },
+
   {
     id: "actions",
     header: "Ações",
@@ -173,12 +155,14 @@ export const columns: ColumnDef<Branch>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Ações</DropdownMenuLabel>
             <DropdownMenuSeparator />
+
             <DropdownMenuItem
               className="flex items-center gap-2"
-              onClick={() => navigator.clipboard.writeText(filial.code)}
+              onClick={() => navigator.clipboard.writeText(filial.email)}
             >
-              <Pencil className="h-4 w-4" /> Copiar CNPJ
+              <Pencil className="h-4 w-4" /> Copiar Email
             </DropdownMenuItem>
+
             <DropdownMenuItem className="flex items-center gap-2">
               <Eye className="h-4 w-4" /> Visualizar
             </DropdownMenuItem>
@@ -190,13 +174,16 @@ export const columns: ColumnDef<Branch>[] = [
 ];
 
 export function BranchesTable() {
-  const [branches, setBranches] = useState<Branch[] >([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   useEffect(() => {
@@ -209,41 +196,36 @@ export function BranchesTable() {
           method: "GET",
           credentials: "include",
         });
-        
-        console.log("Status da API:", response.status)
 
         if (!response.ok) {
           throw new Error(`Erro: ${response.status}`);
         }
 
-        const {data} = await response.json();
-        console.log(data);
+        const { data } = await response.json();
         setBranches(data);
-      }  catch (error: any) {
+      } catch (error: any) {
         console.error("Erro ao buscar filiais:", error);
         setError(error.message);
-        // setBranches(mockBranches);
-      }
-      
-       finally {
+      } finally {
         setLoading(false);
       }
     }
 
     fetchBranches();
-    
   }, []);
-  
 
   const filterValue =
     (columnFilters.find((f) => f.id === "name")?.value as string) ?? "";
 
   const filteredData = React.useMemo(() => {
+    const term = filterValue.toLowerCase();
+
     return branches.filter(
       (branch) =>
-        branch.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-        branch.id.toLowerCase().includes(filterValue.toLowerCase()) ||
-        branch.code.toLowerCase().includes(filterValue.toLowerCase())
+        branch.name.toLowerCase().includes(term) ||
+        branch.code.toLowerCase().includes(term) ||
+        branch.zip_code.toLowerCase().includes(term) ||
+        branch.email.toLowerCase().includes(term)
     );
   }, [filterValue, branches]);
 
@@ -265,32 +247,32 @@ export function BranchesTable() {
       rowSelection,
     },
   });
-  
 
   return (
-    
     <div className="w-full">
       {error && (
         <div className="mb-4 p-2 bg-yellow-100 text-yellow-800 rounded">
           {error}
         </div>
       )}
-      
+
       <div className="flex items-center py-4">
         <Input
-          placeholder="Buscar por nome..."
+          placeholder="Buscar por nome ou código..."
           value={filterValue}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
+
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          {/* <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Colunas <ChevronDown />
             </Button>
-          </DropdownMenuTrigger>
+          </DropdownMenuTrigger> */}
+
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
@@ -307,6 +289,7 @@ export function BranchesTable() {
               ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
         <Button variant="default" className="ml-2 flex items-center gap-2">
           <Plus className="h-4 w-4" /> Novo
         </Button>
@@ -322,8 +305,9 @@ export function BranchesTable() {
                     key={header.id}
                     className={
                       header.id === "name" ||
-                      header.id === "city" ||
-                      header.id === "code"
+                      header.id === "country" ||
+                      header.id === "zip_code" ||
+                      header.id === "email"
                         ? "text-left"
                         : "text-center"
                     }
@@ -339,6 +323,7 @@ export function BranchesTable() {
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {loading ? (
               <TableRow>
@@ -354,8 +339,9 @@ export function BranchesTable() {
                       key={cell.id}
                       className={
                         cell.column.id === "name" ||
-                        cell.column.id === "city" ||
-                        cell.column.id === "code"
+                        cell.column.id === "country" ||
+                        cell.column.id === "zip_code" ||
+                        cell.column.id === "email"
                           ? "text-left"
                           : "text-center"
                       }
@@ -391,6 +377,7 @@ export function BranchesTable() {
         >
           Anterior
         </Button>
+
         <Button
           variant="outline"
           size="sm"
