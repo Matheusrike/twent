@@ -51,47 +51,43 @@ const Login = () => {
 
   // Handle form submission
   const onSubmit = async (data: FormData) => {
-  try {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    const response = await fetch("/response/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+      const response = await fetch("/response/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    const result = await response.json().catch(() => null);
+      const result = await response.json().catch(() => null);
 
-    if (!response.ok) {
-      const message =
-        result?.message || "Credenciais inválidas. Verifique seu email e senha.";
-      form.setError("root", { message });
-      return;
+      if (!response.ok) {
+        const message =
+          result?.message ||
+          "Credenciais inválidas. Verifique seu email e senha.";
+        form.setError("root", { message });
+        return;
+      }
+
+      
+        router.push("/matriz/dashboard");
+
+      
+    } catch (error) {
+      form.setError("root", {
+        message: "Erro de conexão. Tente novamente mais tarde.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-
-    if (!result?.token) {
-      form.setError("root", { message: "Login falhou: token não recebido." });
-      return;
-    }
-
-    router.push("/matriz/dashboard");
-  } catch (error) {
-    form.setError("root", {
-      message: "Erro de conexão. Tente novamente mais tarde.",
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <section className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden">
-        
         {/* Animated background effects */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gray-300/20 dark:bg-zinc-700/20 rounded-full blur-3xl animate-pulse"></div>
@@ -99,10 +95,8 @@ const Login = () => {
         </div>
 
         <div className="w-full max-w-md relative z-10">
-          
           {/* Form card */}
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-zinc-700/50 p-8 sm:p-10 transform transition-all duration-300 hover:scale-[1.02]">
-            
             {/* Logo */}
             <div className="flex justify-center mb-8">
               <div className="transform transition-transform duration-300 hover:scale-110">
@@ -117,7 +111,6 @@ const Login = () => {
 
             <Form {...form}>
               <div className="w-full space-y-5 flex flex-col">
-
                 {/* Email field */}
                 <FormField
                   control={form.control}
@@ -174,7 +167,11 @@ const Login = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 transition"
                           >
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            {showPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
                           </button>
                         </div>
                       </FormControl>
