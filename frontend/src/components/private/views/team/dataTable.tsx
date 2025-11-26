@@ -44,6 +44,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import CreateEmployeeModal from "./form-modals/create-modal";
+
 export type Employee = {
   id: string;
   first_name: string;
@@ -68,18 +70,15 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorFn: (row) => `${row.first_name} ${row.last_name}`,
     id: "name",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="h-9 px-2"
-      >
-        Nome
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
+    header: () => (
+      <div className="flex items-center justify-center">
+        <Button variant="ghost" className="h-9 px-4 font-medium">
+          Nome
+        </Button>
+      </div>
     ),
     cell: ({ row }) => (
-      <div className="font-medium">
+      <div className="text-center font-medium">
         {row.original.first_name} {row.original.last_name}
       </div>
     ),
@@ -87,7 +86,7 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorFn: (row) => row.user_roles[0]?.role?.name ?? "—",
     id: "role",
-    header: "Função",
+    header: () => <div className="text-center font-medium">Função</div>,
     cell: ({ row }) => (
       <div className="text-center">
         {row.original.user_roles[0]?.role?.name ?? "—"}
@@ -97,27 +96,29 @@ const columns: ColumnDef<Employee>[] = [
   {
     accessorFn: (row) => row.store.name,
     id: "store",
-    header: "Loja",
-    cell: ({ row }) => <div>{row.original.store.name}</div>,
+    header: () => <div className="text-center font-medium">Loja</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.store.name}</div>
+    ),
   },
   {
     accessorKey: "is_active",
-    header: "Status",
+    header: () => <div className="text-center font-medium">Status</div>,
     cell: ({ row }) => {
       const active = row.original.is_active;
       return (
         <div className="flex justify-center">
           <Badge
             variant={active ? "default" : "secondary"}
-            className="w-24 justify-center"
+            className="w-24 justify-center py-1"
           >
             {active ? (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4" />
                 Ativa
               </div>
             ) : (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <XCircle className="h-4 w-4 text-red-500" />
                 Inativa
               </div>
@@ -129,24 +130,26 @@ const columns: ColumnDef<Employee>[] = [
   },
   {
     id: "actions",
-    header: "Ações",
+    header: () => <div className="text-center font-medium">Ações</div>,
     cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Abrir menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Ações</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="flex items-center gap-2">
-            <Eye className="h-4 w-4" />
-            Visualizar
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex justify-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Abrir menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center">
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="flex items-center justify-center gap-2">
+              <Eye className="h-4 w-4" />
+              Visualizar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     ),
   },
 ];
@@ -164,6 +167,8 @@ export function TeamTable() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [skip, setSkip] = React.useState(0);
   const take = 10;
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
   const fetchEmployees = React.useCallback(async () => {
     try {
@@ -197,6 +202,10 @@ export function TeamTable() {
     fetchEmployees();
   }, [fetchEmployees]);
 
+  const handleEmployeeCreated = () => {
+    setSkip(0);
+    fetchEmployees();
+  };
   const globalFilter =
     (columnFilters.find((f) => f.id === "name")?.value as string) ?? "";
 
@@ -237,9 +246,9 @@ export function TeamTable() {
         </div>
       )}
 
-      <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center justify-between">
         <Input
-          placeholder="Buscar por nome ou ID..."
+          placeholder="Buscar por nome"
           value={globalFilter}
           onChange={(e) =>
             table.getColumn("name")?.setFilterValue(e.target.value)
@@ -274,7 +283,10 @@ export function TeamTable() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button className="flex items-center gap-2">
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             Novo Funcionário
           </Button>
@@ -355,6 +367,11 @@ export function TeamTable() {
           Próximo
         </Button>
       </div>
+      <CreateEmployeeModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onCreated={handleEmployeeCreated}
+      />
     </div>
   );
 }
