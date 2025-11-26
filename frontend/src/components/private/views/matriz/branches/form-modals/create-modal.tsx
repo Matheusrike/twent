@@ -35,7 +35,7 @@ export default function CreateModal({
     city: "",
     state: "",
     zip_code: "",
-    country: "BR",
+    country: "",
     latitude: "",
     longitude: "",
     opening_hours: [{ day: "Monday", open: "", close: "" }],
@@ -44,78 +44,137 @@ export default function CreateModal({
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
-const handleChange = (key: string, value: string) => {
-  setError("");
+  const formatCoordinate = (val: string, maxLength: number, maxAbsValue: number): string => {
+    let sanitized = val.replace(/[^0-9\-\.]/g, "");
+    
+    const hasMinus = sanitized.startsWith("-");
+    let numPart = sanitized.replace("-", ""); 
 
-  // Validação para CEP (formato: 00000-000)
-  if (key === "zip_code") {
-    const cleaned = value.replace(/\D/g, "");
-    if (cleaned.length <= 8) {
-      const formatted =
-        cleaned.length > 5
-          ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`
-          : cleaned;
-      setForm((prev) => ({ ...prev, [key]: formatted }));
+    if (numPart.length > maxLength) numPart = numPart.slice(0, maxLength);
+
+    const dotIndex = numPart.indexOf(".");
+    if (dotIndex !== -1) {
+      numPart = numPart.slice(0, dotIndex + 1) + numPart.slice(dotIndex + 1).replace(/\./g, "");
     }
-    return;
-  }
 
-  // Validação para número (apenas dígitos)
-  if (key === "number") {
-    const cleaned = value.replace(/\D/g, "");
-    setForm((prev) => ({ ...prev, [key]: cleaned }));
-    return;
-  }
+    let finalValue = (hasMinus ? "-" : "") + numPart;
+    
+    const num = parseFloat(finalValue);
+    
+    if (!isNaN(num) && Math.abs(num) > maxAbsValue) {
+      const maxInt = Math.floor(maxAbsValue).toString();
+      const parts = numPart.split(".");
+      
+      if (parts[0].length > maxInt.length) {
+          parts[0] = maxInt;
+      }
 
-  // Limites máximos de caracteres
-  const MAX_LAT_LENGTH = 8; // ex: -90.0000
-  const MAX_LON_LENGTH = 9; // ex: -180.0000
-
-  // Função auxiliar para adicionar ponto automaticamente
-  const formatCoordinate = (val: string, maxLength: number) => {
-    let sanitized = val.replace(/[^0-9\-]/g, ""); // remove tudo que não for dígito ou "-"
-    if (sanitized.length > maxLength) sanitized = sanitized.slice(0, maxLength);
-    // Adiciona ponto decimal se tiver mais de 2 dígitos (ex: -905432 -> -90.5432)
-    if (!sanitized.includes(".") && sanitized.length > 2) {
-      const negative = sanitized.startsWith("-");
-      const numPart = negative ? sanitized.slice(1) : sanitized;
-      const integer = numPart.length <= 2 ? numPart : numPart.slice(0, 2);
-      const decimal = numPart.length > 2 ? numPart.slice(2) : "";
-      sanitized = (negative ? "-" : "") + integer + (decimal ? "." + decimal : "");
+      finalValue = (hasMinus ? "-" : "") + parts.join(".");
     }
-    return sanitized;
+
+    return finalValue;
   };
 
-  // Validação para latitude (-90 a 90)
-  if (key === "latitude") {
-    if (value === "" || value === "-") {
-      setForm((prev) => ({ ...prev, [key]: value }));
+  const handleChange = (key: string, value: string) => {
+    setError("");
+
+    if (key === "zip_code") {
+      const cleaned = value.replace(/\D/g, "");
+      if (cleaned.length <= 8) {
+        const formatted =
+          cleaned.length > 5
+            ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`
+            : cleaned;
+        setForm((prev) => ({ ...prev, [key]: formatted }));
+      }
       return;
     }
-    const formatted = formatCoordinate(value, MAX_LAT_LENGTH);
-    const num = parseFloat(formatted);
-    if (!isNaN(num) && num >= -90 && num <= 90) {
-      setForm((prev) => ({ ...prev, [key]: formatted }));
-    }
-    return;
-  }
 
-  // Validação para longitude (-180 a 180)
-  if (key === "longitude") {
-    if (value === "" || value === "-") {
-      setForm((prev) => ({ ...prev, [key]: value }));
+    if (key === "number") {
+      const cleaned = value.replace(/\D/g, "");
+      setForm((prev) => ({ ...prev, [key]: cleaned }));
       return;
     }
-    const formatted = formatCoordinate(value, MAX_LON_LENGTH);
-    const num = parseFloat(formatted);
-    if (!isNaN(num) && num >= -180 && num <= 180) {
-      setForm((prev) => ({ ...prev, [key]: formatted }));
-    }
-    return;
-  }
+    
+    if (key === "phone") {
+        const isInternational = value.startsWith('+');
+        let cleaned = isInternational 
+            ? value.replace(/[^\d+]/g, '').replace(/(\+{2,})/g, '+') 
+            : value.replace(/\D/g, '');
 
-  setForm((prev) => ({ ...prev, [key]: value }));
-};
+        if (isInternational) {
+            // Limite de 15 dígitos numéricos para o formato +xx xx xxxxx-xxxx (Ex: +55 11 98765-4321)
+            if (cleaned.length > 17) cleaned = cleaned.slice(0, 17);
+            
+            let numPart = cleaned.slice(1);
+            let temp = "";
+            
+            // DDI (2 dígitos)
+            temp += numPart.slice(0, 2);
+            numPart = numPart.slice(2);
+
+            // DDD/Área (2 dígitos)
+            if (numPart.length > 0) temp += (temp ? " " : "") + numPart.slice(0, 2);
+            numPart = numPart.slice(2);
+
+            // Número (parte 1 - 5 dígitos)
+            if (numPart.length > 0) temp += (temp ? " " : "") + numPart.slice(0, 5);
+            numPart = numPart.slice(5);
+            
+            // Número (parte 2 - 4 dígitos)
+            if (numPart.length > 0) temp += "-" + numPart.slice(0, 4);
+
+            setForm((prev) => ({ ...prev, [key]: '+' + temp }));
+            return;
+
+        } else {
+            // Formato Nacional: xx xxxxx-xxxx
+            if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+
+            let temp = cleaned;
+            
+            // DDD/Área (2 dígitos)
+            if (temp.length > 2) temp = temp.slice(0, 2) + ' ' + temp.slice(2);
+            
+            // Hífen (após 2 de DDD e 5 do número)
+            if (temp.length > 8) temp = temp.slice(0, 8) + '-' + temp.slice(8);
+            
+            setForm((prev) => ({ ...prev, [key]: temp }));
+            return;
+        }
+    }
+
+    const MAX_LAT_LENGTH = 10;
+    const MAX_LON_LENGTH = 11;
+
+    if (key === "latitude") {
+      if (value === "" || value === "-") {
+        setForm((prev) => ({ ...prev, [key]: value }));
+        return;
+      }
+      const formatted = formatCoordinate(value, MAX_LAT_LENGTH, 90);
+      const num = parseFloat(formatted);
+      if (!isNaN(num) && num >= -90 && num <= 90) {
+        setForm((prev) => ({ ...prev, [key]: formatted }));
+      }
+      return;
+    }
+
+    if (key === "longitude") {
+      if (value === "" || value === "-") {
+        setForm((prev) => ({ ...prev, [key]: value }));
+        return;
+      }
+      const formatted = formatCoordinate(value, MAX_LON_LENGTH, 180);
+      const num = parseFloat(formatted);
+      if (!isNaN(num) && num >= -180 && num <= 180) {
+        setForm((prev) => ({ ...prev, [key]: formatted }));
+      }
+      return;
+    }
+
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
 
   const handleOpeningHoursChange = (field: string, value: string) => {
@@ -132,6 +191,19 @@ const handleChange = (key: string, value: string) => {
       return;
     }
 
+    const lat = Number(form.latitude);
+    const lon = Number(form.longitude);
+
+    if (form.latitude !== "" && (isNaN(lat) || lat < -90 || lat > 90)) {
+        setError("Latitude inválida. Deve estar entre -90 e 90.");
+        return;
+    }
+
+    if (form.longitude !== "" && (isNaN(lon) || lon < -180 || lon > 180)) {
+        setError("Longitude inválida. Deve estar entre -180 e 180.");
+        return;
+    }
+
     setLoading(true);
 
     try {
@@ -140,8 +212,8 @@ const handleChange = (key: string, value: string) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          latitude: Number(form.latitude) || 0,
-          longitude: Number(form.longitude) || 0,
+          latitude: lat,
+          longitude: lon,
         }),
       });
 
@@ -250,7 +322,7 @@ const handleChange = (key: string, value: string) => {
                   </Label>
                   <Input
                     id="phone"
-                    placeholder="(11) 4399-1998"
+                    placeholder="Ex: +55 11 98765-4321"
                     value={form.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     className="h-11 transition-all hover:border-primary/50"
@@ -263,7 +335,7 @@ const handleChange = (key: string, value: string) => {
                   </Label>
                   <Input
                     id="country"
-                    placeholder="BR"
+                    placeholder="Digite a sigla ex: BR"
                     value={form.country}
                     onChange={(e) => handleChange("country", e.target.value)}
                     className="h-11 transition-all hover:border-primary/50"
@@ -351,8 +423,8 @@ const handleChange = (key: string, value: string) => {
                     <Label htmlFor="latitude" className="text-sm font-medium">Latitude</Label>
                     <Input
                       id="latitude"
-                      type="number"
-                      step="0.000001"
+                      type="text"
+                      inputMode="decimal"
                       placeholder="-23.561414"
                       value={form.latitude}
                       onChange={(e) => handleChange("latitude", e.target.value)}
@@ -363,8 +435,8 @@ const handleChange = (key: string, value: string) => {
                     <Label htmlFor="longitude" className="text-sm font-medium">Longitude</Label>
                     <Input
                       id="longitude"
-                      type="number"
-                      step="0.000001"
+                      type="text"
+                      inputMode="decimal"
                       placeholder="-46.655881"
                       value={form.longitude}
                       onChange={(e) => handleChange("longitude", e.target.value)}
