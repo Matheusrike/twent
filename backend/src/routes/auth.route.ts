@@ -8,6 +8,7 @@ import {
 	UserInactiveResponseSchema,
 	UserNotFoundResponseSchema,
 	LogoutSuccessResponseSchema,
+    ConflictUserResponseSchema,
 } from '@/schemas/auth.schema';
 import prisma from '@prisma/client';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
@@ -30,6 +31,7 @@ export async function authRoutes(app: fastifyTypedInstance) {
 					400: InvalidPasswordResponseSchema,
 					403: UserInactiveResponseSchema,
 					404: UserNotFoundResponseSchema,
+                    409: ConflictUserResponseSchema,
 					500: ApiGenericErrorSchema,
 				},
 			},

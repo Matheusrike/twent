@@ -46,42 +46,31 @@ import {
 
 export type Branch = {
   id: string;
-  nome: string;
-  cargo: string;
-  filial: string;
-  status: "ativa" | "inativa";
+  first_name: string;
+  last_name: string;
+  phone: string;
+  city: string;
+  state: string;
+  country: string;
+  street: string;
+  is_active: boolean;
+  employee: {
+    position: string;
+    salary: number;
+    is_active: boolean;
+  },
+  user_roles: [
+    {
+        role: {
+            name: string
+        }
+    }
+  ],
+  store: {
+    code: string;
+    name: string;
+  }
 };
-
-const branches: Branch[] = [
-  {
-    id: "1",
-    nome: "João Silva",
-    cargo: "Gerente",
-    filial: "Itaquera",
-    status: "ativa",
-  },
-  {
-    id: "2",
-    nome: "Maria Souza",
-    cargo: "Atendente",
-    filial: "Mooca",
-    status: "inativa",
-  },
-  {
-    id: "3",
-    nome: "Carlos Santos",
-    cargo: "Supervisor",
-    filial: "Santos",
-    status: "ativa",
-  },
-  {
-    id: "4",
-    nome: "Ana Lima",
-    cargo: "Vendedora",
-    filial: "Guarulhos",
-    status: "ativa",
-  },
-];
 
 export const columns: ColumnDef<Branch>[] = [
   {
@@ -126,14 +115,14 @@ export const columns: ColumnDef<Branch>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as Branch["status"];
+      const status = row.getValue("is_active") as Branch["is_active"];
       return (
         <div className="flex justify-center">
           <Badge
-            variant={status === "ativa" ? "default" : "secondary"}
+            variant={status === true ? "default" : "secondary"}
             className="w-24 justify-center"
           >
-            {status === "ativa" ? (
+            {status === true ? (
               <div className="flex items-center gap-1">
                 <CheckCircle2 className="h-4 w-4 text-white" />
                 Ativa
@@ -176,6 +165,30 @@ export function TeamTable() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [branches, setBranches] = React.useState<Branch[]>([]);
+
+  // PRECISA ACABAR ISSO TAVINHOOOOOOO
+  React.useEffect(() => {
+    async function fetchBranches() {
+      try {
+        const response = await fetch("/response/api/employee", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erro ao carregar dados: ${response.status}`);
+        }
+        const { data } = await response.json();
+        console.log(data);
+        setBranches(data);
+      } catch (err: any) {
+        console.error(err);
+      }
+    }
+
+    fetchBranches();
+  }, []);
 
   const filterValue =
     (columnFilters.find((f) => f.id === "nome")?.value as string) ?? "";
@@ -183,7 +196,7 @@ export function TeamTable() {
   const filteredData = React.useMemo(() => {
     return branches.filter(
       (branch) =>
-        branch.nome.toLowerCase().includes(filterValue.toLowerCase()) ||
+        branch.first_name.toLowerCase().includes(filterValue.toLowerCase()) ||
         branch.id.toLowerCase().includes(filterValue.toLowerCase())
     );
   }, [filterValue]);

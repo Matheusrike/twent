@@ -25,6 +25,12 @@ export class AuthController {
 							errorCode: error.errorCode,
 							statusCode: 404,
 						});
+                    case 'CONFLICT':
+                        throw new HttpError({
+                            message: error.message,
+                            errorCode: error.errorCode,
+                            statusCode: 409,
+                        })
 					case 'USER_INACTIVE':
 						throw new HttpError({
 							message: error.message,

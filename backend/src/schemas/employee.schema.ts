@@ -170,9 +170,6 @@ export const EmployeeGetResponseSchema = ApiResponseSchema.extend({
 					.string()
 					.nullable()
 					.meta({ examples: ['+44 20 7946 0958', null] }),
-				user_type: z.enum(['EMPLOYEE']).meta({
-					description: 'Tipo de usuário (fixo: EMPLOYEE)',
-				}),
 				city: z
 					.string()
 					.nullable()

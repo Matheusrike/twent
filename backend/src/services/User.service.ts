@@ -36,6 +36,7 @@ export class UserService {
 		filters: CustomerQuerystring | EmployeeQuerystring,
 		skip = 0,
 		take = 10,
+		storeId?: string,
 		id?: string,
 	) {
 		try {
@@ -45,14 +46,13 @@ export class UserService {
 					take: Number(take),
 					skip: Number(skip),
 					orderBy: { created_at: 'desc' },
-					where: filters,
+					where: { store_id: storeId, ...filters },
 					select: {
 						id: true,
 						email: true,
 						first_name: true,
 						last_name: true,
 						phone: true,
-						user_type: true,
 						city: true,
 						district: true,
 						state: true,
@@ -89,7 +89,7 @@ export class UserService {
 				take: Number(take),
 				skip: Number(skip),
 				orderBy: { created_at: 'desc' },
-				where: filters,
+				where: {store_id: storeId, ...filters},
 				select: {
 					id: true,
 					email: true,
@@ -328,6 +328,4 @@ export class UserService {
 			});
 		}
 	}
-
-	
 }

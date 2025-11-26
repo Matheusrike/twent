@@ -24,6 +24,11 @@ export class AuthService {
 				first_name: true,
 				email: true,
 				store_id: true,
+				store: {
+					select: {
+						is_active: true,
+					},
+				},
 			},
 		});
 
@@ -49,6 +54,12 @@ export class AuthService {
 				message: 'Senha inválida',
 				errorCode: 'INVALID_PASSWORD',
 			});
+		if (user.store?.is_active === false) {
+			throw new AppError({
+				message: 'Loja inativa',
+				errorCode: 'CONFLICT',
+			});
+		}
 
 		const userRoles = await this.database.userRole.findMany({
 			where: { user_id: user.id },
