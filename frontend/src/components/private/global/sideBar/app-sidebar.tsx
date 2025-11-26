@@ -7,6 +7,7 @@ import {
   IconGlobe,
   IconUsers,
   IconHelp,
+  IconShoppingCart
 } from "@tabler/icons-react";
 import { Container } from "lucide-react";
 import { NavUser } from "@/components/private/global/sideBar/nav-user";
@@ -32,11 +33,12 @@ const Matrizdata = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    { title: "Dashboard", url: "/matriz/dashboard", icon: IconLayoutDashboard },
-    { title: "Filiais", url: "/matriz/branches", icon: IconGlobe },
-    { title: "Financeiro", url: "/matriz/financial", icon: IconChartBar },
-    { title: "Estoque", url: "/matriz/inventory", icon: Container },
-    { title: "Colaboradores", url: "/matriz/team", icon: IconUsers },
+    { title: "Dashboard", url: "/private/dashboard", icon: IconLayoutDashboard },
+    { title: "Filiais", url: "/private/branches", icon: IconGlobe },
+    { title: "Financeiro", url: "/private/financial", icon: IconChartBar },
+    { title: "Estoque", url: "/private/inventory", icon: Container },
+    { title: "Colaboradores", url: "/private/team", icon: IconUsers },
+    { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
   ],
   navSecondary: [{ title: "Ajuda", url: "#", icon: IconHelp }],
 };

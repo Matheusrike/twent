@@ -10,7 +10,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/private/views/matriz/login/input";
+import { Input } from "@/components/private/views/login/input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,7 +73,7 @@ const Login = () => {
       }
 
       
-        router.push("/matriz/dashboard");
+        router.push("/private/dashboard");
 
       
     } catch (error) {
