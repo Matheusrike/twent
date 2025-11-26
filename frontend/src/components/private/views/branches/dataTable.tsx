@@ -1,6 +1,6 @@
 "use client";
 import CreateModal from "./form-modals/create-modal";
-import VisualizationModal from "./form-modals/visualization-modal"; 
+import VisualizationModal from "./form-modals/visualization-modal";
 import * as React from "react";
 import {
   ColumnDef,
@@ -10,7 +10,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel, 
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -22,7 +22,7 @@ import {
   Pencil,
   Eye,
   Plus,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -49,8 +49,6 @@ import {
 
 import { useEffect, useState } from "react";
 
-
-
 export type Branch = {
   id: string;
   name: string;
@@ -61,16 +59,18 @@ export type Branch = {
   is_active: boolean;
 };
 
-
 export function BranchesTable() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  
-  const [isVisualizationModalOpen, setIsVisualizationModalOpen] = useState(false);
-  const [editingStoreId, setEditingStoreId] = useState<string | undefined>(undefined);
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const [isVisualizationModalOpen, setIsVisualizationModalOpen] =
+    useState(false);
+  const [editingStoreId, setEditingStoreId] = useState<string | undefined>(
+    undefined
+  );
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -80,15 +80,21 @@ export function BranchesTable() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  const [skip, setSkip] = React.useState(0);
+  const [take, setTake] = React.useState(10);
+
   const fetchBranches = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/response/api/store", {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `/response/api/store?skip=${skip}&take=${take}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Erro: ${response.status}`);
@@ -102,12 +108,11 @@ export function BranchesTable() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [skip, take]);
 
   useEffect(() => {
     fetchBranches();
   }, [fetchBranches]);
-
 
   const handleOpenVisualizationModal = (id: string) => {
     setEditingStoreId(id);
@@ -121,10 +126,9 @@ export function BranchesTable() {
 
   const handleSuccess = () => {
     setIsCreateModalOpen(false);
-    handleCloseVisualizationModal(); 
+    handleCloseVisualizationModal();
     fetchBranches();
-  }
-
+  };
 
   const columns: ColumnDef<Branch>[] = [
     {
@@ -139,7 +143,9 @@ export function BranchesTable() {
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div className="font-medium">{row.getValue("code")}</div>,
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("code")}</div>
+      ),
     },
 
     {
@@ -231,7 +237,7 @@ export function BranchesTable() {
                 <Pencil className="h-4 w-4" /> Copiar Email
               </DropdownMenuItem>
 
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={() => handleOpenVisualizationModal(filial.id)}
               >
@@ -243,7 +249,6 @@ export function BranchesTable() {
       },
     },
   ];
-
 
   const filterValue =
     (columnFilters.find((f) => f.id === "name")?.value as string) ?? "";
@@ -266,9 +271,9 @@ export function BranchesTable() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(), 
+    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), 
+    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -299,9 +304,9 @@ export function BranchesTable() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-             <Button variant="outline" className="ml-auto">
-               Colunas <ChevronDown className="ml-2 h-4 w-4" />
-             </Button>
+            <Button variant="outline" className="ml-auto">
+              Colunas <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {table
@@ -361,7 +366,10 @@ export function BranchesTable() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Carregando...
                 </TableCell>
               </TableRow>
@@ -406,8 +414,8 @@ export function BranchesTable() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => setSkip((prev) => Math.max(prev - take, 0))}
+          disabled={skip === 0}
         >
           Anterior
         </Button>
@@ -415,24 +423,22 @@ export function BranchesTable() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() => setSkip((prev) => prev + take)}
         >
           Próximo
         </Button>
       </div>
 
-   
       <CreateModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        onCreated={handleSuccess} 
+        onCreated={handleSuccess}
       />
 
       <VisualizationModal
         open={isVisualizationModalOpen}
         onOpenChange={handleCloseVisualizationModal}
-        onSuccess={handleSuccess} 
+        onSuccess={handleSuccess}
         storeId={editingStoreId}
       />
     </div>
