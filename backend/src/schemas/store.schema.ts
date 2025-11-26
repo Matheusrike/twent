@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { StoreType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
+import { UuidSchema } from './generic.schema';
 
 export const isoCountries = [
 	'BR',
@@ -38,6 +39,12 @@ const openingDays = [
 ];
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+export const StoreUUIDSchema = UuidSchema.extend({
+    id: z
+        .uuid()
+        .meta({ examples: ['61ba0e5e-59e5-403b-bb76-e317011f7399'] }),
+})
 
 export const StoreQuerystringSchema = z.object({
 	id: z
@@ -243,6 +250,60 @@ export const createStoreSchema = z.object({
 export type CreateStore = z.infer<typeof createStoreSchema>;
 
 export const StoreGetResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true).meta({
+		description: 'Indica se a requisição foi bem-sucedida',
+		examples: [true],
+	}),
+	message: z.string().meta({
+		description: 'Mensagem de sucesso retornada pela API',
+		examples: ['Informações da loja encontradas'],
+	}),
+	data: z.object({
+			id: z
+				.string()
+				.meta({ examples: ['61ba0e5e-59e5-403b-bb76-e317011f7399'] }),
+			name: z.string().meta({ examples: ['Example Twent'] }),
+			code: z.string().meta({ examples: ['EXA001'] }),
+			type: z.enum(StoreType).meta({ examples: ['BRANCH'] }),
+			email: z.string().meta({ examples: ['example@twent.com.br'] }),
+			phone: z
+				.string()
+				.meta({ examples: ['+55 11 9999-8888'] })
+				.nullable(),
+			street: z.string().meta({ examples: ['St. Example'] }),
+			number: z.string().meta({ examples: ['500'] }),
+			district: z.string().meta({ examples: ['Manhattan'] }),
+			city: z.string().meta({ examples: ['New York'] }),
+			state: z.string().meta({ examples: ['NY'] }),
+			zip_code: z.string().meta({ examples: ['01000-000'] }),
+			country: z.string().meta({ examples: ['US'] }),
+			latitude: z
+				.any()
+				.meta({ examples: ['-23.56019'] })
+				.nullable(),
+			longitude: z
+				.any()
+				.meta({ examples: ['-46.67812'] })
+				.nullable(),
+			opening_hours: z.array(
+				z.object({
+					day: z.enum(openingDays).meta({ examples: ['Monday'] }),
+					open: z.string().meta({ examples: ['10:00'] }),
+					close: z.string().meta({ examples: ['19:00'] }),
+				}),
+			),
+			is_active: z.boolean().meta({ examples: [true] }),
+			created_at: z
+				.date()
+				.meta({ examples: ['2025-10-07T18:55:04.196Z'] }),
+			updated_at: z
+				.date()
+				.meta({ examples: ['2025-10-09T19:23:48.922Z'] }),
+		}),
+});
+
+
+export const StoreGetAllResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true).meta({
 		description: 'Indica se a requisição foi bem-sucedida',
 		examples: [true],
