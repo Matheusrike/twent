@@ -15,6 +15,7 @@ export class AuthService {
 	) {}
 
 	async login({ email, password }: ILoginInput) {
+        try {
 		const user = await this.database.user.findFirst({
 			where: { email },
 			select: {
@@ -35,13 +36,13 @@ export class AuthService {
 		if (!user)
 			throw new AppError({
 				message: 'Usuário não encontrado',
-				errorCode: 'USER_NOT_FOUND',
+				errorCode: 'NOT_FOUND',
 			});
 
 		if (!user.is_active)
 			throw new AppError({
 				message: 'Usuário inativo',
-				errorCode: 'USER_INACTIVE',
+				errorCode: 'CONFLICT',
 			});
 
 		const isPasswordValid = await bcrypt.compare(
@@ -91,6 +92,13 @@ export class AuthService {
 		};
 
 		return this.jwtProvider.sign(token, { expiresIn: '1d' });
+    } catch (error) {
+        console.log(error);
+        throw new AppError({
+            message: error.message,
+            errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+        });
+    }
 	}
 	async changePassword(id: string, password: string, newPassword: string) {
 		try {
