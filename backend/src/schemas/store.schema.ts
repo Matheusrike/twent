@@ -186,10 +186,8 @@ export const createStoreSchema = z.object({
 		.meta({ examples: ['SW1A 0AA', '10001'] }),
 
 	country: z.enum(isoCountries).meta({ examples: ['BR', 'US', 'GB'] }),
-	opening_hours: z
-		.array(
-			z
-				.object({
+	opening_hours: z.array(
+			z.object({
 					day: z.enum(openingDays, {
 						error: 'Dia da semana inválido',
 					}),

@@ -29,8 +29,8 @@ export class CollectionService {
 					price_range_max: data.price_range_max,
 					is_active: data.is_active ?? true,
 				},
-				include: {
-					products: true,
+				omit: {
+					image_public_id: true,
 				},
 			});
 
@@ -71,18 +71,26 @@ export class CollectionService {
 				data: {
 					image_public_id: publicId,
 				},
+				select: {
+					id: true,
+					name: true,
+					description: true,
+					image_public_id: true,
+				},
 			});
 
 			return collection;
-		} catch (error: unknown) {
-			const prismaError = error as { code?: string };
-			if (prismaError.code === 'P2025') {
+		} catch (error) {
+			if (error.code === 'P2025') {
 				throw new AppError({
 					message: `Coleção com ID ${id} não encontrada!`,
 					errorCode: 'NOT_FOUND',
 				});
 			}
-			throw error;
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
 		}
 	}
 
