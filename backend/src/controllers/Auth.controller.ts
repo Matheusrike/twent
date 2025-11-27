@@ -10,8 +10,11 @@ export class AuthController {
 	async login(request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const { email, password } = request.body as ILoginInput;
+
+			const emailLowerCase = email.toLowerCase();
+
 			const token = await this.authService.login({
-				email,
+				email: emailLowerCase,
 				password,
 			});
 

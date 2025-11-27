@@ -31,9 +31,6 @@ export class EmailService {
 		this.fromEmail = process.env.FROM_EMAIL || 'noreply@twent.com';
 	}
 
-	/**
-	 * Envia email de recuperação de senha
-	 */
 	async sendPasswordResetEmail(
 		params: SendPasswordResetEmailParams,
 	): Promise<void> {

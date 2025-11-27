@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/generated/client';
 import { EmailService } from '@/services/Email.service';
 import { AppError } from '@/utils/errors.util';
 import { randomBytes } from 'crypto';
-import { hash } from 'bcrypt';
+import { hash } from 'bcryptjs';
 
 export class PasswordRecoveryService {
 	private readonly TOKEN_EXPIRATION_MINUTES = 5;

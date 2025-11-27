@@ -29,7 +29,7 @@ export function passwordResetEmailTemplate(
                     
                     <!-- Body -->
                     <tr>
-                        <td style="padding: 40px; display: flex; flex-direction: column; text-align: center">
+                        <td style="padding: 40px;">
                             <h2 style="margin: 0 0 20px 0; color: #0F0F0F; font-size: 24px; font-weight: 600;">
                                 Recuperação de Senha
                             </h2>
@@ -50,7 +50,7 @@ export function passwordResetEmailTemplate(
                             <!-- Button -->
                             <table role="presentation" style="margin: 0 0 24px 0;">
                                 <tr>
-                                    <td style="border-radius: 4px; background-color: #DE1A26">
+                                    <td style="border-radius: 4px; background-color: #DE1A26;">
                                         <a href="${resetUrl}" 
                                            target="_blank" 
                                            style="display: inline-block; padding: 16px 32px; font-size: 16px; color: #FFFFFF; text-decoration: none; font-weight: 600; letter-spacing: 0.5px;">
