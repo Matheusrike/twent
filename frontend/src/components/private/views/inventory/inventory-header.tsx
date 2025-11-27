@@ -18,7 +18,7 @@ const branches = [
   { name: "Branch 5", current: 180 },
 ];
 
-// Total stock
+
 const totalStock = 1000;
 const totalCurrent = branches.reduce((sum, b) => sum + b.current, 0);
 const sold = totalStock - totalCurrent;
@@ -60,15 +60,7 @@ export function InventoryTotal() {
             <span className="text-xs text-muted-foreground">unidades</span>
           </div>
 
-          <div className="flex flex-col space-y-1 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg text-center flex-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Vendidos
-            </span>
-            <span className="text-2xl font-bold text-foreground">
-              {sold.toLocaleString()}
-            </span>
-            <span className="text-xs text-muted-foreground">unidades</span>
-          </div>
+          
         </div>
       </CardContent>
     </Card>
