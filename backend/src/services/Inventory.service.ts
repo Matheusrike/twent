@@ -9,22 +9,17 @@ import { PrismaClient } from '@prisma/generated/client';
 export class InventoryService {
 	constructor(private database: PrismaClient) {}
 
-	async getAllInventorys() {
-		const inventory = await this.database.inventory.findMany({
+	async getAllInventory() {
+		const inventory = await this.database.store.findMany({
 			select: {
-				store: {
+                name: true,
+                email: true,
+				inventory: {
 					select: {
-						name: true,
-						email: true,
-					},
-				},
-				quantity: true,
-				minimum_stock: true,
-				product: {
-					select: {
-						name: true,
-						description: true,
-						price: true,
+						id: true,
+						quantity: true,
+						minimum_stock: true,
+                        updated_at: true,
 					},
 				},
 			},
@@ -32,38 +27,46 @@ export class InventoryService {
 		return inventory;
 	}
 
-	async getStoreInventorys(storeId: string) {
-		const inventory = await this.database.inventory.findMany({
-			where: {
-				store_id: storeId,
-			},
-			select: {
-				id: true,
-				product: {
-					select: {
-                        sku: true,
-						name: true,
-						description: true,
-						price: true,
-					},
-				},
-				quantity: true,
-				minimum_stock: true,
-			},
-		});
-		return inventory;
-	}
-
-	async newInventory(data: CreateInventoryType) {
+	async getStoreInventory(storeId: string) {
 		try {
-            
+			const inventory = await this.database.inventory.findMany({
+				where: {
+					store_id: storeId,
+				},
+				select: {
+					id: true,
+					product: {
+						select: {
+							sku: true,
+							name: true,
+							description: true,
+							price: true,
+						},
+					},
+					quantity: true,
+					minimum_stock: true,
+				},
+			});
+			return inventory;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async newInventory(data: CreateInventoryType, storeId: string) {
+		try {
 			// if (data.quantity < data.minimum_stock) {
 			// 	throw new AppError({
 			// 		message: 'Quantidade abaixo do estoque mínimo',
 			// 		errorCode: 'BAD_REQUEST',
 			// 	});
 			// }
-			const inventory = await this.database.inventory.create({ data });
+			const inventory = await this.database.inventory.create({
+				data: { ...data, store_id: storeId },
+			});
 			return inventory;
 		} catch (error) {
 			if (error.code === 'P2002') {
@@ -167,7 +170,7 @@ export class InventoryService {
 			const fromInventory = await this.database.inventory.findFirst({
 				where: {
 					store_id: fromStoreId,
-                    product_id: productId,
+					product_id: productId,
 				},
 			});
 			if (!fromInventory) {

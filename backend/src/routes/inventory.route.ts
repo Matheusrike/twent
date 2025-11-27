@@ -20,7 +20,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 		},
 		async (request, reply) => {
 			try {
-				const inventory = await inventoryController.getAllInventorys();
+				const inventory = await inventoryController.getAllInventory();
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
@@ -56,7 +56,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 		async (request, reply) => {
 			try {
 				const inventory =
-					await inventoryController.getStoreInventorys(request);
+					await inventoryController.getStoreInventory(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
