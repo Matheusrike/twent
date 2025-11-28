@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
 	ConflictResponseSchema,
 	NotFoundResponseSchema,
+	PaginationSchema,
 	UuidSchema,
 } from './generic.schema';
 import { ApiResponseSchema } from './api-response.schema';
@@ -259,17 +260,60 @@ export const CollectionGetResponseSchema = ApiResponseSchema.extend({
 	message: z.string().meta({
 		examples: ['Coleções encontradas com sucesso'],
 	}),
-	data: z.array(z.object({})).meta({
-		description: 'Lista de coleções',
-		examples: [
-			{
-				id: 'd8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c',
-				name: "L'Heure",
-				description: 'Coleção de moda feminina',
-				launch_year: 2023,
-				target_gender: GenderTargetEnum,
-			},
-		],
+	data: z.object({
+		collections: z
+			.array(
+				z.object({
+					id: z.uuid().meta({
+						description: 'ID da coleção',
+						examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+					}),
+					name: z.string().meta({
+						description: 'Nome da coleção',
+						examples: ["L'Heure", 'Momentum'],
+					}),
+					description: z
+						.string()
+						.nullable()
+						.meta({
+							description: 'Descrição da coleção',
+							examples: ['Coleção de moda feminina'],
+						}),
+					launch_year: z.number().meta({
+						description: 'Ano de lançamento da coleção',
+						examples: [2023],
+					}),
+					target_gender: GenderTargetEnum.meta({
+						description: 'Gênero alvo da coleção',
+						examples: ['MALE', 'FEMALE', 'UNISEX'],
+					}),
+					price_range_min: z.any(),
+					price_range_max: z.any(),
+					image_public_id: z.string().nullable(),
+					is_active: z.boolean(),
+					created_at: z.coerce.date(),
+					updated_at: z.coerce.date(),
+					products: z.array(
+						z.object({
+							sku: z.string(),
+							name: z.string(),
+						}),
+					),
+				}),
+			)
+			.meta({
+				description: 'Lista de coleções',
+				examples: [
+					{
+						id: 'd8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c',
+						name: "L'Heure",
+						description: 'Coleção de moda feminina',
+						launch_year: 2023,
+						target_gender: GenderTargetEnum,
+					},
+				],
+			}),
+		pagination: PaginationSchema,
 	}),
 });
 
@@ -284,7 +328,7 @@ export const CollectionGetByIdResponseSchema = z.object({
 		target_gender: GenderTargetEnum,
 		price_range_min: z.any(),
 		price_range_max: z.any(),
-		image_public_id: z.string(),
+		image_public_id: z.string().nullable(),
 		is_active: z.boolean(),
 		created_at: z.coerce.date(),
 		updated_at: z.coerce.date(),
@@ -296,9 +340,9 @@ export const CollectionGetByIdResponseSchema = z.object({
 				description: z.string(),
 				limited_edition: z.boolean(),
 				production_limit: z.null(),
-				price: z.string(),
+				price: z.any(),
 				currency: z.string(),
-				cost_price: z.string(),
+				cost_price: z.any(),
 				specifications: z.object({
 					glass: z.string(),
 					total_weight: z.number(),
@@ -406,6 +450,46 @@ export const UploadCollectionImageResponseSchema = ApiResponseSchema.extend({
 			description: 'ID público da imagem da coleção',
 			examples: ['collections/abcd1234efgh5678'],
 		}),
+	}),
+});
+
+export const CollectionPutResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true).meta({
+		examples: [true],
+	}),
+	message: z.string().meta({
+		examples: ['Coleção atualizada com sucesso'],
+	}),
+	data: z.object({
+		id: z.uuid().meta({
+			description: 'ID da coleção',
+			examples: ['d8f9e9c2-3b4d-4a3b-8e9c-2b4d5a3b8e9c'],
+		}),
+		name: z.string().meta({
+			description: 'Nome da coleção',
+			examples: ["L'Heure", 'Momentum'],
+		}),
+		description: z
+			.string()
+			.nullable()
+			.meta({
+				description: 'Descrição da coleção',
+				examples: ['Coleção de moda feminina'],
+			}),
+		launch_year: z.number().meta({
+			description: 'Ano de lançamento da coleção',
+			examples: [2023],
+		}),
+		target_gender: GenderTargetEnum.meta({
+			description: 'Gênero alvo da coleção',
+			examples: ['MALE', 'FEMALE', 'UNISEX'],
+		}),
+		price_range_min: z.any(),
+		price_range_max: z.any(),
+		image_public_id: z.string().nullable(),
+		is_active: z.boolean(),
+		created_at: z.coerce.date(),
+		updated_at: z.coerce.date(),
 	}),
 });
 

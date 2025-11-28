@@ -95,6 +95,7 @@ export class CollectionService {
 	}
 
 	async findById(id: string) {
+        try {
 		const collection = await this.database.collection.findUnique({
 			where: { id },
 			include: {
@@ -110,12 +111,19 @@ export class CollectionService {
 		}
 
 		return collection;
+        } catch (error) {
+            throw new AppError({
+                message: error.message,
+                errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+            });
+        }
 	}
 
 	async findAll(
 		filters?: ICollectionFilters,
 		pagination?: IPaginationParams,
 	) {
+        try{
 		const page =
 			pagination?.page && pagination.page > 0 ? pagination.page : 1;
 		const limit =
@@ -174,6 +182,12 @@ export class CollectionService {
 				hasPrev,
 			},
 		};
+    } catch (error) {
+        throw new AppError({
+            message: error.message,
+            errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+        });
+    }
 	}
 
 	async update(id: string, data: UpdateCollectionType) {
@@ -193,34 +207,15 @@ export class CollectionService {
 				);
 			}
 
-			const updateData: Prisma.CollectionUpdateInput = {};
-
-			if (data.name !== undefined) updateData.name = data.name;
-			if (data.description !== undefined)
-				updateData.description = data.description;
-			if (data.launch_year !== undefined)
-				updateData.launch_year = data.launch_year;
-			if (data.target_gender !== undefined)
-				updateData.target_gender = data.target_gender as GenderTarget;
-			if (data.price_range_min !== undefined)
-				updateData.price_range_min = data.price_range_min;
-			if (data.price_range_max !== undefined)
-				updateData.price_range_max = data.price_range_max;
-			if (data.is_active !== undefined)
-				updateData.is_active = data.is_active;
-
+			
 			const collection = await this.database.collection.update({
 				where: { id },
-				data: updateData,
-				include: {
-					products: true,
-				},
+				data,
 			});
 
 			return collection;
-		} catch (error: unknown) {
-			const prismaError = error as { code?: string };
-			switch (prismaError.code) {
+		} catch (error) {
+			switch (error.code) {
 				case 'P2025':
 					throw new AppError({
 						message: `Coleção com ID "${id}" não encontrada!`,
@@ -232,13 +227,17 @@ export class CollectionService {
 						message: `Coleção com o nome "${data.name}" já existe!`,
 						errorCode: 'CONFLICT',
 					});
+                default: 
+                    throw new AppError({
+                        message: error.message,
+                        errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+                    });
 			}
-			throw error;
 		}
 	}
 
 	async deactivate(id: string) {
-		return this.update(id, { is_active: false });
+		return this.update(id, { is_active: false } );
 	}
 
 	async activate(id: string) {

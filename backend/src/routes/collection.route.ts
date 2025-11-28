@@ -9,6 +9,9 @@ import {
     CollectionPostResponseSchema,
     CollectionConflictResponseSchema,
     CollectionNotFoundResponseSchema,
+    CollectionGetByIdResponseSchema,
+    CollectionGetResponseSchema,
+    CollectionPutResponseSchema,
 } from '@/schemas/collection.schema';
 import { CollectionService } from '@/services/Collection.service';
 import { ImageService } from '@/services/Image.service';
@@ -103,7 +106,9 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
                 response: {
-                    
+                    200: CollectionGetByIdResponseSchema,
+                    404: CollectionNotFoundResponseSchema,
+                    500: ApiGenericErrorSchema
                 }
 			},
 		},
@@ -134,6 +139,10 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Buscar todas as coleções com filtros e paginação',
 				tags: ['Collection'],
 				querystring: CollectionQuerySchema,
+                response: {
+                    200: CollectionGetResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
@@ -165,6 +174,12 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
 				body: UpdateCollectionSchema,
+                response: {
+                    200: CollectionPutResponseSchema,
+                    404: CollectionNotFoundResponseSchema,
+                    409: CollectionConflictResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
@@ -195,6 +210,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Desativar coleção',
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
+                response: {
+                    200: CollectionPutResponseSchema,
+                    404: CollectionNotFoundResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
@@ -226,6 +246,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Ativar coleção',
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
+				response: {
+					200: CollectionPutResponseSchema,
+					404: CollectionNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
