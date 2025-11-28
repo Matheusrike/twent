@@ -1,5 +1,4 @@
 import { Prisma } from '@prisma/client/extension';
-import { validateLocation } from '@/helpers/validate-location.helper';
 import { validatePassword } from '@/utils/password.util';
 import { UserService } from './User.service';
 import { AppError } from '@/utils/errors.util';
@@ -37,15 +36,7 @@ export class EmployeeService extends UserService {
 
 			data.password_hash = await validatePassword(data.password_hash);
 
-			await validateLocation({
-				country: data?.country,
-				state: data?.state,
-				city: data?.city,
-				road: data?.street,
-				district: data?.district,
-				postalcode: data?.zip_code,
-			});
-
+		
 			if (!data.store_code) {
 				const user = await this.database.user.findUnique({
 					where: { id },
@@ -169,24 +160,7 @@ export class EmployeeService extends UserService {
 				data.password_hash = await validatePassword(data.password_hash);
 			}
 
-			if (
-				data?.country ||
-				data?.state ||
-				data?.city ||
-				data?.street ||
-				data?.district ||
-				data?.zip_code
-			) {
-				await validateLocation({
-					country: data?.country,
-					state: data?.state,
-					city: data?.city,
-					road: data?.street,
-					district: data?.district,
-					postalcode: data?.zip_code,
-				});
-			}
-
+		
 			if (!data?.store_code) {
 				const store = await this.database.store.findFirst({
 					where: { id: user.store_id! },
