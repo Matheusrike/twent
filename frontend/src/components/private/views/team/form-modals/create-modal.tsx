@@ -112,8 +112,8 @@ export default function CreateEmployeeModal({
       return;
     }
 
-    if (form.password_hash.length < 6) {
-      setError("A senha deve ter no mínimo 6 caracteres");
+    if (form.password_hash.length < 8) {
+      setError("A senha deve ter no mínimo 8 caracteres");
       return;
     }
 
