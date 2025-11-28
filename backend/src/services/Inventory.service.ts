@@ -12,14 +12,15 @@ export class InventoryService {
 	async getAllInventory() {
 		const inventory = await this.database.store.findMany({
 			select: {
-                name: true,
-                email: true,
+				name: true,
+				email: true,
 				inventory: {
 					select: {
 						id: true,
+						product: true,
 						quantity: true,
 						minimum_stock: true,
-                        updated_at: true,
+						updated_at: true,
 					},
 				},
 			},
