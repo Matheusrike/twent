@@ -29,15 +29,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: [
-					'ADMIN',
-					'MANAGER_HQ',
-					'EMPLOYEE_HQ',
-					'MANAGER_BRANCH',
-					'EMPLOYEE_BRANCH',
-				],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -76,15 +68,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 					504: CustomerGatewayTimeoutSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: [
-					'ADMIN',
-					'MANAGER_HQ',
-					'EMPLOYEE_HQ',
-					'MANAGER_BRANCH',
-					'EMPLOYEE_BRANCH',
-				],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -124,9 +108,7 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 					504: CustomerGatewayTimeoutSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: ['ADMIN'],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {

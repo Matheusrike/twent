@@ -149,9 +149,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				summary: 'Busca um produto pelo sku',
 			},
 			preHandler: [
-				app.authorization({
-					requiredRoles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
-				}),
+				app.authorization(),
 			],
 		},
 		async (request, reply) => {
@@ -184,7 +182,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				body: updateProductSchema,
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -215,7 +213,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				summary: 'Desativa um produto',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -245,7 +243,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				summary: 'Carrega imagens para um produto',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -276,7 +274,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				summary: 'Remove todas as imagens de um produto',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -306,7 +304,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				summary: 'Define uma imagem como principal',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -337,7 +335,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				summary: 'Recupera o histórico de preços de um produto',
 			},
 			preHandler: [
-				app.authorization({ requiredRoles: ['ADMIN', 'MANAGER'] }),
+				app.authorization(),
 			],
 		},
 		async (request, reply) => {

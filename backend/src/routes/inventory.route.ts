@@ -12,7 +12,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/all',
 		{
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 			schema: {
 				tags: ['Inventory'],
 				summary: 'Busca todos os inventários',
@@ -48,9 +48,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 				summary: 'Busca o inventário da loja',
 			},
 			preHandler: [
-				app.authorization({
-					requiredRoles: ['ADMIN', 'STORE_MANAGER'],
-				}),
+				app.authorization(),
 			],
 		},
 		async (request, reply) => {
@@ -83,7 +81,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 				tags: ['Inventory'],
 				summary: 'Cria um novo inventário',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -116,7 +114,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 				tags: ['Inventory'],
 				summary: 'Adiciona um item ao inventário',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -148,7 +146,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 				tags: ['Inventory'],
 				summary: 'Remove um item ao inventário',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -180,7 +178,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 				tags: ['Inventory'],
 				summary: 'Transação de inventário',
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {

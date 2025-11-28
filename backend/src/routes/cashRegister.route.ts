@@ -13,7 +13,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 	app.get(
 		'/',
-		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		{ preHandler: app.authorization() },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -39,7 +39,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 
 	app.post(
 		'/',
-		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		{ preHandler: app.authorization() },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -115,7 +115,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 
 	app.get(
 		'/open-sessions',
-		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		{ preHandler: app.authorization() },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await cashRegisterController.getOpenSessions();
@@ -140,7 +140,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 
 	app.get(
 		'/close-sessions',
-		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		{ preHandler: app.authorization() },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -166,7 +166,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 
 	app.post(
 		'/:cash_register_id/open',
-		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		{ preHandler: app.authorization() },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -190,7 +190,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 	app.delete(
 		'/:cash_register_id/close',
-		{ preHandler: app.authorization({ requiredRoles: ['ADMIN'] }) },
+		{ preHandler: app.authorization() },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =

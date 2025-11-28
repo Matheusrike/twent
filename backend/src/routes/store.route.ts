@@ -35,9 +35,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -72,9 +70,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
                     500: ApiGenericErrorSchema,
                 },
             },
-            preHandler: fastify.authorization({
-                requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-            }),
+            preHandler: fastify.authorization(),
         },
         async (request: FastifyRequest, reply: FastifyReply) => {
             try {
@@ -109,9 +105,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ'],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -148,9 +142,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ'],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -184,9 +176,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ'],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -220,9 +210,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: fastify.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ'],
-			}),
+			preHandler: fastify.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
