@@ -19,7 +19,6 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import InventoryPagination from "./graph-modal/pagination";
 
 export default function InventoryCards() {
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -148,7 +147,7 @@ export default function InventoryCards() {
         return (
           <Dialog key={item.id}>
             <DialogTrigger asChild>
-              <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-500 hover:shadow-xl hover:-translate-y-1 w-full cursor-pointer">
+              <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-500 hover:shadow-xl hover:-translate-y-1 w-full">
                 {/* store and status */}
                 <CardHeader className="pb-2 pt-4 px-6 flex flex-col gap-4 items-start sm:items-center justify-between">
                   <div className="mt-2 sm:mt-0">
@@ -194,7 +193,7 @@ export default function InventoryCards() {
             </DialogTrigger>
 
             {/* modal */}
-            <DialogContent className="max-w-3xl">
+            {/* <DialogContent className="max-w-3xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-lg">
                   <Info className="w-5 h-5 text-primary" />
@@ -202,7 +201,7 @@ export default function InventoryCards() {
                 </DialogTitle>
               </DialogHeader>
 
-              {/* search bar */}
+              {/* search bar 
               <div className="mt-4 mb-3 flex items-center gap-2">
                 <input
                   type="text"
@@ -242,8 +241,8 @@ export default function InventoryCards() {
                 </Table>
               </div>
 
-              <InventoryPagination />
-            </DialogContent>
+      
+            </DialogContent> */}
           </Dialog>
         );
       })}

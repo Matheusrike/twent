@@ -10,18 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const branches = [
-  { name: "Itaquera", current: 200 },
-  { name: "Branch 2", current: 150 },
-  { name: "Branch 3", current: 250 },
-  { name: "Branch 4", current: 100 },
-  { name: "Branch 5", current: 180 },
-];
 
 
-const totalStock = 1000;
-const totalCurrent = branches.reduce((sum, b) => sum + b.current, 0);
-const sold = totalStock - totalCurrent;
+
 
 export function InventoryTotal() {
   return (
@@ -36,31 +27,6 @@ export function InventoryTotal() {
           <CardDescription className="text-sm text-muted-foreground">
             Monitoramento em tempo real
           </CardDescription>
-        </div>
-
-    
-        <div className="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-md">
-          <div className="flex flex-col space-y-1 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg text-center flex-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Atual
-            </span>
-            <span className="text-2xl font-bold text-foreground">
-              {totalCurrent.toLocaleString()}
-            </span>
-            <span className="text-xs text-muted-foreground">unidades</span>
-          </div>
-
-          <div className="flex flex-col space-y-1 bg-gray-50 dark:bg-gray-900 p-3 rounded-lg text-center flex-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Total
-            </span>
-            <span className="text-2xl font-bold text-foreground">
-              {totalStock.toLocaleString()}
-            </span>
-            <span className="text-xs text-muted-foreground">unidades</span>
-          </div>
-
-          
         </div>
       </CardContent>
     </Card>
