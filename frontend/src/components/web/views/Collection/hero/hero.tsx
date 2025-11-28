@@ -21,7 +21,12 @@ interface Product {
   images: Array<{ url: string }>
 }
 
-export default function CollectionHero() {
+// Agora recebe a busca como prop
+interface CollectionHeroProps {
+  searchQuery: string
+}
+
+export default function CollectionHero({ searchQuery }: CollectionHeroProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -29,16 +34,11 @@ export default function CollectionHero() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        console.log('Iniciando fetch...')
         const response = await fetch('/response/api/product/public')
-        console.log('Response status:', response.status)
-        
         const result = await response.json()
-        console.log('Resultado da API:', result)
         
         if (result.success) {
-          console.log('Produtos recebidos:', result.data)
-          setProducts(result.data)
+          setProducts(result.data.products)
         } else {
           setError('Falha ao carregar produtos')
         }
@@ -53,12 +53,17 @@ export default function CollectionHero() {
     fetchProducts()
   }, [])
 
-  console.log('Estado atual - Loading:', loading, 'Products:', products.length, 'Error:', error)
+  // FILTRA OS PRODUTOS COM BASE NA BUSCA
+  const filteredProducts = searchQuery.trim() === ""
+    ? products
+    : products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+      );
 
   if (loading) {
     return (
       <section className="py-5 container mx-auto px-6">
-        <div className="text-center py-10">Carregando produtos...</div>
+        <div className="text-center py-20">Carregando produtos...</div>
       </section>
     )
   }
@@ -66,39 +71,36 @@ export default function CollectionHero() {
   if (error) {
     return (
       <section className="py-5 container mx-auto px-6">
-        <div className="text-center py-10 text-red-500">{error}</div>
-      </section>
-    )
-  }
-
-  if (products.length === 0) {
-    return (
-      <section className="py-5 container mx-auto px-6">
-        <div className="text-center py-10">Nenhum produto encontrado</div>
+        <div className="text-center py-20 text-red-500">{error}</div>
       </section>
     )
   }
 
   return (
     <section className="py-5 container mx-auto px-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map((product) => (
-          <CollectionCard
-            key={product.sku}
-            sku={product.sku}
-            // href={`/collection/${product.sku}`}   // 🔥 ROTA CORRIGIDA
-            image={
-              product.images?.[0]?.url ||
-              product.collection.image_public_id ||
-              '/placeholder.png'
-            }
-            title={product.name}
-            description={truncateText(product.description, 100)}
-            badge={product.collection.name}
-          />
-        ))}
-      </div>
-      <PaginationWithIcon />
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-20 text-muted-foreground text-lg">
+          {searchQuery ? `Nenhum produto encontrado para "${searchQuery}"` : "Nenhum produto disponível"}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProducts.map((product) => (
+            <CollectionCard
+              key={product.sku}
+              sku={product.sku}
+              image={
+                product.images?.[0]?.url ||
+                product.collection.image_public_id ||
+                '/placeholder.png'
+              }
+              title={product.name}
+              description={truncateText(product.description, 100)}
+              badge={product.collection.name}
+            />
+          ))}
+        </div>
+      )}
+      {filteredProducts.length > 0 && <PaginationWithIcon />}
     </section>
   );
 }

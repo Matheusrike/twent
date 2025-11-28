@@ -17,13 +17,13 @@ const TextCardsCollection = () => {
                         >
                             {/* Image - Quadrada e Maior */}
                             <div className="relative overflow-hidden lg:w-3/5 aspect-square rounded-2xl h-100 bg-muted  border border-border/50 shadow-lg">
-                                <Image
+                                {/* <Image
                                     src={feature.image}
                                     width={800}
                                     height={800}
                                     alt={feature.title}
                                     className="absolute inset-0 h-full w-full object-cover"
-                                />
+                                /> */}
                             </div>
 
                             {/* Text Content */}
