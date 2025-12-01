@@ -8,13 +8,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 interface CollectionCardProps {
-  sku: string              // <-- SKU fazendo papel de ID
+  sku: string
   image: string
   title: string
   description: string
   badge?: string
+  index?: number
 }
 
 export default function CollectionCard({
@@ -22,27 +24,39 @@ export default function CollectionCard({
   image,
   title,
   description,
-  badge
+  badge,
+  index = 0
 }: CollectionCardProps) {
   const [liked, setLiked] = useState<boolean>(false)
 
   return (
-    <Link href={`/collection/${sku}`} className='block'> 
-      <div className='relative max-w-md rounded-xl bg-zinc-600 pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1'>
-        
+    <Link href={`/collection/${sku}`} className='block'>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}   
+        animate={{ opacity: 1, y: 0 }}    
+        transition={{ 
+          duration: 0.6, 
+          ease: 'easeOut',
+          delay: index * 0.1
+        }} 
+        className='relative max-w-md rounded-xl bg-zinc-600 pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1'
+      >
+
         <div className='relative h-60 w-full flex items-center justify-center'>
-          {/* <Image
+          <Image
             src={image}
             alt={title}
             fill
             className='object-contain'
-          /> */}
+          />
         </div>
 
         <Button
           size='icon'
           onClick={(e) => {
-            e.stopPropagation() // impede o clique do botão acionar o Link
+            e.preventDefault()
+            e.stopPropagation()
             setLiked(!liked)
           }}
           className='bg-primary/10 hover:bg-primary/20 absolute top-4 right-4 rounded-full'
@@ -78,7 +92,7 @@ export default function CollectionCard({
           </CardContent>
         </Card>
 
-      </div>
+      </motion.div>
     </Link>
   )
 }

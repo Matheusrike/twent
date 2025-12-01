@@ -49,8 +49,9 @@ const MainContainer: React.FC = () => {
           ? result.data.products
           : [];
 
-        // Pega apenas os primeiros 6 produtos para exibir na home
-        setProducts(normalized.slice(0, 6));
+        // Pega 3 produtos aleatórios para exibir na home
+        const shuffled = normalized.sort(() => 0.5 - Math.random());
+        setProducts(shuffled.slice(0, 3));
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
         setProducts([]);
@@ -122,7 +123,7 @@ const MainContainer: React.FC = () => {
           <>
             {/* Collection Preview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <CollectionCard
                   key={product.sku}
                   sku={product.sku}
@@ -137,21 +138,6 @@ const MainContainer: React.FC = () => {
                 />
               ))}
             </div>
-
-            {/* Ver mais produtos */}
-            {products.length > 0 && (
-              <div className="flex justify-center mt-12">
-                <Link href="/collection">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="px-8 py-6 text-lg"
-                  >
-                    Ver todos os produtos
-                  </Button>
-                </Link>
-              </div>
-            )}
 
             {/* Mensagem caso não haja produtos */}
             {products.length === 0 && (
