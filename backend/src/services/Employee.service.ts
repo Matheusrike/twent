@@ -36,7 +36,6 @@ export class EmployeeService extends UserService {
 
 			data.password_hash = await validatePassword(data.password_hash);
 
-		
 			if (!data.store_code) {
 				const user = await this.database.user.findUnique({
 					where: { id },
@@ -131,7 +130,7 @@ export class EmployeeService extends UserService {
 	}
 
 	async getEmployees(
-        storeId: string,
+		storeId: string,
 		filters: EmployeeQuerystring,
 		skip: number,
 		take: number,
@@ -142,7 +141,6 @@ export class EmployeeService extends UserService {
 
 		return response;
 	}
-
 	async updateEmployee(id: string, data: Partial<CreateEmployee>) {
 		try {
 			const user = await this.database.user.findUnique({ where: { id } });
@@ -160,7 +158,6 @@ export class EmployeeService extends UserService {
 				data.password_hash = await validatePassword(data.password_hash);
 			}
 
-		
 			if (!data?.store_code) {
 				const store = await this.database.store.findFirst({
 					where: { id: user.store_id! },
@@ -183,9 +180,11 @@ export class EmployeeService extends UserService {
 							});
 						}
 					}
+
 					const store = await tx.store.findUnique({
 						where: { code: data?.store_code },
 					});
+
 					if (!store) {
 						throw new AppError({
 							message: 'Filial não encontrada',
@@ -231,23 +230,21 @@ export class EmployeeService extends UserService {
 						},
 					});
 
-					if (!role) return { updatedUser, updatedEmployee };
+					
+					if (role) {
+						
+						await tx.userRole.deleteMany({
+							where: { user_id: user.id },
+						});
 
-					await tx.userRole.upsert({
-						where: {
-							user_id_role_id: {
+						
+						await tx.userRole.create({
+							data: {
 								user_id: user.id,
 								role_id: role.id,
 							},
-						},
-						create: {
-							user_id: user.id,
-							role_id: role.id,
-						},
-						update: {
-							role_id: role.id,
-						},
-					});
+						});
+					}
 
 					return [updatedUser, updatedEmployee];
 				},

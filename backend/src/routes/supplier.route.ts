@@ -92,6 +92,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/:id',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Busca um fornecedor pelo ID',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],

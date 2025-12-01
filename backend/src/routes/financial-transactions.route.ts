@@ -19,6 +19,8 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 		'/',
 		{
 			schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Cria uma nova transação financeira',
 				body: createFinancialTransactionSchema,
 			},
 			preHandler: [
@@ -51,6 +53,10 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/',
 		{
+            schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Busca todas as transações financeiras',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
@@ -82,7 +88,11 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 
 	app.get(
 		'/:id',
-		{
+		{   
+            schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Busca uma transação financeira',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
@@ -116,6 +126,8 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 		'/:id',
 		{
 			schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Atualiza uma transação financeira',
 				body: updateFinancialTransactionSchema,
 			},
 			preHandler: [
@@ -148,6 +160,10 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 	app.delete(
 		'/:id',
 		{
+            schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Remove uma transação financeira',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -174,6 +190,10 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/reports/cash-flow',
 		{
+            schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Busca o relatório de fluxo de caixa',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
@@ -209,6 +229,10 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/reports/summary',
 		{
+            schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Busca o resumo financeiro',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
@@ -243,6 +267,10 @@ export async function financialTransactionRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/reports/by-category',
 		{
+            schema: {
+                tags: ['Financial Transaction'],
+                summary: 'Busca as transações por categoria',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],

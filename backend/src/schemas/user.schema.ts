@@ -29,7 +29,7 @@ export const getUserInfoResponse = ApiResponseSchema.extend({
 		zip_code: z.union([z.null(), z.string()]).nullable(),
 		country: z.string().nullable(),
 		reset_token: z.string().optional().nullable(),
-		reset_token_expires: z.string().optional().nullable(),
+		reset_token_expires: z.date().optional().nullable(),
 		last_login_at: z.date().nullable(),
 		is_active: z.boolean(),
 		created_at: z.coerce.date(),

@@ -5,10 +5,9 @@ import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import {
 	createStoreSchema,
-	StoreBadRequestSchema,
 	StoreChangeStatusResponseSchema,
 	StoreConflictSchema,
-	// StoreGetAllResponseSchema,
+	StoreGetAllResponseSchema,
 	StoreGetResponseSchema,
 	StoreNotFoundSchema,
 	StorePostResponseSchema,
@@ -32,7 +31,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 				description: 'Faz busca de todas as lojas, com ou sem filtros',
 				querystring: StoreQuerystringSchema,
 				response: {
-					// 200: StoreGetAllResponseSchema,
+					200: StoreGetAllResponseSchema,
 					500: ApiGenericErrorSchema,
 				},
 			},
