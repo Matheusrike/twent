@@ -15,7 +15,7 @@ export class ProductService {
 
 	async create(data: CreateProductType, user: IJwtAuthPayload) {
 		try {
-			console.log(user);
+
 			const sku = await generateUniqueSKU();
 
 			const product = await this.database.product.create({
