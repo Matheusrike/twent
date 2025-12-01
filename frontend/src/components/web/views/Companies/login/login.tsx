@@ -38,7 +38,6 @@ const Login = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<FormData>({
