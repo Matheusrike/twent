@@ -276,9 +276,6 @@ export default function InventoryTable() {
             onChange={(e) => table.getColumn("sku")?.setFilterValue(e.target.value)}
             className="max-w-sm"
           />
-          <Button className="ml-auto">
-            <Plus className="mr-2 h-4 w-4" /> Novo Produto
-          </Button>
         </div>
 
         <div className="rounded-md border">

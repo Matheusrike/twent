@@ -7,7 +7,8 @@ import {
   IconGlobe,
   IconUsers,
   IconHelp,
-  IconShoppingCart
+  IconShoppingCart,
+  IconDeviceWatch
 } from "@tabler/icons-react";
 import { Container } from "lucide-react";
 import { NavUser } from "@/components/private/global/sideBar/nav-user";
@@ -37,8 +38,10 @@ const Matrizdata = {
     { title: "Filiais", url: "/private/branches", icon: IconGlobe },
     { title: "Financeiro", url: "/private/financial", icon: IconChartBar },
     { title: "Estoque", url: "/private/inventory", icon: Container },
+    { title: "Coleção", url: "/private/collection", icon:  IconDeviceWatch },
     { title: "Colaboradores", url: "/private/team", icon: IconUsers },
     { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
+  
   ],
   navSecondary: [{ title: "Ajuda", url: "#", icon: IconHelp }],
 };
