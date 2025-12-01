@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { StoreType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
 import { UuidSchema } from './generic.schema';
+import { BadRequestResponseSchema, ConflictResponseSchema, NotFoundResponseSchema } from './generic.schema';
 
 export const isoCountries = [
 	'BR',
@@ -190,10 +191,8 @@ export const createStoreSchema = z.object({
 		.meta({ examples: ['SW1A 0AA', '10001'] }),
 
 	country: z.enum(isoCountries).meta({ examples: ['BR', 'US', 'GB'] }),
-	opening_hours: z
-		.array(
-			z
-				.object({
+	opening_hours: z.array(
+			z.object({
 					day: z.enum(openingDays, {
 						error: 'Dia da semana inválido',
 					}),
@@ -402,20 +401,14 @@ export const StoreChangeStatusResponseSchema = ApiResponseSchema.extend({
 		.string()
 		.meta({ examples: ['Status da loja alterado com sucesso'] }),
 });
-export const StoreNotFoundSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const StoreNotFoundSchema = NotFoundResponseSchema.extend({
 	message: z.string().meta({ examples: ['Loja nao encontrada'] }),
-	errorCode: z.string().meta({ examples: ['STORE_NOT_FOUND'] }),
 });
 
-export const StoreBadRequestSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const StoreBadRequestSchema = BadRequestResponseSchema.extend({
 	message: z.string().meta({ examples: ['Dados da loja inválidos'] }),
-	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
 });
 
-export const StoreConflictSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const StoreConflictSchema = ConflictResponseSchema.extend({
 	message: z.string().meta({ examples: ['Dados da loja conflitantes'] }),
-	errorCode: z.string().meta({ examples: ['STORE_CONFLICT'] }),
 });

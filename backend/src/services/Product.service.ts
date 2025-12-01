@@ -15,6 +15,7 @@ export class ProductService {
 
 	async create(data: CreateProductType, user: IJwtAuthPayload) {
 		try {
+
 			const sku = await generateUniqueSKU();
 
 			const product = await this.database.product.create({
@@ -32,7 +33,6 @@ export class ProductService {
 					production_limit: data.production_limit,
 					specifications: data.specifications ?? {},
 					created_by: user.id,
-					updated_by: user.id,
 				},
 				include: {
 					collection: true,
@@ -44,8 +44,8 @@ export class ProductService {
 		} catch (error) {
 			if (error.code === 'P2003') {
 				throw new AppError({
-					message: 'Collection not found',
-					errorCode: 'COLLECTION_NOT_FOUND',
+					message: error.message,
+					errorCode: 'NOT_FOUND',
 				});
 			}
 			throw error;

@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { ApiResponseSchema } from './api-response.schema';
 import { UserTypes } from './user.schema';
+import {
+	BadGatewayResponseSchema,
+	BadRequestResponseSchema,
+	GatewayTimeoutResponseSchema,
+	NotFoundResponseSchema,
+} from './generic.schema';
 
 export const customerQuerystringSchema = z.object({
 	first_name: z
@@ -290,30 +296,22 @@ export const CustomerPutResponseSchema = z.object({
 	data: customerSchema,
 });
 
-export const CustomerBadRequestSchema = z.object({
-	success: z.literal(false),
+export const CustomerBadRequestSchema = BadRequestResponseSchema.extend({
 	message: z
 		.string()
 		.meta({ examples: ['Informações do usuário inválidas'] }),
-	errorCode: z.string().meta({ examples: ['BAD_REQUEST'] }),
 });
 
-export const CustomerNotFoundSchema = z.object({
-	success: z.literal(false),
+export const CustomerNotFoundSchema = NotFoundResponseSchema.extend({
 	message: z.string().meta({ examples: ['Usuário não encontrado'] }),
-	errorCode: z.string().meta({ examples: ['USER_NOT_FOUND'] }),
 });
 
-export const CustomerBadGatewaySchema = z.object({
-	success: z.literal(false),
+export const CustomerBadGatewaySchema = BadGatewayResponseSchema.extend({
 	message: z.string().meta({ examples: ['Servidor externo indisponível'] }),
-	errorCode: z.string().meta({ examples: ['BAD_GATEWAY'] }),
 });
 
-export const CustomerGatewayTimeoutSchema = z.object({
-	success: z.literal(false),
-	message: z
-		.string()
-		.meta({ examples: ['Tempo de espera do servidor excedido'] }),
-	errorCode: z.string().meta({ examples: ['GATEWAY_TIMEOUT'] }),
+export const CustomerGatewayTimeoutSchema = GatewayTimeoutResponseSchema.extend({
+		message: z
+			.string()
+			.meta({ examples: ['Tempo de espera do servidor excedido'] }),
 });

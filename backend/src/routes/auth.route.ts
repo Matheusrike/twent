@@ -9,6 +9,8 @@ import {
 	UserNotFoundResponseSchema,
 	LogoutSuccessResponseSchema,
     ConflictUserResponseSchema,
+    changePasswordResponseSchema,
+    changePasswordBodySchema,
 } from '@/schemas/auth.schema';
 import prisma from '@prisma/client';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
@@ -90,28 +92,43 @@ export async function authRoutes(app: fastifyTypedInstance) {
 			}
 		},
 	);
-    	app.patch(
-			'/change-password',
-			{ preHandler: app.authorization() },
-			async (request: FastifyRequest, reply: FastifyReply) => {
-				try {
-					await authController.changePassword(request);
-
-					return new ApiResponse({
-						success: true,
-						statusCode: 200,
-						message: 'Senha alterada com sucesso',
-					}).send(reply);
-				} catch (error) {
-					return new ApiResponse({
-						success: false,
-						statusCode: error.statusCode,
-						message: error.message,
-						errorCode: error.errorCode,
-					}).send(reply);
-				}
+	app.patch(
+		'/change-password',
+		{
+			schema: {
+				tags: ['Autenticação'],
+				summary: 'Altera a senha do usuário logado',
+				body: changePasswordBodySchema,
+				response: {
+					200: changePasswordResponseSchema,
+					400: InvalidPasswordResponseSchema,
+					403: UserInactiveResponseSchema,
+					404: UserNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
-		);
+
+			preHandler: app.authorization(),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				await authController.changePassword(request);
+
+				return new ApiResponse({
+					success: true,
+					statusCode: 200,
+					message: 'Senha alterada com sucesso',
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
 
 	return app;
 }

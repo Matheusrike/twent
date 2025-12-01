@@ -1,4 +1,18 @@
 import { CashRegisterController } from '@/controllers/CashRegister.controller';
+import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
+import {
+	CashRegisterBadRequestSchema,
+	CashRegisterParamsSchema,
+	CashRegisterGetResponseSchema,
+	CashRegisterPatchResponseSchema,
+	CashRegisterPostResponseSchema,
+	CashRegisterNotFoundSchema,
+	CashSessionGetResponseSchema,
+	CashSessionQueryStringSchema,
+	CashSessionPostResponseSchema,
+	CashRegisterConflictSchema,
+	CloseCashSessionResponseSchema,
+} from '@/schemas/cashRegister.schema';
 import { CashRegisterService } from '@/services/CashRegister.service';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
@@ -13,7 +27,17 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 	app.get(
 		'/',
-		{ preHandler: app.authorization() },
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Busca todos os caixas da loja',
+				responses: {
+					200: CashRegisterGetResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -21,7 +45,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Informações das filiais encontradas',
+					message: 'Caixas da loja encontradas',
 					data: response,
 				});
 			} catch (error) {
@@ -39,7 +63,18 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 
 	app.post(
 		'/',
-		{ preHandler: app.authorization() },
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Cria um novo caixa',
+				responses: {
+					201: CashRegisterPostResponseSchema,
+					400: CashRegisterBadRequestSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -47,7 +82,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 201,
 					success: true,
-					message: 'caixa criado com sucesso',
+					message: 'Caixa criado com sucesso',
 					data: response,
 				}).send(reply);
 			} catch (error) {
@@ -63,8 +98,20 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.patch(
-		'/activate/:id',
-		{},
+		'/:id/activate',
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Ativa o caixa',
+				params: CashRegisterParamsSchema,
+				responses: {
+					200: CashRegisterPatchResponseSchema,
+					404: CashRegisterNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -72,7 +119,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'caixa ativada com sucesso',
+					message: 'caixa ativado com sucesso',
 					data: response,
 				}).send(reply);
 			} catch (error) {
@@ -87,8 +134,20 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		},
 	);
 	app.patch(
-		'/deactivate/:id',
-		{},
+		'/:id/deactivate',
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Desativa o caixa',
+				params: CashRegisterParamsSchema,
+				responses: {
+					200: CashRegisterPatchResponseSchema,
+					404: CashRegisterNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -98,7 +157,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Caixa desativada com sucesso',
+					message: 'Caixa desativado com sucesso',
 					data: response,
 				}).send(reply);
 			} catch (error) {
@@ -114,15 +173,25 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.get(
-		'/open-sessions',
-		{ preHandler: app.authorization() },
+		'/sessions/open',
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Busca caixas com sessões abertas',
+				responses: {
+					200: CashSessionGetResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await cashRegisterController.getOpenSessions();
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Informações da sessão encontradas',
+					message: 'Caixas com sessões abertas encontradas',
 					data: response,
 				}).send(reply);
 			} catch (error) {
@@ -139,8 +208,19 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.get(
-		'/close-sessions',
-		{ preHandler: app.authorization() },
+		'/sessions/closed',
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Busca sessões fechadas de caixas',
+				querystring: CashSessionQueryStringSchema,
+				responses: {
+					200: CashSessionGetResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -148,7 +228,7 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
-					message: 'Informações da sessão encontradas',
+					message: 'Sessões fechadas encontradas',
 					data: response,
 				}).send(reply);
 			} catch (error) {
@@ -165,8 +245,21 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.post(
-		'/:cash_register_id/open',
-		{ preHandler: app.authorization() },
+		'/:id/open',
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Abre uma sessão de caixa',
+				params: CashRegisterParamsSchema,
+				responses: {
+					201: CashSessionPostResponseSchema,
+					404: CashRegisterNotFoundSchema,
+					409: CashRegisterConflictSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =
@@ -189,8 +282,20 @@ export async function cashRegisterRoutes(app: fastifyTypedInstance) {
 		},
 	);
 	app.delete(
-		'/:cash_register_id/close',
-		{ preHandler: app.authorization() },
+		'/:id/close',
+		{
+			schema: {
+				tags: ['Cash Register'],
+				summary: 'Fecha a sessão de caixa',
+				params: CashRegisterParamsSchema,
+				responses: {
+					200: CloseCashSessionResponseSchema,
+					404: CashRegisterNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization({ requiredRoles: ['ADMIN'] }),
+		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response =

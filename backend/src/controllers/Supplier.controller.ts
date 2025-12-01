@@ -3,10 +3,9 @@ import { SupplierService } from '@/services/Supplier.service';
 import {
 	CreateSupplierType,
 	UpdateSupplierType,
-	ISupplierFilters,
+	SupplierFilters,
 } from '@/schemas/supplier.schema';
 import { IJwtAuthPayload } from '@/types/authorization.types';
-import { IPaginationParams } from '@/types/pagination.types';
 import { AppError, HttpError } from '@/utils/errors.util';
 
 export class SupplierController {
@@ -18,71 +17,59 @@ export class SupplierController {
 			const user = request.user as IJwtAuthPayload;
 			const newSupplier = await this.supplierService.create(
 				supplierData,
-				user,
+				user.id,
 			);
 			return newSupplier;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'CONFLICT':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 409,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
-
-			throw new HttpError({
-				statusCode: 500,
-				message: 'Internal server error',
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
 	async findAll(request: FastifyRequest) {
 		try {
-			const user = request.user as IJwtAuthPayload;
-			const query = request.query as IPaginationParams & ISupplierFilters;
-
-			const pagination: IPaginationParams = {
-				page: query.page ? parseInt(String(query.page), 10) : 1,
-				limit: query.limit ? parseInt(String(query.limit), 10) : 10,
-			};
-
-			const filters: ISupplierFilters = {
-				name: query.name,
-				email: query.email,
-				contact_name: query.contact_name,
-				city: query.city,
-				state: query.state,
-				country: query.country,
-				is_active:
-					query.is_active !== undefined
-						? typeof query.is_active === 'string'
-							? query.is_active === 'true'
-							: !!query.is_active
-						: undefined,
-			};
+			const { page, limit, ...query } = request.query as {
+				page: number;
+				limit: number;
+			} & SupplierFilters;
 
 			const result = await this.supplierService.findAll(
-				user,
-				filters,
-				pagination,
+				query,
+				page,
+				limit,
 			);
 			return result;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
-
-			throw new HttpError({
-				statusCode: 500,
-				message: 'Internal server error',
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
@@ -121,18 +108,33 @@ export class SupplierController {
 			return updatedSupplier;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'CONFLICT':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 409,
+						});
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 400,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
-
-			throw new HttpError({
-				statusCode: 500,
-				message: 'Internal server error',
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
@@ -147,18 +149,21 @@ export class SupplierController {
 			return supplier;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 404,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
-
-			throw new HttpError({
-				statusCode: 500,
-				message: 'Internal server error',
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
@@ -169,18 +174,21 @@ export class SupplierController {
 			await this.supplierService.delete(id, user);
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 404,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
-
-			throw new HttpError({
-				statusCode: 500,
-				message: 'Internal server error',
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
@@ -191,18 +199,21 @@ export class SupplierController {
 			return transactions;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 404,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
 			}
-
-			throw new HttpError({
-				statusCode: 500,
-				message: 'Internal server error',
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 }

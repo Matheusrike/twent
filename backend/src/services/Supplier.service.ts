@@ -1,17 +1,16 @@
 import {
 	CreateSupplierType,
 	UpdateSupplierType,
-	ISupplierFilters,
+	SupplierFilters,
 } from '@/schemas/supplier.schema';
 import { IJwtAuthPayload } from '@/types/authorization.types';
-import { IPaginationParams } from '@/types/pagination.types';
 import { AppError } from '@/utils/errors.util';
 import { Prisma, PrismaClient } from '@prisma/generated/client';
 
 export class SupplierService {
 	constructor(private database: PrismaClient) {}
 
-	async create(data: CreateSupplierType, user: IJwtAuthPayload) {
+	async create(data: CreateSupplierType, id: string) {
 		try {
 			const existingSupplier = await this.database.supplier.findFirst({
 				where: {
@@ -22,7 +21,7 @@ export class SupplierService {
 			if (existingSupplier) {
 				throw new AppError({
 					message: 'Fornecedor com este email já existe',
-					errorCode: 'SUPPLIER_EMAIL_ALREADY_EXISTS',
+					errorCode: 'CONFLICT',
 				});
 			}
 
@@ -35,7 +34,20 @@ export class SupplierService {
 			if (existingPhone) {
 				throw new AppError({
 					message: 'Fornecedor com este telefone já existe',
-					errorCode: 'SUPPLIER_PHONE_ALREADY_EXISTS',
+					errorCode: 'CONFLICT',
+				});
+			}
+
+			const existingDocument = await this.database.supplier.findFirst({
+				where: {
+					document_number: data.document_number,
+				},
+			});
+
+			if (existingDocument) {
+				throw new AppError({
+					message: 'Fornecedor com este documento já existe',
+					errorCode: 'CONFLICT',
 				});
 			}
 
@@ -58,7 +70,7 @@ export class SupplierService {
 
 			await this.database.auditLog.create({
 				data: {
-					user_id: user.id,
+					user_id: id,
 					action: 'CREATE',
 					entity: 'Supplier',
 					entity_id: supplier.id,
@@ -68,148 +80,139 @@ export class SupplierService {
 
 			return supplier;
 		} catch (error) {
-			if (error instanceof AppError) throw error;
-			throw error;
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
 		}
 	}
+	async findAll(filters: SupplierFilters, page = 1, limit = 10) {
+		try {
+			const safePage = Math.max(1, page);
+			const safeLimit = Math.max(1, limit);
+			const skip = (safePage - 1) * safeLimit;
 
-	async findAll(
-		user: IJwtAuthPayload,
-		filters?: ISupplierFilters,
-		pagination?: IPaginationParams,
-	) {
-		const page =
-			pagination?.page && pagination.page > 0 ? pagination.page : 1;
-		const limit =
-			pagination?.limit && pagination.limit > 0 ? pagination.limit : 10;
-		const skip = (page - 1) * limit;
+			const where: Prisma.SupplierWhereInput = {};
 
-		const where: Prisma.SupplierWhereInput = {};
+			if (filters?.name) {
+				where.name = { startsWith: filters.name, mode: 'insensitive' };
+			}
 
-		if (filters?.name) {
-			where.name = {
-				contains: filters.name,
+			if (filters?.email) {
+				where.email = {
+					startsWith: filters.email,
+					mode: 'insensitive',
+				};
+			}
+
+			for (const key of [
+				'contact_name',
+				'city',
+				'state',
+				'country',
+			] as const) {
+				if (filters?.[key]) {
+					where[key] = {
+						contains: filters[key],
+						mode: 'insensitive',
+					};
+				}
+			}
+
+			where.is_active = filters?.is_active ?? true;
+
+			const [suppliers, total] = await Promise.all([
+				this.database.supplier.findMany({
+					where,
+					include: {
+						_count: {
+							select: {
+								financial_transactions: true,
+							},
+						},
+					},
+					orderBy: { name: 'asc' },
+					skip,
+					take: safeLimit,
+				}),
+				this.database.supplier.count({ where }),
+			]);
+
+			const totalPages = Math.ceil(total / safeLimit);
+
+			return {
+				suppliers,
+				pagination: {
+					page: safePage,
+					limit: safeLimit,
+					total,
+					totalPages,
+					hasNext: safePage < totalPages,
+					hasPrev: safePage > 1,
+				},
 			};
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
 		}
-
-		if (filters?.email) {
-			where.email = {
-				contains: filters.email,
-			};
-		}
-
-		if (filters?.contact_name) {
-			where.contact_name = {
-				contains: filters.contact_name,
-			};
-		}
-
-		if (filters?.city) {
-			where.city = {
-				contains: filters.city,
-			};
-		}
-
-		if (filters?.state) {
-			where.state = {
-				contains: filters.state,
-			};
-		}
-
-		if (filters?.country) {
-			where.country = {
-				contains: filters.country,
-			};
-		}
-
-		if (filters?.is_active !== undefined) {
-			where.is_active = filters.is_active;
-		} else {
-			where.is_active = true;
-		}
-
-		const [suppliers, total] = await Promise.all([
-			this.database.supplier.findMany({
-				where,
+	}
+	async findById(id: string) {
+		try {
+			const supplier = await this.database.supplier.findUnique({
+				where: { id },
 				include: {
+					financial_transactions: {
+						orderBy: { transaction_date: 'desc' },
+						take: 10,
+						include: {
+							store: {
+								select: {
+									id: true,
+									name: true,
+									code: true,
+								},
+							},
+							createdBy: {
+								select: {
+									id: true,
+									first_name: true,
+									last_name: true,
+									email: true,
+								},
+							},
+						},
+					},
 					_count: {
 						select: {
 							financial_transactions: true,
 						},
 					},
 				},
-				orderBy: { name: 'asc' },
-				skip,
-				take: limit,
-			}),
-			this.database.supplier.count({ where }),
-		]);
+			});
 
-		const totalPages = Math.ceil(total / limit);
-		const hasNext = page < totalPages;
-		const hasPrev = page > 1;
+			if (!supplier) {
+				throw new AppError({
+					message: 'Fornecedor não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
 
-		return {
-			suppliers,
-			pagination: {
-				page,
-				limit,
-				total,
-				totalPages,
-				hasNext,
-				hasPrev,
-			},
-		};
-	}
+			if (!supplier.is_active) {
+				throw new AppError({
+					message: 'Fornecedor inativo',
+					errorCode: 'BAD_REQUEST',
+				});
+			}
 
-	async findById(id: string) {
-		const supplier = await this.database.supplier.findUnique({
-			where: { id },
-			include: {
-				financial_transactions: {
-					orderBy: { transaction_date: 'desc' },
-					take: 10,
-					include: {
-						store: {
-							select: {
-								id: true,
-								name: true,
-								code: true,
-							},
-						},
-						createdBy: {
-							select: {
-								id: true,
-								first_name: true,
-								last_name: true,
-								email: true,
-							},
-						},
-					},
-				},
-				_count: {
-					select: {
-						financial_transactions: true,
-					},
-				},
-			},
-		});
-
-		if (!supplier) {
+			return supplier;
+		} catch (error) {
 			throw new AppError({
-				message: 'Fornecedor não encontrado',
-				errorCode: 'SUPPLIER_NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-
-		if (!supplier.is_active) {
-			throw new AppError({
-				message: 'Fornecedor inativo',
-				errorCode: 'SUPPLIER_INACTIVE',
-			});
-		}
-
-		return supplier;
 	}
 
 	async update(id: string, data: UpdateSupplierType, user: IJwtAuthPayload) {
@@ -221,14 +224,14 @@ export class SupplierService {
 			if (!existingSupplier) {
 				throw new AppError({
 					message: 'Fornecedor não encontrado',
-					errorCode: 'SUPPLIER_NOT_FOUND',
+					errorCode: 'NOT_FOUND',
 				});
 			}
 
 			if (!existingSupplier.is_active) {
 				throw new AppError({
 					message: 'Não é possível atualizar um fornecedor inativo',
-					errorCode: 'SUPPLIER_INACTIVE',
+					errorCode: 'BAD_REQUEST',
 				});
 			}
 
@@ -243,7 +246,7 @@ export class SupplierService {
 				if (emailExists) {
 					throw new AppError({
 						message: 'Email já está em uso por outro fornecedor',
-						errorCode: 'SUPPLIER_EMAIL_ALREADY_EXISTS',
+						errorCode: 'CONFLICT',
 					});
 				}
 			}
@@ -259,7 +262,7 @@ export class SupplierService {
 				if (phoneExists) {
 					throw new AppError({
 						message: 'Telefone já está em uso por outro fornecedor',
-						errorCode: 'SUPPLIER_PHONE_ALREADY_EXISTS',
+						errorCode: 'CONFLICT',
 					});
 				}
 			}
@@ -295,118 +298,142 @@ export class SupplierService {
 
 			return updatedSupplier;
 		} catch (error) {
-			if (error instanceof AppError) throw error;
-			throw error;
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
 		}
 	}
 
 	async setActiveStatus(id: string, user: IJwtAuthPayload) {
-		const supplier = await this.database.supplier.findUnique({
-			where: { id },
-		});
+		try {
+			const supplier = await this.database.supplier.findUnique({
+				where: { id },
+			});
 
-		if (!supplier) {
+			if (!supplier) {
+				throw new AppError({
+					message: 'Fornecedor não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+
+			if (!supplier.is_active) {
+				const updatedSupplier = await this.database.supplier.update({
+					where: { id },
+					data: { is_active: true },
+				});
+
+				await this.database.auditLog.create({
+					data: {
+						user_id: user.id,
+						action: 'UPDATE',
+						entity: 'Supplier',
+						entity_id: id,
+						old_value: supplier,
+						new_value: updatedSupplier,
+					},
+				});
+			}
+
+			return supplier;
+		} catch (error) {
 			throw new AppError({
-				message: 'Fornecedor não encontrado',
-				errorCode: 'SUPPLIER_NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
+	}
 
-		if (!supplier.is_active) {
-			const updatedSupplier = await this.database.supplier.update({
+	async delete(id: string, user: IJwtAuthPayload) {
+		try {
+			const supplier = await this.database.supplier.findUnique({
 				where: { id },
-				data: { is_active: true },
+				include: {
+					_count: {
+						select: {
+							financial_transactions: true,
+						},
+					},
+				},
+			});
+
+			if (!supplier) {
+				throw new AppError({
+					message: 'Fornecedor não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+
+			const oldData = { ...supplier };
+
+			await this.database.supplier.update({
+				where: { id },
+				data: { is_active: false },
 			});
 
 			await this.database.auditLog.create({
 				data: {
 					user_id: user.id,
-					action: 'UPDATE',
+					action: 'DELETE',
 					entity: 'Supplier',
 					entity_id: id,
-					old_value: supplier,
-					new_value: updatedSupplier,
+					old_value: oldData,
 				},
 			});
-		}
-
-		return supplier;
-	}
-
-	async delete(id: string, user: IJwtAuthPayload) {
-		const supplier = await this.database.supplier.findUnique({
-			where: { id },
-			include: {
-				_count: {
-					select: {
-						financial_transactions: true,
-					},
-				},
-			},
-		});
-
-		if (!supplier) {
+		} catch (error) {
 			throw new AppError({
-				message: 'Fornecedor não encontrado',
-				errorCode: 'SUPPLIER_NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-
-		const oldData = { ...supplier };
-
-		await this.database.supplier.update({
-			where: { id },
-			data: { is_active: false },
-		});
-
-		await this.database.auditLog.create({
-			data: {
-				user_id: user.id,
-				action: 'DELETE',
-				entity: 'Supplier',
-				entity_id: id,
-				old_value: oldData,
-			},
-		});
 	}
 
 	async getTransactions(id: string) {
-		const supplier = await this.database.supplier.findUnique({
-			where: { id },
-		});
+		try {
+			const supplier = await this.database.supplier.findUnique({
+				where: { id },
+			});
 
-		if (!supplier) {
+			if (!supplier) {
+				throw new AppError({
+					message: 'Fornecedor não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+
+			const transactions =
+				await this.database.financialTransaction.findMany({
+					where: {
+						supplier_id: id,
+					},
+					include: {
+						store: {
+							select: {
+								id: true,
+								name: true,
+								code: true,
+								type: true,
+							},
+						},
+						createdBy: {
+							select: {
+								id: true,
+								first_name: true,
+								last_name: true,
+								email: true,
+							},
+						},
+					},
+					orderBy: { transaction_date: 'desc' },
+				});
+
+			return transactions;
+		} catch (error) {
 			throw new AppError({
-				message: 'Fornecedor não encontrado',
-				errorCode: 'SUPPLIER_NOT_FOUND',
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 			});
 		}
-
-		const transactions = await this.database.financialTransaction.findMany({
-			where: {
-				supplier_id: id,
-			},
-			include: {
-				store: {
-					select: {
-						id: true,
-						name: true,
-						code: true,
-						type: true,
-					},
-				},
-				createdBy: {
-					select: {
-						id: true,
-						first_name: true,
-						last_name: true,
-						email: true,
-					},
-				},
-			},
-			orderBy: { transaction_date: 'desc' },
-		});
-
-		return transactions;
 	}
 }

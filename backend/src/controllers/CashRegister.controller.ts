@@ -17,7 +17,7 @@ export class CashRegisterController {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
-					statusCode: 400,
+					statusCode: 500,
 					errorCode: error.errorCode,
 				});
 			}
@@ -40,49 +40,79 @@ export class CashRegisterController {
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 400,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
-			throw new HttpError({
-				message: error.message,
-				statusCode: 500,
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 
 	async activateCashRegister(request: FastifyRequest) {
 		try {
-			const { id } = request.params as { id: string };
+			const { id } = request.params as {
+				id: string;
+			};
 			const response =
-				await this.cashRegisterService.activateCashRegister(id);
+				await this.cashRegisterService.activateCashRegister(
+					id,
+				);
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
 		}
 	}
 	async deactivateCashRegister(request: FastifyRequest) {
 		try {
-			const { id } = request.params as { id: string };
+			const { id } = request.params as {
+				id: string;
+			};
 			const response =
-				await this.cashRegisterService.deactivateCashRegister(id);
+				await this.cashRegisterService.deactivateCashRegister(
+					id,
+				);
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
 		}
 	}
@@ -95,7 +125,7 @@ export class CashRegisterController {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
-					statusCode: 400,
+					statusCode: 500,
 					errorCode: error.errorCode,
 				});
 			}
@@ -117,7 +147,7 @@ export class CashRegisterController {
 			if (error instanceof AppError) {
 				throw new HttpError({
 					message: error.message,
-					statusCode: 400,
+					statusCode: 500,
 					errorCode: error.errorCode,
 				});
 			}
@@ -126,13 +156,13 @@ export class CashRegisterController {
 
 	async openSession(request: FastifyRequest) {
 		try {
-			const { cash_register_id } = request.params as {
-				cash_register_id: string;
+			const { id } = request.params as {
+				id: string;
 			};
-			const { id } = request.user as IJwtAuthPayload;
+			const { id: userId } = request.user as IJwtAuthPayload;
 			const response = await this.cashRegisterService.openSession(
-				cash_register_id,
 				id,
+				userId,
 			);
 			return response;
 		} catch (error) {
@@ -142,6 +172,12 @@ export class CashRegisterController {
 						throw new HttpError({
 							message: error.message,
 							statusCode: 409,
+							errorCode: error.errorCode,
+						});
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
 							errorCode: error.errorCode,
 						});
 					default:
@@ -157,31 +193,31 @@ export class CashRegisterController {
 
 	async closeSession(request: FastifyRequest) {
 		try {
-			const { cash_register_id } = request.params as {
-				cash_register_id: string;
+			const { id } = request.params as {
+				id: string;
 			};
-			const { closing_amount } = request.body as {
-				closing_amount: number;
-			};
-            
+
 			const response = await this.cashRegisterService.closeSession(
-				cash_register_id,
-				closing_amount,
+				id
 			);
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
-				throw new HttpError({
-					message: error.message,
-					statusCode: 400,
-					errorCode: error.errorCode,
-				});
+				switch (error.errorCode) {
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							statusCode: 404,
+							errorCode: error.errorCode,
+						});
+					default:
+						throw new HttpError({
+							message: error.message,
+							statusCode: 500,
+							errorCode: error.errorCode,
+						});
+				}
 			}
-			throw new HttpError({
-				message: error.message,
-				statusCode: 500,
-				errorCode: 'INTERNAL_SERVER_ERROR',
-			});
 		}
 	}
 }

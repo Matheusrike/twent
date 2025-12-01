@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { UserType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
 import { Decimal } from '@prisma/client/runtime/library';
+import { ConflictResponseSchema } from './generic.schema';
 
 export const UserTypes: UserType[] = ['CUSTOMER', 'EMPLOYEE'];
 
@@ -28,14 +29,17 @@ export const getUserInfoResponse = ApiResponseSchema.extend({
 		zip_code: z.union([z.null(), z.string()]).nullable(),
 		country: z.string().nullable(),
 		reset_token: z.string().optional().nullable(),
-		reset_token_expires: z.string().optional().nullable(),
+		reset_token_expires: z.date().optional().nullable(),
 		last_login_at: z.date().nullable(),
 		is_active: z.boolean(),
 		created_at: z.coerce.date(),
 		updated_at: z.coerce.date(),
-		store: z.object({
-			name: z.string(),
-		}).optional().nullable(),
+		store: z
+			.object({
+				name: z.string(),
+			})
+			.optional()
+			.nullable(),
 		employee: z
 			.object({
 				position: z.string(),
@@ -66,26 +70,20 @@ export const getUserInfoResponse = ApiResponseSchema.extend({
 });
 
 export const changeStatusResponseSchema = ApiResponseSchema.extend({
-    success: z.literal(true),
-    message: z
-        .string()
-        .meta({ examples: ['Status alterado com sucesso'] }),
-    data: z.object({
-        id: z.string(),
-        email: z.email(),
-        first_name: z.string(), 
-        last_name: z.string(),
-        user_type: z.enum(UserTypes),
-        is_active: z.boolean(),
-    }),
-})
+	success: z.literal(true),
+	message: z.string().meta({ examples: ['Status alterado com sucesso'] }),
+	data: z.object({
+		id: z.string(),
+		email: z.email(),
+		first_name: z.string(),
+		last_name: z.string(),
+		user_type: z.enum(UserTypes),
+		is_active: z.boolean(),
+	}),
+});
 
-export const ConflictStatusResponseSchema = ApiResponseSchema.extend({
-	success: z.literal(false),
+export const ConflictStatusResponseSchema = ConflictResponseSchema.extend({
 	message: z
 		.string()
-		.meta({ examples: ['Usuário já está ativado/desativado'] }),
-	errorCode: z.string().meta({ examples: ['CONFLICT_STATUS'] }),
-}).meta({
-	description: 'Resposta para alteração de status conflitante (409).',
+		.meta({ examples: ['Informações do usuário conflitantes'] }),
 });
