@@ -38,9 +38,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					504: CustomerGatewayTimeoutSchema,
 				},
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -80,9 +78,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					504: CustomerGatewayTimeoutSchema,
 				},
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -120,9 +116,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 					504: CustomerGatewayTimeoutSchema,
 				},
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {

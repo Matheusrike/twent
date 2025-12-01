@@ -55,8 +55,8 @@ export default function CreateEmployeeModal({
     department: "",
     salary: "",
     currency: "BRL",
-    role: "EMPLOYEE_HQ",
-    store_code: "",
+    role: "",
+    code: "",
     benefits: "",
     emergency_name: "",
     emergency_phone: "",
@@ -68,16 +68,13 @@ export default function CreateEmployeeModal({
   const handleChange = (key: string, value: string) => {
     setError("");
 
-    // Máscaras e validações
     if (key === "phone" || key === "emergency_phone") {
       let cleaned = value.replace(/\D/g, "");
       if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
-      if (cleaned.length <= 11) {
-        if (cleaned.length > 6)
-          cleaned = cleaned.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-        else if (cleaned.length > 2)
-          cleaned = cleaned.replace(/(\d{2})(\d+)/, "($1) $2");
-      }
+      if (cleaned.length > 6)
+        cleaned = cleaned.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+      else if (cleaned.length > 2)
+        cleaned = cleaned.replace(/(\d{2})(\d+)/, "($1) $2");
       setForm((prev) => ({ ...prev, [key]: cleaned }));
       return;
     }
@@ -112,50 +109,53 @@ export default function CreateEmployeeModal({
       return;
     }
 
-    if (form.password_hash.length < 6) {
-      setError("A senha deve ter no mínimo 6 caracteres");
+    if (form.password_hash.length < 8) {
+      setError("A senha deve ter no mínimo 8 caracteres");
       return;
     }
 
     setLoading(true);
     try {
+      const cleanedPhone = form.phone.replace(/\D/g, "");
+      const cleanedEmergency = form.emergency_phone.replace(/\D/g, "");
+
       const response = await fetch("/response/api/employee", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          email: form.email,
+          email: form.email.trim(),
           password_hash: form.password_hash,
-          first_name: form.first_name,
-          last_name: form.last_name,
-          phone: form.phone.replace(/\D/g, ""),
+          first_name: form.first_name.trim(),
+          last_name: form.last_name.trim(),
+          phone: cleanedPhone ? `+55${cleanedPhone}` : null,
           user_type: "EMPLOYEE",
-          document_number: form.document_number,
+          document_number: form.document_number || null,
           birth_date: form.birth_date || null,
-          street: form.street,
-          number: form.number,
-          district: form.district,
-          city: form.city,
-          state: form.state,
-          zip_code: form.zip_code.replace(/\D/g, ""),
-          country: form.country,
+          street: form.street || null,
+          number: form.number || null,
+          district: form.district || null,
+          city: form.city || null,
+          state: form.state || null,
+          zip_code: form.zip_code.replace(/\D/g, "") || null,
+          country: form.country || "Brasil",
           is_active: true,
-          national_id: form.national_id,
-          department: form.department,
+          national_id: form.national_id || null,
+          department: form.department || null,
           salary: Number(form.salary) || 0,
           currency: form.currency,
-          role: form.role,
+          role: form.role || "EMPLOYEE_BRANCH",
+          code: form.code || null,
           benefits: form.benefits
             .split(",")
             .map((b) => b.trim())
             .filter(Boolean),
           emergency_contact: form.emergency_name
             ? {
-                name: form.emergency_name,
-                phone: form.emergency_phone.replace(/\D/g, ""),
+                name: form.emergency_name.trim(),
+                phone: cleanedEmergency ? `+55${cleanedEmergency}` : null,
               }
             : null,
-          store: form.store_code ? { code: form.store_code } : null,
         }),
       });
 
@@ -165,7 +165,6 @@ export default function CreateEmployeeModal({
         throw new Error(data.message || data.error || "Erro ao criar funcionário");
       }
 
-      // Reset form
       setForm({
         email: "",
         password_hash: "",
@@ -185,8 +184,8 @@ export default function CreateEmployeeModal({
         department: "",
         salary: "",
         currency: "BRL",
-        role: "EMPLOYEE_HQ",
-        store_code: "",
+        role: "",
+        code: "",
         benefits: "",
         emergency_name: "",
         emergency_phone: "",
@@ -229,7 +228,6 @@ export default function CreateEmployeeModal({
               </Alert>
             )}
 
-            {/* Informações Pessoais */}
             <section className="space-y-6">
               <div className="flex items-center gap-3 text-sm font-semibold">
                 <User className="h-4 w-4" />
@@ -254,7 +252,7 @@ export default function CreateEmployeeModal({
                   </Label>
                   <Input
                     type="password"
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder="Mínimo 8 caracteres"
                     value={form.password_hash}
                     onChange={(e) => handleChange("password_hash", e.target.value)}
                   />
@@ -308,7 +306,6 @@ export default function CreateEmployeeModal({
               </div>
             </section>
 
-            {/* Endereço */}
             <section className="space-y-6">
               <div className="flex items-center gap-3 text-sm font-semibold">
                 <MapPin className="h-4 w-4" />
@@ -345,7 +342,6 @@ export default function CreateEmployeeModal({
               </div>
             </section>
 
-            {/* Trabalho */}
             <section className="space-y-6">
               <div className="flex items-center gap-3 text-sm font-semibold">
                 <Building2 className="h-4 w-4" />
@@ -364,8 +360,8 @@ export default function CreateEmployeeModal({
                   <Input placeholder="3500" value={form.salary} onChange={(e) => handleChange("salary", e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Código da Loja</Label>
-                  <Input placeholder="BRA008" value={form.store_code} onChange={(e) => handleChange("store_code", e.target.value)} />
+                  <Label>Código da Loja <span className="text-destructive">*</span></Label>
+                  <Input placeholder="BRA001" value={form.code} onChange={(e) => handleChange("code", e.target.value)} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-6">
@@ -374,7 +370,7 @@ export default function CreateEmployeeModal({
                   <select
                     className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     value={form.role}
-                    onChange={(e) => setForm(prev => ({ ...prev, role: e.target.value }))}
+                    onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
                   >
                     <option value="EMPLOYEE_HQ">EMPLOYEE_HQ</option>
                     <option value="EMPLOYEE_BRANCH">EMPLOYEE_BRANCH</option>
@@ -392,7 +388,6 @@ export default function CreateEmployeeModal({
               </div>
             </section>
 
-            {/* Contato de Emergência */}
             <section className="space-y-6">
               <div className="flex items-center gap-3 text-sm font-semibold">
                 <HeartHandshake className="h-4 w-4" />
@@ -413,7 +408,7 @@ export default function CreateEmployeeModal({
           </div>
         </div>
 
-       <div className="p-2 border-t bg-muted/30 backdrop-blur-sm flex justify-end gap-3">
+        <div className="p-6 border-t bg-muted/30 backdrop-blur-sm flex justify-end gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancelar
           </Button>

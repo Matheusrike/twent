@@ -5,6 +5,7 @@ import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError, HttpError } from '@/utils/errors.util';
 import { SkuType } from '@/schemas/generic.schema';
 import path from 'node:path';
+import { IPaginationParams } from '@/types/pagination.types';
 
 export class ProductController {
 	private readonly IMAGE_FORMATS_ALLOWED = [
@@ -45,9 +46,17 @@ export class ProductController {
 		}
 	}
 
-	async findAllPublic() {
+	async findAllPublic(request: FastifyRequest) {
 		try {
-			const products = await this.productService.findAllPublic();
+			const query = request.query as IPaginationParams;
+
+			const pagination = {
+				page: query.page,
+				limit: query.limit,
+			};
+
+			const products =
+				await this.productService.findAllPublic(pagination);
 			return products;
 		} catch (error) {
 			if (error instanceof AppError) {
@@ -57,6 +66,8 @@ export class ProductController {
 					errorCode: error.errorCode,
 				});
 			}
+
+			console.error(error);
 			throw new HttpError({
 				statusCode: 500,
 				message: 'Internal server error',

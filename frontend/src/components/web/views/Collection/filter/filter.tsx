@@ -4,39 +4,39 @@ import { useState } from "react";
 import { Table2, List, X } from "lucide-react";
 import DropdownMenuWithCheckboxes from "./dropdown/dropdown";
 import SearchInput from "./search";
+import CollectionHero from "../hero/hero"
 
 export default function FiltersSection() {
-  const [categories, setCategories] = useState<string[]>([]);
+  const [collections, setCollections] = useState<string[]>([]);
   const [prices, setPrices] = useState<string[]>([]);
-  const [brands, setBrands] = useState<string[]>([]);
-  const [materials, setMaterials] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState(""); // ← ESTADO DA BUSCA
 
   const handleChange =
     (setter: React.Dispatch<React.SetStateAction<string[]>>) =>
-      (option: string, checked: boolean) => {
-        setter((prev) =>
-          checked ? [...prev, option] : prev.filter((o) => o !== option)
-        );
-      };
+    (option: string, checked: boolean) => {
+      setter((prev) =>
+        checked ? [...prev, option] : prev.filter((o) => o !== option)
+      );
+    };
 
-  const activeFilters = [...categories, ...prices, ...brands, ...materials];
+  const activeFilters = [...collections, ...prices];
 
   return (
-    <section id="filters" className=" py-8 container ">
+    <section id="filters" className="py-8 container">
       <div className="max-w-8xl mx-auto px-6">
         <div className="flex flex-wrap items-center justify-between gap-6">
           {/* search input */}
-          <div className="flex items-center gap-4 w-full">
-            <SearchInput />
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <SearchInput onSearch={setSearchQuery} /> {/* ← PASSA A FUNÇÃO */}
           </div>
            
           {/* Dropdowns */}
           <div className="flex flex-wrap gap-4">
             <DropdownMenuWithCheckboxes
-              label="Categories"
-              options={["Sports Watches", "Dress Watches", "Diving Watches", "Chronographs"]}
-              selected={categories}
-              onChange={handleChange(setCategories)}
+              label="Collections"
+              options={["Heritage", "Diamond", "Royal", "Limited"]}
+              selected={collections}
+              onChange={handleChange(setCollections)}
             />
             <DropdownMenuWithCheckboxes
               label="Price Range"
@@ -44,24 +44,10 @@ export default function FiltersSection() {
               selected={prices}
               onChange={handleChange(setPrices)}
             />
-            <DropdownMenuWithCheckboxes
-              label="Brand"
-              options={["Chronos Elite", "Chronos Sport", "Chronos Heritage", "Chronos Limited"]}
-              selected={brands}
-              onChange={handleChange(setBrands)}
-            />
-            <DropdownMenuWithCheckboxes
-              label="Material"
-              options={["Stainless Steel", "Gold", "Titanium", "Ceramic"]}
-              selected={materials}
-              onChange={handleChange(setMaterials)}
-            />
           </div>
-
-
         </div>
 
-        {/* active filter */}
+        {/* active filters */}
         <div className="flex items-center justify-between mt-6">
           <div className="flex flex-wrap gap-2">
             {activeFilters.map((filter) => (
@@ -73,10 +59,8 @@ export default function FiltersSection() {
                 <X
                   className="w-4 h-4 cursor-pointer"
                   onClick={() => {
-                    setCategories((prev) => prev.filter((f) => f !== filter));
+                    setCollections((prev) => prev.filter((f) => f !== filter));
                     setPrices((prev) => prev.filter((f) => f !== filter));
-                    setBrands((prev) => prev.filter((f) => f !== filter));
-                    setMaterials((prev) => prev.filter((f) => f !== filter));
                   }}
                 />
               </span>
@@ -85,16 +69,19 @@ export default function FiltersSection() {
               <button
                 className="text-muted-foreground hover:text-gray-400 hover:dark:text-muted text-sm font-medium cursor-pointer"
                 onClick={() => {
-                  setCategories([]);
+                  setCollections([]);
                   setPrices([]);
-                  setBrands([]);
-                  setMaterials([]);
                 }}
               >
-                Clear All
+                Limpar tudo
               </button>
             )}
           </div>
+        </div>
+
+        {/* AQUI VEM O GRID COM A BUSCA JÁ FUNCIONANDO */}
+        <div className="mt-12">
+          <CollectionHero searchQuery={searchQuery} />
         </div>
       </div>
     </section>

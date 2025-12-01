@@ -24,6 +24,9 @@ export class StoreService {
 				take: take || 10,
 				skip: skip || 0,
 				where,
+                include: {
+                    sales: true 
+                }
 			});
 
 			return response;

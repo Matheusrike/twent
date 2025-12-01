@@ -4,6 +4,7 @@ import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError } from '@/utils/errors.util';
 import { Prisma, PrismaClient } from '@prisma/generated/client';
 import { ImageService } from '@/services/Image.service';
+import { IPaginationParams } from '@/types/pagination.types';
 
 export class ProductService {
 	private imageService: ImageService;
@@ -51,39 +52,76 @@ export class ProductService {
 		}
 	}
 
-	async findAllPublic() {
-		const products = await this.database.product.findMany({
-			where: { is_active: true },
-			select: {
-				sku: true,
-				name: true,
-				description: true,
-				price: true,
-				currency: true,
-				limited_edition: true,
-				production_limit: true,
-				specifications: true,
-				collection: {
-					select: {
-						id: true,
-						name: true,
-						description: true,
-						target_gender: true,
-						launch_year: true,
-					},
-				},
-				images: {
-					select: {
-						id: true,
-						public_id: true,
-						is_primary: true,
-					},
-				},
-			},
-			orderBy: { created_at: 'desc' },
-		});
+	async findAllPublic(pagination?: IPaginationParams) {
+		const page =
+			pagination?.page && pagination.page > 0 ? pagination.page : 1;
+		const limit =
+			pagination?.limit && pagination.limit > 0 ? pagination.limit : 10;
+		const skip = (page - 1) * limit;
 
-		return products;
+		const where: Prisma.ProductWhereInput = {
+			is_active: true,
+		};
+
+		const [products, total] = await Promise.all([
+			this.database.product.findMany({
+				where,
+				select: {
+					sku: true,
+					name: true,
+					description: true,
+					price: true,
+					currency: true,
+					limited_edition: true,
+					production_limit: true,
+					specifications: true,
+					collection: {
+						select: {
+							id: true,
+							name: true,
+							description: true,
+							target_gender: true,
+							launch_year: true,
+						},
+					},
+					images: {
+						select: {
+							id: true,
+							public_id: true,
+							is_primary: true,
+						},
+					},
+				},
+				orderBy: { created_at: 'desc' },
+				skip,
+				take: Number(limit),
+			}),
+			this.database.product.count({ where }),
+		]);
+
+		const totalPages = Math.ceil(total / limit);
+		const hasNext = page < totalPages;
+		const hasPrev = page > 1;
+
+		const productsWithUrls = products.map((product) => ({
+			...product,
+			images: product.images.map((img) => ({
+				...img,
+				url: this.imageService.generateUrl(img.public_id, {}),
+			})),
+		}));
+
+		return {
+			products: productsWithUrls,
+			pagination: {
+				page,
+				limit,
+				total,
+				totalPages,
+				hasNext,
+				hasPrev,
+			},
+		};
 	}
 
 	async findBySkuPublic(sku: string) {
@@ -126,29 +164,75 @@ export class ProductService {
 			});
 		}
 
-		return product;
+		const productWithUrls = {
+			...product,
+			images: product.images.map((img) => ({
+				...img,
+				url: this.imageService.generateUrl(img.public_id, {}),
+			})),
+		};
+
+		return productWithUrls;
 	}
 
-	async findAllInternal(user: IJwtAuthPayload) {
-		const products = await this.database.product.findMany({
-			where: { is_active: true },
-			include: {
-				collection: true,
-				images: { where: { is_primary: true } },
-				inventory: user.storeId
-					? { where: { store_id: user.storeId } }
-					: true,
-				_count: {
-					select: {
-						sale_items: true,
-						favorites: true,
+	async findAllInternal(
+		user: IJwtAuthPayload,
+		pagination?: IPaginationParams,
+	) {
+		const page =
+			pagination?.page && pagination.page > 0 ? pagination.page : 1;
+		const limit =
+			pagination?.limit && pagination.limit > 0 ? pagination.limit : 10;
+		const skip = (page - 1) * limit;
+
+		const where: Prisma.ProductWhereInput = { is_active: true };
+
+		const [products, total] = await Promise.all([
+			this.database.product.findMany({
+				where,
+				include: {
+					collection: true,
+					images: { where: { is_primary: true } },
+					inventory: user.storeId
+						? { where: { store_id: user.storeId } }
+						: true,
+					_count: {
+						select: {
+							sale_items: true,
+							favorites: true,
+						},
 					},
 				},
-			},
-			orderBy: { created_at: 'desc' },
-		});
+				orderBy: { created_at: 'desc' },
+				skip,
+				take: Number(limit),
+			}),
+			this.database.product.count({ where }),
+		]);
 
-		return products;
+		const productsWithUrls = products.map((product) => ({
+			...product,
+			images: product.images.map((img) => ({
+				...img,
+				url: this.imageService.generateUrl(img.public_id, {}),
+			})),
+		}));
+
+		const totalPages = Math.ceil(total / limit);
+		const hasNext = page < totalPages;
+		const hasPrev = page > 1;
+
+		return {
+			products: productsWithUrls,
+			pagination: {
+				page,
+				limit,
+				total,
+				totalPages,
+				hasNext,
+				hasPrev,
+			},
+		};
 	}
 
 	async findBySkuInternal(sku: string, user: IJwtAuthPayload) {
@@ -220,7 +304,15 @@ export class ProductService {
 			});
 		}
 
-		return product;
+		const productWithUrls = {
+			...product,
+			images: product.images.map((img) => ({
+				...img,
+				url: this.imageService.generateUrl(img.public_id, {}),
+			})),
+		};
+
+		return productWithUrls;
 	}
 
 	async update(sku: string, data: UpdateProductType, user: IJwtAuthPayload) {
@@ -324,10 +416,10 @@ export class ProductService {
 				.then((res) => res as { publicId: string }[]);
 
 			await this.database.productImage.createMany({
-				data: publicIds.map((img) => ({
+				data: publicIds.map((img, index) => ({
 					product_id: sku,
 					public_id: img.publicId,
-					is_primary: existingImages === 0,
+					is_primary: existingImages === 0 && index === 0,
 				})),
 			});
 

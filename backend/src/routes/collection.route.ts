@@ -38,7 +38,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
                     500: ApiGenericErrorSchema
                 }
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -75,7 +75,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
                     500: ApiGenericErrorSchema
                 }
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -144,7 +144,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
                     500: ApiGenericErrorSchema
                 }
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -181,7 +181,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
                     500: ApiGenericErrorSchema
                 }
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -216,7 +216,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
                     500: ApiGenericErrorSchema
                 }
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -252,7 +252,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -282,7 +282,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -312,7 +312,7 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
 			},
-			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
+			preHandler: [app.authorization()],
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {

@@ -1,10 +1,7 @@
 import { FastifyRequest } from 'fastify';
-import {
-	CreateEmployee,
-	EmployeeQuerystring,
-} from '@/schemas/employee.schema.ts';
-import { AppError, HttpError } from '@/utils/errors.util.ts';
-import { EmployeeService } from '@/services/Employee.service.ts';
+import { CreateEmployee, EmployeeQuerystring } from '@/schemas/employee.schema';
+import { AppError, HttpError } from '@/utils/errors.util';
+import { EmployeeService } from '@/services/Employee.service';
 import { IJwtAuthPayload } from '@/types/authorization.types';
 
 export class EmployeeController {

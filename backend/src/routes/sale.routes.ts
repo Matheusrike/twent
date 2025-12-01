@@ -17,9 +17,7 @@ export function saleRoutes(app: fastifyTypedInstance) {
 				tags: ['Sale'],
 				summary: 'Busca todas as vendas',
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -49,9 +47,7 @@ export function saleRoutes(app: fastifyTypedInstance) {
 				summary: 'Cria uma nova venda',
 				body: newSaleSchema,
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -80,9 +76,7 @@ export function saleRoutes(app: fastifyTypedInstance) {
 				tags: ['Sale'],
 				summary: 'cancela uma venda',
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {

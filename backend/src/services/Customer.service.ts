@@ -1,4 +1,3 @@
-import { validateLocation } from '@/helpers/validate-location.helper';
 import { AppError } from '@/utils/errors.util';
 import { UserService } from './User.service';
 import { comparePassword, validatePassword } from '@/utils/password.util';
@@ -21,23 +20,7 @@ export class CustomerService extends UserService {
 		if (data.birth_date) {
 			data.birth_date = new Date(data.birth_date!);
 		}
-		if (
-			data.country ||
-			data.state ||
-			data.city ||
-			data.street ||
-			data.district ||
-			data.zip_code
-		) {
-			await validateLocation({
-				country: data.country,
-				state: data.state,
-				city: data.city,
-				road: data.street,
-				district: data.district,
-				postalcode: data.zip_code,
-			});
-		}
+		
 		const user = await this.database.user.create({
 			data: { ...data, is_active: true, user_type: 'CUSTOMER' },
             omit: { password_hash: true },
@@ -58,23 +41,6 @@ export class CustomerService extends UserService {
 			throw new AppError({
 				message: 'Usuário não encontrado',
 				errorCode: 'NOT_FOUND',
-			});
-		}
-		if (
-			data.country ||
-			data.state ||
-			data.city ||
-			data.street ||
-			data.district ||
-			data.zip_code
-		) {
-			await validateLocation({
-				country: data.country,
-				state: data.state,
-				city: data.city,
-				road: data.street,
-				district: data.district,
-				postalcode: data.zip_code,
 			});
 		}
 		await this.validateUser(

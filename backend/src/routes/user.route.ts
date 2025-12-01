@@ -95,9 +95,7 @@ export function userRoute(app: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
@@ -130,9 +128,7 @@ export function userRoute(app: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: app.authorization({
-				requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
-			}),
+			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
