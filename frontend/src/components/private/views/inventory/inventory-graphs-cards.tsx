@@ -18,52 +18,44 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+type InventoryItem = {
+  quantity: number;
+  minimum_stock?: number;
+  product: {
+    sku: string;
+    name: string;
+  };
+};
+
+type Store = {
+  name: string;
+  inventory: InventoryItem[];
+};
 
 export default function InventoryCards() {
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [stores, setStores] = React.useState<Store[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const items = [
-    { id: 1, nome: "Twent Itaquera", current: 750, total: 1000 },
-    { id: 2, nome: "Filial 2", current: 450, total: 1000 },
-    { id: 3, nome: "Filial 3", current: 900, total: 1000 },
-    { id: 4, nome: "Filial 4", current: 600, total: 1000 },
-    { id: 5, nome: "Filial 5", current: 350, total: 1000 },
-    { id: 6, nome: "Filial 6", current: 820, total: 1000 },
-  ];
-
-  const produtos = [
-    {
-      sku: "PRD-001",
-      nome: "Camiseta Preta",
-      quantidade: 120,
-      categoria: "Vestuário",
-    },
-    {
-      sku: "PRD-002",
-      nome: "Tênis Branco",
-      quantidade: 80,
-      categoria: "Calçados",
-    },
-    {
-      sku: "PRD-003",
-      nome: "Boné Azul",
-      quantidade: 45,
-      categoria: "Acessórios",
-    },
-    {
-      sku: "PRD-004",
-      nome: "Jaqueta Jeans",
-      quantidade: 60,
-      categoria: "Vestuário",
-    },
-    {
-      sku: "PRD-005",
-      nome: "Jaqueta Jeans",
-      quantidade: 60,
-      categoria: "Vestuário",
-    },
-  ];
+  React.useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/response/api/inventory/all", {
+          method: "GET",
+          credentials: "include",
+        });
+        const json = await res.json();
+        const data = json?.data ?? json;
+        setStores(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Erro ao carregar inventário:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const CircularProgress = ({ percentage }: { percentage: number }) => {
     const radius = 40;
@@ -104,84 +96,92 @@ export default function InventoryCards() {
   };
 
   const StockStatus = ({ percentage }: { percentage: number }) => {
-    if (percentage >= 80) {
+    if (percentage >= 80)
       return (
         <div className="flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-2.5 py-1 rounded-full">
           <Package className="h-3.5 w-3.5" />
           Estoque Alto
         </div>
       );
-    } else if (percentage >= 50) {
+    if (percentage >= 50)
       return (
         <div className="flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
           <TrendingUp className="h-3.5 w-3.5" />
           Estoque Normal
         </div>
       );
-    } else {
-      return (
-        <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
-          <AlertCircle className="h-3.5 w-3.5" />
-          Estoque Baixo
-        </div>
-      );
-    }
+    return (
+      <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
+        <AlertCircle className="h-3.5 w-3.5" />
+        Estoque Baixo
+      </div>
+    );
   };
 
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+        {[...Array(6)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <CardHeader className="pb-2 pt-4 px-6">
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center">
+              <div className="w-28 h-28 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="
-        grid
-        grid-cols-1
-        sm:grid-cols-2
-        md:grid-cols-3
-        xl:grid-cols-4
-        gap-6
-        w-full
-        h-full
-      "
-    >
-      {items.map((item) => {
-        const percentage = (item.current / item.total) * 100;
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+      {stores.map((store) => {
+        const items = store.inventory ?? [];
+
+        const current = items.reduce((acc, item) => acc + item.quantity, 0);
+        const total = items.reduce(
+          (acc, item) => acc + (item.minimum_stock ?? 0),
+          0
+        );
+
+        const percentage = total > 0 ? (current / total) * 100 : 0;
 
         return (
-          <Dialog key={item.id}>
+          <Dialog key={store.name}>
             <DialogTrigger asChild>
-              <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-500 hover:shadow-xl hover:-translate-y-1 w-full">
-                {/* store and status */}
+              <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-500 hover:shadow-xl hover:-translate-y-1 w-full cursor-pointer">
                 <CardHeader className="pb-2 pt-4 px-6 flex flex-col gap-4 items-start sm:items-center justify-between">
                   <div className="mt-2 sm:mt-0">
                     <StockStatus percentage={percentage} />
                   </div>
                   <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {item.nome}
+                    {store.name}
                   </CardTitle>
                 </CardHeader>
 
                 <CardContent className="xl:p-6 flex flex-col items-center justify-center">
-                  {/* graph */}
                   <CircularProgress percentage={percentage} />
 
-                  {/* inventory info */}
                   <div className="flex w-full gap-4 mt-4">
                     <div className="flex flex-col bg-gray-50 dark:bg-gray-900 rounded-lg flex-1 p-3 text-center">
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                         Atual
                       </span>
                       <span className="text-xl font-bold text-foreground">
-                        {item.current.toLocaleString()}
+                        {current.toLocaleString()}
                       </span>
                       <span className="text-xs text-muted-foreground">
                         unidades
                       </span>
                     </div>
-
                     <div className="flex flex-col bg-gray-50 dark:bg-gray-900 rounded-lg flex-1 p-3 text-center">
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Total
+                        Mínimo
                       </span>
                       <span className="text-xl font-bold text-foreground">
-                        {item.total.toLocaleString()}
+                        {total.toLocaleString()}
                       </span>
                       <span className="text-xs text-muted-foreground">
                         unidades
@@ -192,57 +192,79 @@ export default function InventoryCards() {
               </Card>
             </DialogTrigger>
 
-            {/* modal */}
-            {/* <DialogContent className="max-w-3xl">
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-lg">
                   <Info className="w-5 h-5 text-primary" />
-                  Estoque detalhado | {item.nome}
+                  Estoque detalhado | {store.name}
                 </DialogTitle>
               </DialogHeader>
 
-              {/* search bar 
-              <div className="mt-4 mb-3 flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Pesquisar código..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+              <div className="mt-6">
+                <Input
+                  placeholder="Pesquisar por SKU ou nome..."
+                  className="mb-4"
+                  onChange={(e) => {
+                    const term = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll("tbody tr");
+                    rows.forEach((row) => {
+                      const text = row.textContent?.toLowerCase() || "";
+                      (row as HTMLElement).style.display = text.includes(term)
+                        ? ""
+                        : "none";
+                    });
+                  }}
                 />
-              </div>
 
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Código</TableHead>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Quantidade</TableHead>
-                      <TableHead>Categoria</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {produtos
-                      .filter((produto) =>
-                        produto.sku
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase())
-                      )
-                      .map((produto, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{produto.sku}</TableCell>
-                          <TableCell>{produto.nome}</TableCell>
-                          <TableCell>{produto.quantidade}</TableCell>
-                          <TableCell>{produto.categoria}</TableCell>
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-left">SKU</TableHead>
+                        <TableHead className="text-left">
+                          Nome do Produto
+                        </TableHead>
+                        <TableHead className="text-right">Atual</TableHead>
+                        <TableHead className="text-right">Mínimo</TableHead>
+                      </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                      {items.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={4}
+                            className="text-center text-muted-foreground"
+                          >
+                            Nenhum produto em estoque
+                          </TableCell>
                         </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </div>
+                      ) : (
+                        items.map((item, i) => (
+                          <TableRow key={i}>
+                            <TableCell className="text-left font-medium">
+                              {item.product.sku}
+                            </TableCell>
 
-      
-            </DialogContent> */}
+                            <TableCell className="text-left">
+                              {item.product.name}
+                            </TableCell>
+
+                            <TableCell className="text-right font-semibold">
+                              {item.quantity}
+                            </TableCell>
+
+                            <TableCell className="text-right">
+                              {item.minimum_stock ?? 0}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </DialogContent>
           </Dialog>
         );
       })}
