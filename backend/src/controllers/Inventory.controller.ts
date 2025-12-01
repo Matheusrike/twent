@@ -11,9 +11,9 @@ import { FastifyRequest } from 'fastify';
 export class InventoryController {
 	constructor(private inventoryService: InventoryService) {}
 
-	async getAllInventorys() {
+	async getAllInventory() {
 		try {
-			const inventory = await this.inventoryService.getAllInventorys();
+			const inventory = await this.inventoryService.getAllInventory();
 			return inventory;
 		} catch (error) {
 			if (error instanceof AppError) {
@@ -31,10 +31,10 @@ export class InventoryController {
 		}
 	}
 
-	async getStoreInventorys(request: FastifyRequest) {
+	async getStoreInventory(request: FastifyRequest) {
 		try {
 			const user = request.user as IJwtAuthPayload;
-			const inventory = await this.inventoryService.getStoreInventorys(
+			const inventory = await this.inventoryService.getStoreInventory(
 				user.storeId!,
 			);
 			return inventory;
@@ -56,17 +56,18 @@ export class InventoryController {
 
 	async newInventory(request: FastifyRequest) {
 		try {
-			const { product_id, quantity, store_id, minimum_stock } =
+			const { product_id, quantity, minimum_stock } =
 				request.body as CreateInventoryType;
-                
+			const { storeId } = request.user as IJwtAuthPayload;
 
-			const newInventory = await this.inventoryService.newInventory({
-				product_id,
-				quantity,
-				store_id:
-					store_id || (request.user as IJwtAuthPayload).storeId!,
-				minimum_stock,
-			});
+			const newInventory = await this.inventoryService.newInventory(
+				{
+					product_id,
+					quantity,
+					minimum_stock,
+				},
+				storeId!,
+			);
 			return newInventory;
 		} catch (error) {
 			if (error instanceof AppError) {
@@ -98,7 +99,7 @@ export class InventoryController {
 		try {
 			const { inventoryId } = request.params as { inventoryId: string };
 			const { quantity } = request.body as InventoryAddRemoveType;
-            
+
 			const updatedInventory = await this.inventoryService.addToInventory(
 				{ id: inventoryId, quantity },
 			);
@@ -180,7 +181,7 @@ export class InventoryController {
 			});
 			return result;
 		} catch (error) {
-            console.log(error);
+			console.log(error);
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
 					case 'NOT_FOUND':

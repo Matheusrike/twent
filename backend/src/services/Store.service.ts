@@ -7,8 +7,19 @@ import { PrismaClient } from '@prisma/generated/client';
 export class StoreService {
 	constructor(private database: PrismaClient) {}
 
-	async get(where: StoreQuerystring, skip: number, take: number) {
+	async get(
+		where: StoreQuerystring,
+		skip: number,
+		take: number,
+		id?: string,
+	) {
 		try {
+			if (id) {
+				const response = await this.database.store.findUnique({
+					where: { id },
+				});
+				return response;
+			}
 			const response = await this.database.store.findMany({
 				take: take || 10,
 				skip: skip || 0,

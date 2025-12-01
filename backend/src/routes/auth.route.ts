@@ -8,6 +8,7 @@ import {
 	UserInactiveResponseSchema,
 	UserNotFoundResponseSchema,
 	LogoutSuccessResponseSchema,
+    ConflictUserResponseSchema,
     changePasswordResponseSchema,
     changePasswordBodySchema,
 } from '@/schemas/auth.schema';
@@ -32,6 +33,7 @@ export async function authRoutes(app: fastifyTypedInstance) {
 					400: InvalidPasswordResponseSchema,
 					403: UserInactiveResponseSchema,
 					404: UserNotFoundResponseSchema,
+                    409: ConflictUserResponseSchema,
 					500: ApiGenericErrorSchema,
 				},
 			},

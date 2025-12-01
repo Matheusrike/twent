@@ -5,6 +5,7 @@ import {
 } from '@/schemas/employee.schema.ts';
 import { AppError, HttpError } from '@/utils/errors.util.ts';
 import { EmployeeService } from '@/services/Employee.service.ts';
+import { IJwtAuthPayload } from '@/types/authorization.types';
 
 export class EmployeeController {
 	constructor(private employeeService: EmployeeService) {}
@@ -69,7 +70,9 @@ export class EmployeeController {
 				skip: number;
 				take: number;
 			} & EmployeeQuerystring;
+			const { storeId } = request.user as IJwtAuthPayload;
 			const response = await this.employeeService.getEmployees(
+				storeId!,
 				filters as EmployeeQuerystring,
 				skip,
 				take,

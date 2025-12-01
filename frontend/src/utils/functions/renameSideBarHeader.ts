@@ -5,6 +5,7 @@ export function renameTitleFn(title : string) {
       { oldName: "Branches", newName: "Filiais" },
       { oldName: "Team", newName: "Colaboradores" },
       { oldName: "Profile", newName: "Minha conta" },
+          { oldName: "Pdv", newName: "Venda Rápida" },
     ];
   
     return renameList.find(item => item.oldName === title)?.newName || title;

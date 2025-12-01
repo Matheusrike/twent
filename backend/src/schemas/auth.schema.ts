@@ -93,6 +93,14 @@ export const UnauthorizedUserResponseSchema = ApiResponseSchema.extend({
 	description: 'Resposta para usuário não autorizado (401).',
 });
 
+export const ConflictUserResponseSchema = ApiResponseSchema.extend({
+    success: z.literal(false),
+    message: z.string().meta({ examples: ['Usuário duplicado'] }),
+    errorCode: z.string().meta({ examples: ['CONFLICT_USER'] }),
+}).meta({
+    description: 'Resposta para usuário duplicado (409).',
+});
+
 // Logout Responses
 export const LogoutSuccessResponseSchema = ApiResponseSchema.extend({
 	success: z.literal(true),

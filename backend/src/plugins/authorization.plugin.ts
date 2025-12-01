@@ -25,8 +25,7 @@ function authorization(options: IAuthorizationOptions = {}) {
 				});
 			}
 
-			const decoded =
-				await request.server.jwt.verify<IJwtAuthPayload>(token);
+			const decoded = request.server.jwt.verify<IJwtAuthPayload>(token);
 			request.user = decoded;
 
 			// Verifica roles
@@ -66,6 +65,13 @@ function authorization(options: IAuthorizationOptions = {}) {
 						statusCode: 401,
 						message: 'Token de autenticação expirado',
 						errorCode: 'TOKEN_EXPIRED',
+					}).send(reply);
+				case 'FAST_JWT_MALFORMED':
+					return new ApiResponse({
+						success: false,
+						statusCode: 401,
+						message: 'Token de autenticação malformado',
+						errorCode: 'MALFORMED_TOKEN',
 					}).send(reply);
 			}
 			console.error(error);

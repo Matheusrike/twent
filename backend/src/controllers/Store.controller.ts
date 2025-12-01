@@ -8,6 +8,7 @@ export class StoreController {
 
 	async get(request: FastifyRequest) {
 		try {
+            const { id } = request.params as { id: string };
 			const { skip, take, ...filters } = request.query as {
 				skip: number;
 				take: number;
@@ -17,6 +18,7 @@ export class StoreController {
 				filters,
 				Number(skip),
 				Number(take),
+                id
 			);
 
 			return response;

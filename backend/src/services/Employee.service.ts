@@ -140,13 +140,14 @@ export class EmployeeService extends UserService {
 	}
 
 	async getEmployees(
+        storeId: string,
 		filters: EmployeeQuerystring,
 		skip: number,
 		take: number,
 	) {
 		filters.user_type = 'EMPLOYEE';
 
-		const response = await super.get(filters, skip, take);
+		const response = await super.get(filters, skip, take, storeId);
 
 		return response;
 	}

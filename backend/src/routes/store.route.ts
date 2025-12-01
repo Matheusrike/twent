@@ -8,11 +8,13 @@ import {
 	StoreBadRequestSchema,
 	StoreChangeStatusResponseSchema,
 	StoreConflictSchema,
+	StoreGetAllResponseSchema,
 	StoreGetResponseSchema,
 	StoreNotFoundSchema,
 	StorePostResponseSchema,
 	StorePutResponseSchema,
 	StoreQuerystringSchema,
+    StoreUUIDSchema,
 } from '@/schemas/store.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import prisma from '@prisma/client';
@@ -30,7 +32,7 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 				description: 'Faz busca de todas as lojas, com ou sem filtros',
 				querystring: StoreQuerystringSchema,
 				response: {
-					200: StoreGetResponseSchema,
+					200: StoreGetAllResponseSchema,
 					500: ApiGenericErrorSchema,
 				},
 			},
@@ -57,6 +59,43 @@ export function storeRoute(fastify: fastifyTypedInstance) {
 			}
 		},
 	);
+    fastify.get(
+        '/:id',
+        {
+            schema: {
+                tags: ['Store'],
+                summary: 'Busca uma loja',
+                description: 'Faz busca de uma loja',
+                params: StoreUUIDSchema,
+                response: {
+                    200: StoreGetResponseSchema,
+                    404: StoreNotFoundSchema,
+                    500: ApiGenericErrorSchema,
+                },
+            },
+            preHandler: fastify.authorization({
+                requiredRoles: ['ADMIN', 'MANAGER_HQ', 'MANAGER_BRANCH'],
+            }),
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            try {
+                const response = await storeController.get(request);
+                return new ApiResponse({
+                    statusCode: 200,
+                    success: true,
+                    message: 'Loja encontrada',
+                    data: response,
+                }).send(reply);
+            } catch (error) {
+                return new ApiResponse({
+                    success: false,
+                    statusCode: error.statusCode,
+                    message: error.message,
+                    errorCode: error.errorCode,
+                }).send(reply);
+            }
+        },
+    )
 	fastify.post(
 		'/',
 		{

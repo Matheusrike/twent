@@ -144,7 +144,7 @@ export function NavUser({}) {
             <DropdownMenuSeparator />
 
             <div className="p-1">
-              <Link href="/matriz/profile">
+              <Link href="/private/profile">
                 <DropdownMenuItem className="cursor-pointer rounded-lg py-2.5">
                   <IconUserCircle className="h-4 w-4" />
                   <span className="font-medium">Minha Conta</span>

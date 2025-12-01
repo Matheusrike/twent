@@ -10,8 +10,11 @@ export class AuthController {
 	async login(request: FastifyRequest) {
 		try {
 			const { email, password } = request.body as ILoginInput;
+
+			const emailLowerCase = email.toLowerCase();
+
 			const token = await this.authService.login({
-				email,
+				email: emailLowerCase,
 				password,
 			});
 
@@ -25,6 +28,12 @@ export class AuthController {
 							errorCode: error.errorCode,
 							statusCode: 404,
 						});
+                    case 'CONFLICT':
+                        throw new HttpError({
+                            message: error.message,
+                            errorCode: error.errorCode,
+                            statusCode: 409,
+                        })
 					case 'USER_INACTIVE':
 						throw new HttpError({
 							message: error.message,
