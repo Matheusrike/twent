@@ -1,5 +1,4 @@
 "use client";
-
 import * as React from "react";
 import {
   IconLayoutDashboard,
@@ -8,7 +7,7 @@ import {
   IconUsers,
   IconHelp,
   IconShoppingCart,
-  IconDeviceWatch
+  IconDeviceWatch,
 } from "@tabler/icons-react";
 import { Container } from "lucide-react";
 import { NavUser } from "@/components/private/global/sideBar/nav-user";
@@ -29,43 +28,25 @@ import { usePathname } from "next/navigation";
 
 type RoleName = "ADMIN" | "MANAGER_BRANCH" | "EMPLOYEE_BRANCH" | string;
 
-interface UserRoleResponse {
-  data?: {
-    user_roles?: {
-      role?: {
-        name?: RoleName;
-      };
-    }[];
-  };
-}
-
 interface MenuItem {
   title: string;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
-export function AppSidebar({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  const [isClient, setIsClient] = React.useState(false);
   const [navMain, setNavMain] = React.useState<MenuItem[]>([]);
-  const [activeIndex, setActiveIndex] = React.useState(-1);
+  const [headerTitle, setHeaderTitle] = React.useState("Carregando...");
 
   React.useEffect(() => {
-    setIsClient(true);
-
-    const fetchRole = async () => {
+    const loadData = async () => {
       try {
-        const res = await fetch("/response/api/user/me", {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch("/response/api/user/me", { credentials: "include" });
+        const json = await res.json();
 
-        const json: UserRoleResponse = await res.json();
-        const role: RoleName | undefined =
-          json.data?.user_roles?.[0]?.role?.name;
+        const role = json.data?.user_roles?.[0]?.role?.name as RoleName;
+        const storeName = json.data?.store?.name || "Minha Loja";
 
         let menu: MenuItem[] = [];
 
@@ -75,36 +56,35 @@ export function AppSidebar({
             { title: "Filiais", url: "/private/branches", icon: IconGlobe },
             { title: "Financeiro", url: "/private/financial", icon: IconChartBar },
             { title: "Estoque", url: "/private/inventory", icon: Container },
-            { title: "Coleção", url: "/private/collection", icon: IconDeviceWatch },
+            { title: "Coleólica", url: "/private/collection", icon: IconDeviceWatch },
             { title: "Colaboradores", url: "/private/team", icon: IconUsers },
           ];
+          setHeaderTitle("Matriz");
         } else if (role === "MANAGER_BRANCH") {
           menu = [
             { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
             { title: "Estoque", url: "/private/inventory", icon: Container },
             { title: "Colaboradores", url: "/private/team", icon: IconUsers },
           ];
+          setHeaderTitle(storeName);
         } else {
           menu = [
             { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
           ];
+          setHeaderTitle(storeName);
         }
 
         setNavMain(menu);
       } catch (error) {
-        console.error("Erro ao buscar role:", error);
+        console.error("Erro ao carregar dados do usuário:", error);
+        setHeaderTitle("Erro");
       }
     };
 
-    fetchRole();
+    loadData();
   }, []);
 
-  React.useEffect(() => {
-    const index = navMain.findIndex(item => item.url === pathname);
-    setActiveIndex(index);
-  }, [pathname, navMain]);
-
-  if (!isClient) return null;
+  const activeIndex = navMain.findIndex((item) => item.url === pathname);
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r" {...props}>
@@ -115,12 +95,12 @@ export function AppSidebar({
               src="/img/global/light/faviconLight.svg"
               width={60}
               height={60}
-              alt="Matriz Logo"
+              alt="Logo"
               className="object-contain"
             />
           </div>
           <div>
-            <h2 className="text-lg font-bold tracking-tight">Matriz</h2>
+            <h2 className="text-md font-bold tracking-tight">{headerTitle}</h2>
             <p className="text-xs text-muted-foreground">Gerenciador</p>
           </div>
         </div>
@@ -131,25 +111,20 @@ export function AppSidebar({
           <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Menu
           </SidebarGroupLabel>
-
           <SidebarGroupContent>
             <SidebarMenu className="gap-1 relative">
               {activeIndex >= 0 && (
                 <div
                   className="absolute left-0 right-0 h-[42px] bg-primary rounded-lg transition-all duration-300 ease-out"
-                  style={{
-                    top: `${activeIndex * 44}px`,
-                  }}
+                  style={{ top: `${activeIndex * 44}px` }}
                 />
               )}
-              
-              {navMain.map((item, index) => {
+              {navMain.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.url;
-
                 return (
-                  <SidebarMenuItem key={item.title} className="relative z-10 ">
-                    <Link href={item.url} className="block  w-full">
+                  <SidebarMenuItem key={item.title} className="relative z-10">
+                    <Link href={item.url} className="block w-full">
                       <div
                         className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ${
                           isActive
@@ -158,12 +133,8 @@ export function AppSidebar({
                         }`}
                       >
                         <Icon className="h-5 w-5 shrink-0" />
-                        <span className="flex-1 font-medium text-sm">
-                          {item.title}
-                        </span>
-                        {isActive && (
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
-                        )}
+                        <span className="flex-1 font-medium text-sm">{item.title}</span>
+                        {isActive && <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
                       </div>
                     </Link>
                   </SidebarMenuItem>
@@ -177,7 +148,6 @@ export function AppSidebar({
           <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Suporte
           </SidebarGroupLabel>
-
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               <SidebarMenuItem>
@@ -195,13 +165,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4">
-        <NavUser
-          user={{
-            name: "shadcn",
-            email: "m@example.com",
-            avatar: "/avatars/shadcn.jpg",
-          }}
-        />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

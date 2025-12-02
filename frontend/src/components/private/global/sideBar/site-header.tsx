@@ -68,9 +68,9 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-lg uppercase font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        {/* <h1 className="text-lg uppercase font-bold text-black">
           {renameTitleFn(title)}
-        </h1>
+        </h1> */}
         <div className="ml-auto flex items-center gap-2"></div>
       </div>
     </header>
