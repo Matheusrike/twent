@@ -130,10 +130,10 @@ export class EmployeeService extends UserService {
 	}
 
 	async getEmployees(
-		storeId: string,
 		filters: EmployeeQuerystring,
 		skip: number,
 		take: number,
+		storeId?: string,
 	) {
 		filters.user_type = 'EMPLOYEE';
 

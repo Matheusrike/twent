@@ -90,7 +90,7 @@ export default function InventoryTable() {
     try {
       setLoading(true);
       const [storeRes, productsRes] = await Promise.all([
-        fetch("/response/api/inventory/store", { credentials: "include" }),
+        fetch("/response/api/inventory/", { credentials: "include" }),
         fetch("/response/api/product/public", { credentials: "include" }),
       ]);
       const storeJson = await storeRes.json();

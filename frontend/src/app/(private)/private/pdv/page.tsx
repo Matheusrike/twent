@@ -98,7 +98,7 @@ export default function Pdv() {
     const loadInventory = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/response/api/inventory/store", {
+        const res = await fetch("/response/api/inventory/", {
           credentials: "include",
         });
 

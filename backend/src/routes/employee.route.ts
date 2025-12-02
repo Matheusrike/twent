@@ -67,7 +67,7 @@ export function employeeRoute(app: fastifyTypedInstance) {
 		{
 			schema: {
 				tags: ['Employee'],
-				summary: 'Busca todos os funcionários',
+				summary: 'Busca todos os funcionários da filial',
 				description: 'Busca todos os funcionários, com ou sem filtros',
 				querystring: employeeQuerystringSchema,
 				response: {
@@ -83,6 +83,43 @@ export function employeeRoute(app: fastifyTypedInstance) {
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
 				const response = await employeeController.getEmployee(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Funcionarios encontrados com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+	app.get(
+		'/all',
+		{
+			schema: {
+				tags: ['Employee'],
+				summary: 'Busca todos os funcionários',
+				description: 'Busca todos os funcionários, com ou sem filtros',
+				querystring: employeeQuerystringSchema,
+				response: {
+					200: EmployeeGetResponseSchema,
+					401: UnauthorizedUserResponseSchema,
+					500: ApiGenericErrorSchema,
+					502: CustomerBadGatewaySchema,
+					504: CustomerGatewayTimeoutSchema,
+				},
+			},
+			preHandler: app.authorization(),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await employeeController.getAllEmployee(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,

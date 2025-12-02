@@ -41,7 +41,7 @@ export async function inventoryRoutes(app: fastifyTypedInstance) {
 	);
 
 	app.get(
-		'/store',
+		'/',
 		{
 			schema: {
 				tags: ['Inventory'],
