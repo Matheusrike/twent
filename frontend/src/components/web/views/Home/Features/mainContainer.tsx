@@ -32,9 +32,9 @@ interface MainContainerData {
 const MainContainer: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [badges, setBadges] = useState<string[]>([]);
   
   const data = mainContainerData as MainContainerData;
-  const { categories } = data;
 
   useEffect(() => {
     async function fetchProducts() {
@@ -43,18 +43,32 @@ const MainContainer: React.FC = () => {
         const response = await fetch("/response/api/product/public");
         const result = await response.json();
 
-        const normalized = Array.isArray(result.data)
-          ? result.data
-          : Array.isArray(result.data?.products)
-          ? result.data.products
+        const payload = result?.data ?? result;
+        const normalized = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.products)
+          ? payload.products
           : [];
 
+        // Extrai badges com tipagem correta (type guard)
+        const validBadges = normalized
+          .map((p: any) => p?.collection?.name)
+          .filter((n: unknown): n is string => 
+            typeof n === "string" && n.trim().length > 0
+          )
+          .map((n: string) => n.trim());
+
+        // Remove duplicatas e garante tipo string[]
+        const distinctBadges: string[] = Array.from(new Set(validBadges));
+        setBadges(distinctBadges);
+
         // Pega 3 produtos aleatórios para exibir na home
-        const shuffled = normalized.sort(() => 0.5 - Math.random());
+        const shuffled = [...normalized].sort(() => 0.5 - Math.random());
         setProducts(shuffled.slice(0, 3));
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
         setProducts([]);
+        setBadges([]);
       } finally {
         setLoading(false);
       }
@@ -123,7 +137,7 @@ const MainContainer: React.FC = () => {
           <>
             {/* Collection Preview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product, index) => (
+              {products.map((product) => (
                 <CollectionCard
                   key={product.sku}
                   sku={product.sku}
@@ -151,17 +165,17 @@ const MainContainer: React.FC = () => {
         )}
       </section>
 
-      {/* Categories Section */}
+      {/* Badges Section */}
       <div className="container mx-auto px-6 lg:px-12 pb-24">
         <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-black dark:text-white uppercase">
-          Categorias
+          Badges
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category, i) => (
-            <Link key={i} href={category.href}>
+          {badges.map((badge) => (
+            <Link key={badge} href="/collection">
               <div className="group h-15 bg-white rounded-xl flex items-center justify-center transition-transform cursor-pointer px-4 relative overflow-hidden z-10 after:absolute after:h-1 after:w-1 after:bg-primary after:left-0 after:bottom-0 after:-z-10 after:rounded-full after:transition-all after:duration-1000 hover:after:scale-[300]">
                 <span className="uppercase text-lg md:text-md font-semibold text-center text-gray-800 transition-all duration-1000 relative z-20 group-hover:text-white">
-                  {category.title}
+                  {badge}
                 </span>
               </div>
             </Link>

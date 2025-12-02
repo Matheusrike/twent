@@ -15,7 +15,7 @@ export default function FiltersSection() {
   useEffect(() => {
   async function fetchBadges() {
     try {
-      const res = await fetch("/response/api/product/public");
+      const res = await fetch("/response/api/product/public?limit=9");
       const json = await res.json();
 
       const list =
