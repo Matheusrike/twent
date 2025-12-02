@@ -27,8 +27,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-
-
 type RoleName = "ADMIN" | "MANAGER_BRANCH" | "EMPLOYEE_BRANCH" | string;
 
 interface UserRoleResponse {
@@ -47,16 +45,13 @@ interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-
 export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-
   const [isClient, setIsClient] = React.useState(false);
-
   const [navMain, setNavMain] = React.useState<MenuItem[]>([]);
-
+  const [activeIndex, setActiveIndex] = React.useState(-1);
 
   React.useEffect(() => {
     setIsClient(true);
@@ -85,10 +80,9 @@ export function AppSidebar({
           ];
         } else if (role === "MANAGER_BRANCH") {
           menu = [
-             { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
+            { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
             { title: "Estoque", url: "/private/inventory", icon: Container },
             { title: "Colaboradores", url: "/private/team", icon: IconUsers },
-           
           ];
         } else {
           menu = [
@@ -105,14 +99,15 @@ export function AppSidebar({
     fetchRole();
   }, []);
 
+  React.useEffect(() => {
+    const index = navMain.findIndex(item => item.url === pathname);
+    setActiveIndex(index);
+  }, [pathname, navMain]);
 
   if (!isClient) return null;
 
-
   return (
     <Sidebar collapsible="offcanvas" className="border-r" {...props}>
-      
-      {/* HEADER */}
       <SidebarHeader className="border-b px-6 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
@@ -131,8 +126,6 @@ export function AppSidebar({
         </div>
       </SidebarHeader>
 
-
-      {/* MENU PRINCIPAL */}
       <SidebarContent className="px-3 py-4">
         <SidebarGroup>
           <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -140,18 +133,27 @@ export function AppSidebar({
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {navMain.map((item) => {
+            <SidebarMenu className="gap-1 relative">
+              {activeIndex >= 0 && (
+                <div
+                  className="absolute left-0 right-0 h-[42px] bg-primary rounded-lg transition-all duration-300 ease-out"
+                  style={{
+                    top: `${activeIndex * 44}px`,
+                  }}
+                />
+              )}
+              
+              {navMain.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.url;
 
                 return (
-                  <SidebarMenuItem key={item.title}>
-                    <Link href={item.url} className="block w-full">
+                  <SidebarMenuItem key={item.title} className="relative z-10 ">
+                    <Link href={item.url} className="block  w-full">
                       <div
                         className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ${
                           isActive
-                            ? "bg-primary text-primary-foreground shadow-sm"
+                            ? "text-primary-foreground"
                             : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                         }`}
                       >
@@ -171,8 +173,6 @@ export function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
 
-
-        {/* SUPORTE */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Suporte
@@ -194,8 +194,6 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-
-   
       <SidebarFooter className="border-t p-4">
         <NavUser
           user={{

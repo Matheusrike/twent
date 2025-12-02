@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
+import { CollectionHeader } from "@/components/private/views/collection/collection-header";
 
 export default function Colletion() {
   const router = useRouter();
@@ -38,5 +39,7 @@ export default function Colletion() {
   if (authorized === null) {
     <Loading />;
   }
-  return <></>;
+  return <section className="flex flex-col gap-5">
+          <CollectionHeader/>
+        </section>
 }
