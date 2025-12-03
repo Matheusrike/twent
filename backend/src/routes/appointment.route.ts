@@ -1,5 +1,13 @@
 import { AppointmentController } from '@/controllers/Appointment.controller';
-import { AppointmentUuidSchema, CreateAppointmentSchema } from '@/schemas/appointment.schema';
+import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
+import {
+	AppointmentConflictSchema,
+	AppointmentGetResponseSchema,
+	AppointmentNotFoundSchema,
+	AppointmentResponseSchema,
+	AppointmentUuidSchema,
+	CreateAppointmentSchema,
+} from '@/schemas/appointment.schema';
 import { AppointmentService } from '@/services/Appoiment.service';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
@@ -16,6 +24,12 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 				tags: ['Appointment'],
 				summary: 'Cria um novo agendamento',
 				body: CreateAppointmentSchema,
+				response: {
+					201: AppointmentResponseSchema,
+					404: AppointmentNotFoundSchema,
+					409: AppointmentConflictSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization()],
 		},
@@ -45,6 +59,10 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 			schema: {
 				tags: ['Appointment'],
 				summary: 'Busca todos os agendamentos',
+				response: {
+					200: AppointmentGetResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization()],
 		},
@@ -74,7 +92,12 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 			schema: {
 				tags: ['Appointment'],
 				summary: 'Cancela um agendamento',
-                params: AppointmentUuidSchema,
+				params: AppointmentUuidSchema,
+				response: {
+					200: AppointmentResponseSchema,
+					404: AppointmentNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization()],
 		},
@@ -106,6 +129,11 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 				tags: ['Appointment'],
 				summary: 'Confirma um agendamento',
 				params: AppointmentUuidSchema,
+				response: {
+					200: AppointmentResponseSchema,
+					404: AppointmentNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization()],
 		},
@@ -137,6 +165,11 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 				tags: ['Appointment'],
 				summary: 'Finaliza um agendamento',
 				params: AppointmentUuidSchema,
+				response: {
+					200: AppointmentResponseSchema,
+					404: AppointmentNotFoundSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization()],
 		},

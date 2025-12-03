@@ -7,8 +7,9 @@ export class AppointmentService {
 
 	async create(data: CreateAppointment, id: string) {
 		try {
+            data.appointment_date = new Date(data.appointment_date);
 			const appoiment = await this.database.appointment.create({
-				data: {customer_id: id,...data},
+				data: {customer_id: id, status: "SCHEDULED",...data},
 			});
 			return appoiment;
 		} catch (error) {
@@ -24,6 +25,7 @@ export class AppointmentService {
 					errorCode: 'NOT_FOUND',
 				});
 			}
+            console.log(error);
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
@@ -51,6 +53,7 @@ export class AppointmentService {
 			});
 			return appoiment;
 		} catch (error) {
+            console.log(error);
 			if (error.code === 'P2025') {
 				throw new AppError({
 					message: 'Agendamento não encontrado.',
