@@ -38,7 +38,7 @@ export default function CollectionHero({ searchQuery, selectedCategories = [], s
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch('/response/api/product/public')
+        const response = await fetch('/response/api/product/public?limit=1000')
         const result = await response.json()
         
         if (result.success) {
