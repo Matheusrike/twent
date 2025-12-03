@@ -128,6 +128,8 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 		'/:id',
 		{
 			schema: {
+				tags: ['Supplier'],
+                summary: 'Atualiza um fornecedor pelo ID',
 				body: updateSupplierSchema,
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
@@ -158,6 +160,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.patch(
 		'/:id/activate',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Ativa um fornecedor pelo ID',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -186,6 +192,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.delete(
 		'/:id',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Desativa um fornecedor pelo ID',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -212,6 +222,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/:id/transactions',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Busca as transações de um fornecedor pelo ID',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
