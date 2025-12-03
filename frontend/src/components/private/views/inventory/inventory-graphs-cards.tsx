@@ -151,7 +151,8 @@ export default function InventoryCards() {
         return (
           <Dialog key={store.name}>
             <DialogTrigger asChild>
-              <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-500 hover:shadow-xl hover:-translate-y-1 w-full cursor-pointer">
+              <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-[-10px_-10px_30px_4px_rgba(0,0,0,0.08),_10px_10px_30px_4px_rgba(100,100,100,0.15)]
+ transition-all duration-500 hover:shadow-xl hover:-translate-y-1 w-full cursor-pointer">
                 <CardHeader className="pb-2 pt-4 px-6 flex flex-col gap-4 items-start sm:items-center justify-between">
                   <div className="mt-2 sm:mt-0">
                     <StockStatus percentage={percentage} />

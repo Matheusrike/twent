@@ -42,7 +42,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch("/response/api/user/me", { credentials: "include" });
+        const res = await fetch("/response/api/user/me", {
+          credentials: "include",
+        });
         const json = await res.json();
 
         const role = json.data?.user_roles?.[0]?.role?.name as RoleName;
@@ -52,24 +54,44 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         if (role === "ADMIN") {
           menu = [
-            { title: "Dashboard", url: "/private/dashboard", icon: IconLayoutDashboard },
+            {
+              title: "Dashboard",
+              url: "/private/dashboard",
+              icon: IconLayoutDashboard,
+            },
             { title: "Filiais", url: "/private/branches", icon: IconGlobe },
-            { title: "Financeiro", url: "/private/financial", icon: IconChartBar },
+            {
+              title: "Financeiro",
+              url: "/private/financial",
+              icon: IconChartBar,
+            },
             { title: "Estoque", url: "/private/inventory", icon: Container },
-            { title: "Coleção", url: "/private/collection", icon: IconDeviceWatch },
+            {
+              title: "Coleção",
+              url: "/private/collection",
+              icon: IconDeviceWatch,
+            },
             { title: "Colaboradores", url: "/private/team", icon: IconUsers },
           ];
           setHeaderTitle("Matriz");
         } else if (role === "MANAGER_BRANCH") {
           menu = [
-            { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
+            {
+              title: "Venda Rápida",
+              url: "/private/pdv",
+              icon: IconShoppingCart,
+            },
             { title: "Estoque", url: "/private/inventory", icon: Container },
             { title: "Colaboradores", url: "/private/team", icon: IconUsers },
           ];
           setHeaderTitle(storeName);
         } else {
           menu = [
-            { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
+            {
+              title: "Venda Rápida",
+              url: "/private/pdv",
+              icon: IconShoppingCart,
+            },
           ];
           setHeaderTitle(storeName);
         }
@@ -133,8 +155,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         }`}
                       >
                         <Icon className="h-5 w-5 shrink-0" />
-                        <span className="flex-1 font-medium text-sm">{item.title}</span>
-                        {isActive && <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
+                        <span className="flex-1 font-medium text-sm">
+                          {item.title}
+                        </span>
+                        {isActive && (
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+                        )}
                       </div>
                     </Link>
                   </SidebarMenuItem>
@@ -152,7 +178,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu className="gap-1">
               <SidebarMenuItem>
                 <a
-                  href="#"
+                  href="mailto:noreply.twent@gmail.com"
                   className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
                 >
                   <IconHelp className="h-5 w-5 shrink-0" />
