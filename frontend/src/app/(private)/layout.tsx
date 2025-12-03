@@ -35,7 +35,7 @@ export default async function RootLayout({
       lang="pt-br"
       className={`${playfairDisplay.variable} ${inter.variable} bg-white`}
     >
-      <body data-layout="manager">
+      <body data-layout="manager"    cz-shortcut-listen="true">
         <SideBar>{children}</SideBar>
       </body>
     </html>
