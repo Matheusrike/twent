@@ -108,7 +108,7 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
   }
 
   return (
-    <section className="py-5 container mx-auto px-6">
+    <section className="py-5 container mx-auto">
       {filteredProducts.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground text-lg">
           {selectedCategories.length > 0
