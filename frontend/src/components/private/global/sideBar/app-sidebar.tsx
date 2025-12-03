@@ -56,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             { title: "Filiais", url: "/private/branches", icon: IconGlobe },
             { title: "Financeiro", url: "/private/financial", icon: IconChartBar },
             { title: "Estoque", url: "/private/inventory", icon: Container },
-            { title: "Coleólica", url: "/private/collection", icon: IconDeviceWatch },
+            { title: "Coleção", url: "/private/collection", icon: IconDeviceWatch },
             { title: "Colaboradores", url: "/private/team", icon: IconUsers },
           ];
           setHeaderTitle("Matriz");

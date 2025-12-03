@@ -86,6 +86,9 @@ export default function InventoryTable() {
   const [editQuantity, setEditQuantity] = React.useState("");
   const [editMinimum, setEditMinimum] = React.useState("");
 
+  // ===============================================
+  // LOAD DATA
+  // ===============================================
   const loadData = React.useCallback(async () => {
     try {
       setLoading(true);
@@ -93,8 +96,10 @@ export default function InventoryTable() {
         fetch("/response/api/inventory/", { credentials: "include" }),
         fetch("/response/api/product/public", { credentials: "include" }),
       ]);
+
       const storeJson = await storeRes.json();
       const productsJson = await productsRes.json();
+
       setItems(storeJson?.data ?? []);
       setAllProducts(productsJson?.data?.products ?? []);
     } catch (err) {
@@ -113,8 +118,12 @@ export default function InventoryTable() {
     loadData();
   }, [loadData]);
 
+  // ===============================================
+  // ADD PRODUCT
+  // ===============================================
   const handleAddProduct = async () => {
     if (!selectedProduct || !addQuantity) return;
+
     try {
       const res = await fetch("/response/api/inventory", {
         method: "POST",
@@ -126,6 +135,7 @@ export default function InventoryTable() {
           minimum_stock: Number(addMinimum) || 0,
         }),
       });
+
       if (res.ok) {
         loadData();
         setAddModalOpen(false);
@@ -138,6 +148,9 @@ export default function InventoryTable() {
     }
   };
 
+  // ===============================================
+  // EDIT PRODUCT
+  // ===============================================
   const openEditModal = (item: InventoryItem) => {
     setEditingItem(item);
     setEditQuantity(String(item.quantity));
@@ -147,6 +160,7 @@ export default function InventoryTable() {
 
   const handleEdit = async () => {
     if (!editingItem) return;
+
     try {
       const res = await fetch("/response/api/inventory", {
         method: "PATCH",
@@ -158,6 +172,7 @@ export default function InventoryTable() {
           minimum_stock: Number(editMinimum),
         }),
       });
+
       if (res.ok) {
         loadData();
         setEditModalOpen(false);
@@ -167,21 +182,32 @@ export default function InventoryTable() {
     }
   };
 
+  // ===============================================
+  // REMOVE PRODUCT
+  // ===============================================
   const handleRemove = async (id: string) => {
     if (!confirm("Remover este produto do estoque?")) return;
+
     await fetch(`/response/api/inventory/remove/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
+
     loadData();
   };
 
+  // ===============================================
+  // STOCK LEVEL BADGES
+  // ===============================================
   const getStockLevel = (quantity: number, minimum: number) => {
     if (quantity === 0) return { label: "Baixo", variant: "destructive" };
-    if (quantity < minimum ) return { label: "Médio", variant: "secondary" };
+    if (quantity < minimum) return { label: "Médio", variant: "secondary" };
     return { label: "Alto", variant: "default" };
   };
 
+  // ===============================================
+  // TABLE COLUMNS
+  // ===============================================
   const columns: ColumnDef<InventoryItem>[] = [
     {
       accessorKey: "product.sku",
@@ -219,6 +245,7 @@ export default function InventoryTable() {
       cell: ({ row }) => {
         const { quantity, minimum_stock } = row.original;
         const { label, variant } = getStockLevel(quantity, minimum_stock);
+
         return (
           <div className="flex justify-center">
             <Badge variant={variant as any} className="w-20 justify-center">
@@ -232,6 +259,7 @@ export default function InventoryTable() {
       id: "actions",
       cell: ({ row }) => {
         const item = row.original;
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -245,9 +273,11 @@ export default function InventoryTable() {
               <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.product.sku)}>
                 Copiar SKU
               </DropdownMenuItem>
-              <DropdownMenuItem className="" onClick={() => openEditModal(item)}>
+
+              <DropdownMenuItem onClick={() => openEditModal(item)}>
                 <Edit2 className="h-4 w-4 mr-2" /> Editar
               </DropdownMenuItem>
+
               {/* <DropdownMenuItem className="text-red-600" onClick={() => handleRemove(item.id)}>
                 <Trash2 className="h-4 w-4 mr-2" /> Remover
               </DropdownMenuItem> */}
@@ -258,6 +288,9 @@ export default function InventoryTable() {
     },
   ];
 
+  // ===============================================
+  // TABLE INSTANCE + PAGINATION STATE
+  // ===============================================
   const table = useReactTable({
     data: items,
     columns,
@@ -272,6 +305,12 @@ export default function InventoryTable() {
     initialState: { pagination: { pageSize: 15 } },
   });
 
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const totalPages = table.getPageCount();
+
+  // ===============================================
+  // RENDER
+  // ===============================================
   return (
     <>
       <div className="w-full space-y-6">
@@ -282,6 +321,7 @@ export default function InventoryTable() {
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="max-w-sm"
           />
+
           <Button onClick={() => setAddModalOpen(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" /> Adicionar Produto
           </Button>
@@ -294,12 +334,15 @@ export default function InventoryTable() {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead key={header.id} className="text-center first:text-left">
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
                 </TableRow>
               ))}
             </TableHeader>
+
             <TableBody>
               {loading ? (
                 <TableRow>
@@ -328,24 +371,43 @@ export default function InventoryTable() {
           </Table>
         </div>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        {/* PAGINAÇÃO CORRIGIDA */}
+        <div className="flex items-center justify-end gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
             Anterior
           </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+
+          <span className="text-sm text-muted-foreground">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
             Próximo
           </Button>
         </div>
       </div>
 
+      {/* ADD MODAL */}
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Adicionar Produto ao Estoque</DialogTitle>
           </DialogHeader>
+
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label>Produto</Label>
+
               <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
                 <PopoverTrigger asChild>
                   <Button
@@ -354,14 +416,19 @@ export default function InventoryTable() {
                     aria-expanded={openCombobox}
                     className="w-full justify-between font-normal"
                   >
-                    {selectedProduct ? `${selectedProduct.sku} - ${selectedProduct.name}` : "Selecione um produto..."}
+                    {selectedProduct
+                      ? `${selectedProduct.sku} - ${selectedProduct.name}`
+                      : "Selecione um produto..."}
+
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
+
                 <PopoverContent className="w-full p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Buscar produto..." />
                     <CommandEmpty>Nenhum produto encontrado.</CommandEmpty>
+
                     <CommandGroup className="max-h-64 overflow-auto">
                       {availableProducts.map((product) => (
                         <CommandItem
@@ -377,6 +444,7 @@ export default function InventoryTable() {
                               selectedProduct?.id === product.id ? "opacity-100" : "opacity-0"
                             )}
                           />
+
                           <span className="font-medium">{product.sku}</span> - {product.name}
                         </CommandItem>
                       ))}
@@ -385,6 +453,7 @@ export default function InventoryTable() {
                 </PopoverContent>
               </Popover>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Quantidade Inicial</Label>
@@ -396,6 +465,7 @@ export default function InventoryTable() {
                   onChange={(e) => setAddQuantity(e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label>Estoque Mínimo</Label>
                 <Input
@@ -408,10 +478,12 @@ export default function InventoryTable() {
               </div>
             </div>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddModalOpen(false)}>
               Cancelar
             </Button>
+
             <Button onClick={handleAddProduct} disabled={!selectedProduct || !addQuantity}>
               Adicionar ao Estoque
             </Button>
@@ -419,27 +491,40 @@ export default function InventoryTable() {
         </DialogContent>
       </Dialog>
 
+      {/* EDIT MODAL */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Editar Estoque</DialogTitle>
           </DialogHeader>
+
           {editingItem && (
             <>
               <div className="py-4 space-y-2 text-sm text-muted-foreground">
                 <div><strong>SKU:</strong> {editingItem.product.sku}</div>
                 <div><strong>Produto:</strong> {editingItem.product.name}</div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Quantidade Atual</Label>
-                  <Input type="number" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} />
+                  <Input
+                    type="number"
+                    value={editQuantity}
+                    onChange={(e) => setEditQuantity(e.target.value)}
+                  />
                 </div>
+
                 <div className="space-y-2">
                   <Label>Estoque Mínimo</Label>
-                  <Input type="number" value={editMinimum} onChange={(e) => setEditMinimum(e.target.value)} />
+                  <Input
+                    type="number"
+                    value={editMinimum}
+                    onChange={(e) => setEditMinimum(e.target.value)}
+                  />
                 </div>
               </div>
+
               <DialogFooter className="mt-6">
                 <Button variant="outline" onClick={() => setEditModalOpen(false)}>
                   Cancelar

@@ -68,6 +68,7 @@ export type Product = {
 };
 
 export default function InventoryTable() {
+  const [page, setPage] = React.useState(1);
   const [products, setProducts] = React.useState<Product[]>([]);
   const [inventories, setInventories] = React.useState<Store[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -126,7 +127,7 @@ export default function InventoryTable() {
             method: "GET",
             credentials: "include",
           }),
-          fetch("/response/api/product", {
+          fetch("/response/api/product?limit=10&page=" + page, {
             method: "GET",
             credentials: "include",
           }),
@@ -148,7 +149,7 @@ export default function InventoryTable() {
     }
 
     fetchAll();
-  }, [processInventoryData]);
+  }, [page, processInventoryData]);
 
   function openProductDialog(sku: string) {
     setSelectedProduct(sku);
@@ -312,7 +313,10 @@ export default function InventoryTable() {
     },
     onGlobalFilterChange: setGlobalFilter,
     initialState: {
-      pagination: { pageSize: 10 },
+      pagination: {
+        pageIndex: 0,
+        pageSize: 20,
+      },
     },
   });
 
@@ -386,16 +390,16 @@ export default function InventoryTable() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
           >
             Anterior
           </Button>
+
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => setPage((p) => p + 1)}
           >
             Próximo
           </Button>
