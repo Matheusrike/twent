@@ -8,7 +8,7 @@ export class StoreController {
 
 	async get(request: FastifyRequest) {
 		try {
-            const { id } = request.params as { id: string };
+			const { id } = request.params as { id: string };
 			const { skip, take, ...filters } = request.query as {
 				skip: number;
 				take: number;
@@ -18,9 +18,32 @@ export class StoreController {
 				filters,
 				Number(skip),
 				Number(take),
-                id
+				id,
 			);
 
+			return response;
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					message: error.message,
+					errorCode: error.errorCode,
+					statusCode: 500,
+				});
+			}
+		}
+	}
+
+	async getAll(request: FastifyRequest) {
+		try {
+			const { skip, take } = request.query as {
+				skip: number;
+				take: number;
+			};
+
+			const response = await this.storeService.getAll(
+				Number(skip),
+				Number(take),
+			);
 			return response;
 		} catch (error) {
 			if (error instanceof AppError) {

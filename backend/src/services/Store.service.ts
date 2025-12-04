@@ -24,9 +24,36 @@ export class StoreService {
 				take: take || 10,
 				skip: skip || 0,
 				where,
-                include: {
-                    sales: true 
-                }
+				include: {
+					sales: true,
+				},
+			});
+
+			return response;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async getAll(skip: number, take: number) {
+		try {
+			const response = await this.database.store.findMany({
+				take: take || 10,
+				skip: skip || 0,
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					city: true,
+                    country: true,
+					latitude: true,
+					longitude: true,
+					phone: true,
+					opening_hours: true,
+				},
 			});
 
 			return response;
