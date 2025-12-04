@@ -68,7 +68,6 @@ export function storeRoute(app: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: app.authorization(),
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {

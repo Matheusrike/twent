@@ -3,49 +3,55 @@ import { InputName } from "../contactForm/input-name";
 import { InputPhone } from "../contactForm/input-phone";
 import { Textarea } from "../contactForm/textarea";
 import { Button } from "@/components/web/Global/ui/button";
+import React from "react";
+
+interface Store {
+  id: string;
+  name: string;
+  email?: string;
+  city?: string;
+  country?: string;
+}
 
 interface ContactFormProps {
-    onBack?: () => void;
+  onBack: () => void;
+  store?: Store;
 }
 
-export default function ContactForm({ onBack }: ContactFormProps) {
-    const handleCancel = () => {
-        if (onBack) {
-            onBack();
-        }
-    };
+const ContactForm: React.FC<ContactFormProps> = ({ onBack, store }) => {
+  return (
+    <div className="flex flex-col gap-4">
+      <button onClick={onBack} className="text-sm text-primary text-left">Voltar</button>
+      <h2 className="text-xl font-semibold dark:text-white">{store?.name ?? "Boutique Exemplo"}</h2>
+      {store?.country && (
+        <p className="text-sm text-muted-foreground dark:text-white">País: {store.country}</p>
+      )}
+      <InputEmail />
+      <InputName />
+      <InputPhone />
+      <Textarea />
+      
+      <section className="flex w-full justify-center gap-2 p-2">
+        <Button
+          variant="standartButton"
+          size="standartButton"
+          type="submit"
+          className="w-1/2!"
+        >
+          Enviar
+        </Button>
+        <Button
+          variant="standartButton"
+          size="standartButton"
+          type="button"
+          onClick={onBack}
+          className="w-1/2! bg-muted-foreground! hover:bg-gray-400!"
+        >
+          Cancelar
+        </Button>
+      </section>
+    </div>
+  );
+};
 
-    return (
-        <form className="w-full flex flex-col gap-8.5 h-full z-50 justify-center items-center ">
-            <div className="w-full flex gap-2 text-left left-4 text-3xl font-semibold leading-tight tracking-tighter dark:text-white">
-                <h1>Boutique Exemplo</h1>
-                <h2>-</h2>
-                <h1>País</h1>
-            </div>
-            <InputEmail />
-            <InputName />
-            <InputPhone />
-            <Textarea />
-            
-            <section className="flex w-full justify-center gap-2 p-2">
-                <Button
-                    variant="standartButton"
-                    size="standartButton"
-                    type="submit"
-                    className="w-1/2!"
-                >
-                    Enviar
-                </Button>
-                <Button
-                    variant="standartButton"
-                    size="standartButton"
-                    type="button"
-                    onClick={handleCancel}
-                    className="w-1/2! bg-muted-foreground! hover:bg-gray-400!"
-                >
-                    Cancelar
-                </Button>
-            </section>
-        </form>
-    );
-}
+export default ContactForm;
