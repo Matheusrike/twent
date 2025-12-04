@@ -1,151 +1,161 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
-  IconLayoutDashboard,
-  IconChartBar,
-  IconGlobe,
-  IconUsers,
-  IconHelp,
-  IconShoppingCart
-} from "@tabler/icons-react";
-import { Container } from "lucide-react";
-import { NavUser } from "@/components/private/global/sideBar/nav-user";
+	IconLayoutDashboard,
+	IconChartBar,
+	IconGlobe,
+	IconUsers,
+	IconHelp,
+	IconShoppingCart,
+} from '@tabler/icons-react';
+import { Container } from 'lucide-react';
+import { NavUser } from '@/components/private/global/sideBar/nav-user';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarGroup,
+	SidebarGroupLabel,
+	SidebarGroupContent,
+	SidebarMenu,
+	SidebarMenuItem,
+} from '@/components/ui/sidebar';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const Matrizdata = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    { title: "Dashboard", url: "/private/dashboard", icon: IconLayoutDashboard },
-    { title: "Filiais", url: "/private/branches", icon: IconGlobe },
-    { title: "Financeiro", url: "/private/financial", icon: IconChartBar },
-    { title: "Estoque", url: "/private/inventory", icon: Container },
-    { title: "Colaboradores", url: "/private/team", icon: IconUsers },
-    { title: "Venda Rápida", url: "/private/pdv", icon: IconShoppingCart },
-  ],
-  navSecondary: [{ title: "Ajuda", url: "#", icon: IconHelp }],
+	user: {
+		name: 'shadcn',
+		email: 'm@example.com',
+		avatar: '/avatars/shadcn.jpg',
+	},
+	navMain: [
+		{
+			title: 'Dashboard',
+			url: '/private/dashboard',
+			icon: IconLayoutDashboard,
+		},
+		{ title: 'Filiais', url: '/private/branches', icon: IconGlobe },
+		{ title: 'Financeiro', url: '/private/financial', icon: IconChartBar },
+		{ title: 'Estoque', url: '/private/inventory', icon: Container },
+		{ title: 'Colaboradores', url: '/private/team', icon: IconUsers },
+		{ title: 'Venda Rápida', url: '/private/pdv', icon: IconShoppingCart },
+	],
+	navSecondary: [{ title: 'Ajuda', url: '#', icon: IconHelp }],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname();
-  const [isClient, setIsClient] = React.useState(false);
+	const pathname = usePathname();
+	const [isClient, setIsClient] = React.useState(false);
 
+	React.useEffect(() => {
+		setIsClient(true);
+	}, []);
 
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
+	if (!isClient) return null;
 
-  if (!isClient) return null; 
+	return (
+		<Sidebar collapsible="offcanvas" className="border-r" {...props}>
+			{/* Header */}
+			<SidebarHeader className="border-b px-6 py-5">
+				<div className="flex items-center gap-3">
+					<div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
+						<Image
+							src="/img/global/light/faviconLight.svg"
+							width={60}
+							height={60}
+							alt="Matriz Logo"
+							className="object-contain"
+						/>
+					</div>
+					<div>
+						<h2 className="text-lg font-bold tracking-tight">
+							Matriz
+						</h2>
+						<p className="text-xs text-muted-foreground">
+							Gerenciador
+						</p>
+					</div>
+				</div>
+			</SidebarHeader>
 
-  return (
-    <Sidebar collapsible="offcanvas" className="border-r" {...props}>
-      {/* Header */}
-      <SidebarHeader className="border-b px-6 py-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
-            <Image
-              src="/img/global/light/faviconLight.svg"
-              width={60}
-              height={60}
-              alt="Matriz Logo"
-              className="object-contain"
-            />
-          </div>
-          <div>
-            <h2 className="text-lg font-bold tracking-tight">Matriz</h2>
-            <p className="text-xs text-muted-foreground">Gerenciador</p>
-          </div>
-        </div>
-      </SidebarHeader>
+			{/* Main Navigation */}
+			<SidebarContent className="px-3 py-4">
+				<SidebarGroup>
+					<SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						Menu
+					</SidebarGroupLabel>
 
-      {/* Main Navigation */}
-      <SidebarContent className="px-3 py-4">
-        <SidebarGroup>
-          <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Menu
-          </SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu className="gap-1">
+							{Matrizdata.navMain.map((item) => {
+								const Icon = item.icon;
+								const isActive = pathname === item.url;
 
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {Matrizdata.navMain.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.url;
+								return (
+									<SidebarMenuItem key={item.title}>
+										<Link
+											href={item.url}
+											className="block w-full"
+										>
+											<div
+												className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-out ${
+													isActive
+														? 'bg-primary text-primary-foreground shadow-sm'
+														: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+												}`}
+											>
+												<Icon className="h-5 w-5 shrink-0" />
+												<span className="flex-1 font-medium text-sm">
+													{item.title}
+												</span>
+												{isActive && (
+													<div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+												)}
+											</div>
+										</Link>
+									</SidebarMenuItem>
+								);
+							})}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
 
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <Link href={item.url} className="block w-full">
-                      <div
-                        className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ease-out ${
-                          isActive
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 shrink-0" />
-                        <span className="flex-1 font-medium text-sm">
-                          {item.title}
-                        </span>
-                        {isActive && (
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
-                        )}
-                      </div>
-                    </Link>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+				{/* Secondary Navigation */}
+				<SidebarGroup className="mt-auto">
+					<SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						Suporte
+					</SidebarGroupLabel>
 
-        {/* Secondary Navigation */}
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Suporte
-          </SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu className="gap-1">
+							{Matrizdata.navSecondary.map((item) => {
+								const Icon = item.icon;
+								return (
+									<SidebarMenuItem key={item.title}>
+										<a
+											href={item.url}
+											className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+										>
+											<Icon className="h-5 w-5 shrink-0" />
+											<span className="flex-1 font-medium text-sm">
+												{item.title}
+											</span>
+										</a>
+									</SidebarMenuItem>
+								);
+							})}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+			</SidebarContent>
 
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {Matrizdata.navSecondary.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <a
-                      href={item.url}
-                      className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
-                    >
-                      <Icon className="h-5 w-5 shrink-0" />
-                      <span className="flex-1 font-medium text-sm">
-                        {item.title}
-                      </span>
-                    </a>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter className="border-t p-4">
-        <NavUser user={Matrizdata.user} />
-      </SidebarFooter>
-    </Sidebar>
-  );
+			<SidebarFooter className="border-t p-4">
+				<NavUser />
+			</SidebarFooter>
+		</Sidebar>
+	);
 }

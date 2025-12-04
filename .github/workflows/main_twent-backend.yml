@@ -1,9 +1,9 @@
-name: Build and deploy Node.js app to Azure Web App - twent-backend
+name: Build and Deploy Backend to Azure Web App (Docker + ACR)
 
 on:
     push:
         branches:
-            - chore/azure-config
+            - main
     workflow_dispatch:
 
 jobs:
@@ -11,16 +11,19 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            # Checkout do repositório
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Login to Azure
+            # Login na Azure
+            - name: Azure Login
               uses: azure/login@v2
               with:
                   client-id: ${{ secrets.AZURE_CLIENT_ID }}
                   tenant-id: ${{ secrets.AZURE_TENANT_ID }}
                   subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+            # Login no ACR
             - name: Login to Azure Container Registry
               uses: azure/docker-login@v1
               with:
@@ -28,14 +31,17 @@ jobs:
                   username: ${{ secrets.AZURE_ACR_USERNAME }}
                   password: ${{ secrets.AZURE_ACR_PASSWORD }}
 
+            # Build da imagem Docker usando o Dockerfile dentro de /backend
             - name: Build Docker image
               run: |
                   docker build -t twentbackendacr.azurecr.io/twent-backend:latest ./backend
 
+            # Push da imagem para o ACR
             - name: Push Docker image
               run: |
                   docker push twentbackendacr.azurecr.io/twent-backend:latest
 
+            # Deploy no Azure Web App for Containers
             - name: Deploy image to Azure Web App
               uses: azure/webapps-deploy@v3
               with:
