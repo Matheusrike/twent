@@ -1,17 +1,36 @@
 import { CreateAppointment } from '@/schemas/appointment.schema';
 import { AppError } from '@/utils/errors.util';
 import { PrismaClient } from '@prisma/generated/client';
+import { Resend } from 'resend';
 
 export class AppointmentService {
 	constructor(private database: PrismaClient) {}
+    private resend = new Resend
+    private fromEmail = process.env.FROM_EMAIL || 'noreply@twent.com';
 
-	async create(data: CreateAppointment, id: string) {
+	async create(appointmentData: CreateAppointment, id: string) {
 		try {
-            data.appointment_date = new Date(data.appointment_date);
-			const appoiment = await this.database.appointment.create({
-				data: {customer_id: id, status: "SCHEDULED",...data},
+            appointmentData.appointment_date = new Date(
+				appointmentData.appointment_date,
+			);
+            const { data, error } = await this.resend.emails.send({
+				from: this.fromEmail,
+				to: 'noreply.twent@gmail.com',
+				subject: 'Novo Agendamento - TWENT',
+				html: `<h1>Novo Agendamento</h1>
+                <p>Cliente ID: ${id}</p>
+                <p>Nome: ${appointmentData.customer_name}</p>
+                <p>Telefone: ${appointmentData.customer_phone}</p>
+                <p>Email: ${appointmentData.customer_email}</p>
+                <p>Data: ${appointmentData.appointment_date}</p>`,
 			});
-			return appoiment;
+            if (error) {
+                throw new AppError({
+                    message: error.message,
+                    errorCode: 'INTERNAL_SERVER_ERROR',
+                });
+            }
+			return data;
 		} catch (error) {
 			if (error.code === 'P2002') {
 				throw new AppError({
@@ -51,6 +70,18 @@ export class AppointmentService {
 				where: { id },
 				data: { status: 'CANCELLED' },
 			});
+
+            await this.resend.emails.send({
+                from: this.fromEmail,
+                to: appoiment.customer_email,
+                subject: 'Agendamento Cancelado - TWENT',
+                html: `<h1>Agendamento Cancelado</h1>
+                <p>Cliente ID: ${appoiment.customer_id}</p>
+                <p>Nome: ${appoiment.customer_name}</p>
+                <p>Telefone: ${appoiment.customer_phone}</p>
+                <p>Email: ${appoiment.customer_email}</p>
+                <p>Data: ${appoiment.appointment_date}</p>`,
+            });
 			return appoiment;
 		} catch (error) {
             console.log(error);
@@ -73,6 +104,17 @@ export class AppointmentService {
 				where: { id },
 				data: { status: 'CONFIRMED' },
 			});
+            await this.resend.emails.send({
+                from: this.fromEmail,
+                to: appoiment.customer_email,
+                subject: 'Agendamento Confirmado - TWENT',
+                html: `<h1>Agendamento Confirmado</h1>
+                <p>Cliente ID: ${appoiment.customer_id}</p>
+                <p>Nome: ${appoiment.customer_name}</p>
+                <p>Telefone: ${appoiment.customer_phone}</p>
+                <p>Email: ${appoiment.customer_email}</p>
+                <p>Data: ${appoiment.appointment_date}</p>`,
+            });
 			return appoiment;
 		} catch (error) {
 			if (error.code === 'P2025') {
