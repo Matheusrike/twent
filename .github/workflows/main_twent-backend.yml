@@ -3,7 +3,7 @@ name: Build and Deploy Backend to Azure Web App (Docker + ACR)
 on:
     push:
         branches:
-            - main
+            - chore/azure-config
     workflow_dispatch:
 
 jobs:
