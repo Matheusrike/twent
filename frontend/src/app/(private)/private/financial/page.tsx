@@ -4,7 +4,6 @@ import FinancialBarChart from "@/components/private/views/financial/financial-Ba
 import { FinancialPieChart } from "@/components/private/views/financial/financial-Piechart";
 import { FinancialGraph } from "@/components/private/views/financial/financial-graphic";
 import { FinancialHeader } from "@/components/private/views/financial/financial-header";
-import { FinancialTable } from "@/components/private/views/financial/financial-table";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
@@ -54,10 +53,6 @@ export default function Financial() {
             <div className="flex flex-col lg:flex-row gap-5 w-full">
                 <FinancialPieChart />
                 <FinancialBarChart />
-            </div>
-
-            <div>
-            <FinancialTable />
             </div>
 
         </section>
