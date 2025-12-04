@@ -4,15 +4,27 @@ import { PrismaClient } from '@prisma/generated/client';
 import { Resend } from 'resend';
 
 export class AppointmentService {
-	constructor(private database: PrismaClient) {}
-    private resend = new Resend
-    private fromEmail = process.env.FROM_EMAIL || 'noreply@twent.com';
+	private resend: Resend;
+	private fromEmail: string;
 
+	constructor(private database: PrismaClient) {
+		const apiKey = process.env.RESEND_API_KEY;
+
+		if (!apiKey) {
+			throw new Error(
+				'RESEND_API_KEY não configurada nas variáveis de ambiente',
+			);
+		}
+
+		this.resend = new Resend(apiKey);
+		this.fromEmail = process.env.FROM_EMAIL || 'noreply@twent.com';
+	}
 	async create(appointmentData: CreateAppointment, id: string) {
 		try {
             appointmentData.appointment_date = new Date(
 				appointmentData.appointment_date,
 			);
+            console.log(this.fromEmail);
             const { data, error } = await this.resend.emails.send({
 				from: this.fromEmail,
 				to: 'noreply.twent@gmail.com',
@@ -26,7 +38,7 @@ export class AppointmentService {
 			});
             if (error) {
                 throw new AppError({
-                    message: error.message,
+                    message: error.name + ': ' + error.message,
                     errorCode: 'INTERNAL_SERVER_ERROR',
                 });
             }

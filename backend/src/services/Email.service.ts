@@ -1,5 +1,6 @@
 import { passwordChangedEmailTemplate } from '@/templates/resetPasswordConfirmationEmail.template';
 import { passwordResetEmailTemplate } from '@/templates/resetPasswordEmail.template';
+import { AppError } from '@/utils/errors.util';
 import { Resend } from 'resend';
 
 interface SendPasswordResetEmailParams {
@@ -37,7 +38,7 @@ export class EmailService {
 		try {
 			const { to, userName, resetUrl, expirationMinutes } = params;
 
-			await this.resend.emails.send({
+			const {error} = await this.resend.emails.send({
 				from: this.fromEmail,
 				to,
 				subject: 'Recuperação de Senha - TWENT',
@@ -47,11 +48,20 @@ export class EmailService {
 					expirationMinutes,
 				}),
 			});
+            if (error) {
+                throw new AppError({
+                    message: error.name + ': ' + error.message,
+                    errorCode: 'INTERNAL_SERVER_ERROR',
+                })
+            }
 
 			console.log(`Password reset email sent to: ${to}`);
 		} catch (error) {
 			console.error('Error sending password reset email:', error);
-			throw new Error('Falha ao enviar email de recuperação');
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
 		}
 	}
 
@@ -64,12 +74,19 @@ export class EmailService {
 		try {
 			const { to, userName } = params;
 
-			await this.resend.emails.send({
+			const { error } = await this.resend.emails.send({
 				from: this.fromEmail,
 				to,
 				subject: 'Senha Alterada com Sucesso - TWENT',
 				html: passwordChangedEmailTemplate({ userName }),
 			});
+
+            if (error) {
+                throw new AppError({
+                    message: error.name + ': ' + error.message,
+                    errorCode: 'INTERNAL_SERVER_ERROR',
+                })
+            }
 
 			console.log(`Password changed confirmation email sent to: ${to}`);
 		} catch (error) {
