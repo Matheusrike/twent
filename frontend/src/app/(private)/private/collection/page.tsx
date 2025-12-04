@@ -1,10 +1,12 @@
-"use client"
-
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
-import { CollectionHeader } from "@/components/private/views/collection/collection-header";
+import { CollectionHeader } from "@/components/private/views/collection/header/collection-header";
+import { CollectionProductsHeader } from "@/components/private/views/collection/header/products-header";
+import CollectionProductsTable from "@/components/private/views/collection/tables/products-table";
+import CollectionsTable from "@/components/private/views/collection/tables/collection-table";
 
 export default function Colletion() {
   const router = useRouter();
@@ -39,7 +41,12 @@ export default function Colletion() {
   if (authorized === null) {
     <Loading />;
   }
-  return <section className="flex flex-col gap-5">
-          <CollectionHeader/>
-        </section>
+  return (
+    <section className="flex flex-col gap-5">
+      <CollectionProductsHeader />
+      <CollectionProductsTable/>
+      <CollectionHeader />
+      <CollectionsTable/>
+    </section>
+  );
 }
