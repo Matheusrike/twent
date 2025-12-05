@@ -23,7 +23,7 @@ const envSchema = z.object({
 		.min(1, 'Cloudinary API secret is required'),
 
 	RESEND_API_KEY: z.string('Resend API key is required'),
-	FROM_EMAIL: z.email('From email must be a valid email address'),
+	FROM_EMAIL: z.string('From email must be a valid email address'),
 });
 
 export function loadConfig(): IAppConfig {
