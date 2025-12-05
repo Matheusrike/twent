@@ -8,6 +8,8 @@ const envSchema = z.object({
 	NODE_ENV: z.enum(['prod', 'dev']).default('prod'),
 	PORT: z.coerce.number().default(3333),
 	DATABASE_URL: z.string().min(1, 'Database URL is required'),
+	FRONTEND_URL: z.url('Frontend URL must be a valid URL').optional(),
+
 	COOKIE_SECRET: z.string().min(1, 'Cookie secret is required'),
 	JWT_SECRET: z.string().min(1, 'JWT secret is required'),
 	ADMIN_PASSWORD: z.string().min(1, 'Admin password is required'),
@@ -19,6 +21,9 @@ const envSchema = z.object({
 	CLOUDINARY_API_SECRET: z
 		.string()
 		.min(1, 'Cloudinary API secret is required'),
+
+	RESEND_API_KEY: z.string('Resend API key is required'),
+	FROM_EMAIL: z.email('From email must be a valid email address'),
 });
 
 export function loadConfig(): IAppConfig {
@@ -41,6 +46,10 @@ export function loadConfig(): IAppConfig {
 	return {
 		nodeEnv: env.NODE_ENV,
 		port: env.PORT,
+		frontendUrl:
+			env.NODE_ENV === 'prod'
+				? env.FRONTEND_URL!
+				: 'http://localhost:3000',
 		databaseUrl: env.DATABASE_URL,
 		cookieSecret: env.COOKIE_SECRET,
 		jwtSecret: env.JWT_SECRET,
