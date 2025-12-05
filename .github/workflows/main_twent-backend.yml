@@ -6,6 +6,10 @@ on:
             - chore/azure-config
     workflow_dispatch:
 
+permissions:
+    id-token: write
+    contents: read
+
 jobs:
     docker-deploy:
         runs-on: ubuntu-latest
