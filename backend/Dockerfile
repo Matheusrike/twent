@@ -15,8 +15,6 @@ RUN pnpm install --frozen-lockfile
 # Generate Prisma client
 RUN pnpm prisma generate
 
-COPY ./prisma/generated/libquery_engine-linux-musl-openssl-3.0.x.so.node ./dist/prisma/generated/libquery_engine-linux-musl-openssl-3.0.x.so.node
-
 # Copy application source code
 COPY . .
 
