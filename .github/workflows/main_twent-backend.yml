@@ -19,13 +19,6 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Login to Azure
-              uses: azure/login@v2
-              with:
-                  client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_CB341227D7B34EA5B6990CD68933360E }}
-                  tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5AC148E0CCE142D29244334BC54614F8 }}
-                  subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A580685B8D1449EE9E22048BF4377DA5 }}
-
             # Login no ACR
             - name: Login to Azure Container Registry
               uses: azure/docker-login@v1
@@ -51,3 +44,4 @@ jobs:
                   app-name: '${{secrets.AZURE_WEBAPP_NAME}}'
                   slot-name: 'Production'
                   images: '${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest'
+                  publish-profile: ${{secrets.AZURE_PUBLISH_PROFILE}}
