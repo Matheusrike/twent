@@ -32,13 +32,6 @@ export type Sale = z.infer<typeof SaleSchema>;
 export const newSaleSchema = z.object({
     product_id: z.string(),
     quantity: z.number(),
-    unit_price: z
-        .union([z.string(), z.number(), z.instanceof(Decimal)])
-        .transform((val) => (val instanceof Decimal ? val : new Decimal(val)))
-        .meta({
-            description: 'Preço unitário',
-            examples: ['4200.75', 5100],
-        }),
 	cash_session_id: z.uuid(),
 	customer_id: z.uuid().optional(),
 	total_discount: z
@@ -61,7 +54,6 @@ export const newSaleSchema = z.object({
 export type NewSale = z.infer<typeof newSaleSchema>;
 
 export const salesFiltersSchema = z.object({
-	store_id: z.uuid().optional(),
 	cash_session_id: z.uuid().optional(),
 	customer_id: z.uuid().optional(),
 	payment_method: z.enum(PaymentMethod).optional(),

@@ -11,7 +11,7 @@ export function saleRoutes(app: fastifyTypedInstance) {
 	const saleController = new SaleController(saleService);
 
 	app.get(
-		'/',
+		'/all',
 		{
 			schema: {
 				tags: ['Sale'],
@@ -21,7 +21,7 @@ export function saleRoutes(app: fastifyTypedInstance) {
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			try {
-				const response = await saleController.getSales(request);
+				const response = await saleController.getAllSales(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
@@ -38,6 +38,35 @@ export function saleRoutes(app: fastifyTypedInstance) {
 			}
 		},
 	);
+
+    app.get(
+        '/',
+        {
+            schema: {
+                tags: ['Sale'],
+                summary: 'Busca todas as vendas',
+            },
+            preHandler: app.authorization(),
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            try {
+                const response = await saleController.getSales(request);
+                return new ApiResponse({
+                    statusCode: 200,
+                    success: true,
+                    message: 'Vendas encontradas',
+                    data: response,
+                }).send(reply);
+            } catch (error) {
+                return new ApiResponse({
+                    success: false,
+                    statusCode: error.statusCode,
+                    message: error.message,
+                    errorCode: error.errorCode,
+                }).send(reply);
+            }
+        },
+    )
 
 	app.post(
 		'/',

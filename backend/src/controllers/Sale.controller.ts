@@ -43,7 +43,7 @@ export class SaleController {
 		}
 	}
 
-	async getSales(request: FastifyRequest) {
+	async getAllSales(request: FastifyRequest) {
 		try {
 			const filters = request.query as SalesFilters;
 			const response = await this.saleService.getSales(filters);
@@ -58,12 +58,28 @@ export class SaleController {
 			}
 		}
 	}
+	async getSales(request: FastifyRequest) {
+		try {
+			const { storeId } = request.user as IJwtAuthPayload;
+			const filters = request.query as SalesFilters;
+			const response = await this.saleService.getSales(filters, storeId);
+			return response;
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw new HttpError({
+					errorCode: error.errorCode,
+					message: error.message,
+					statusCode: 500,
+				});
+			}
+		}
+	}
 
 	async cancelSale(request: FastifyRequest) {
 		try {
-            const { id } = request.params as { id: string };
-            const response = await this.saleService.cancelSale(id);
-            return response;
+			const { id } = request.params as { id: string };
+			const response = await this.saleService.cancelSale(id);
+			return response;
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw new HttpError({
