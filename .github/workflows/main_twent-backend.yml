@@ -15,36 +15,28 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            # Login na Azure
-            - name: Azure Login
-              uses: azure/login@v2
-              with:
-                  client-id: ${{ secrets.AZURE_CLIENT_ID }}
-                  tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-                  subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
             # Login no ACR
             - name: Login to Azure Container Registry
               uses: azure/docker-login@v1
               with:
-                  login-server: twentbackendacr.azurecr.io
-                  username: ${{ secrets.AZURE_ACR_USERNAME }}
-                  password: ${{ secrets.AZURE_ACR_PASSWORD }}
+                  login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+                  username: ${{ secrets.ACR_USERNAME }}
+                  password: ${{ secrets.ACR_PASSWORD }}
 
             # Build da imagem Docker usando o Dockerfile dentro de /backend
             - name: Build Docker image
               run: |
-                  docker build -t twentbackendacr.azurecr.io/twent-backend:latest ./backend
+                  docker build -t ${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest ./backend
 
             # Push da imagem para o ACR
             - name: Push Docker image
               run: |
-                  docker push twentbackendacr.azurecr.io/twent-backend:latest
+                  docker push ${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest
 
             # Deploy no Azure Web App for Containers
             - name: Deploy image to Azure Web App
               uses: azure/webapps-deploy@v3
               with:
-                  app-name: 'twent-backend'
+                  app-name: '${{secrets.AZURE_WEBAPP_NAME}}'
                   slot-name: 'Production'
-                  images: 'twentbackendacr.azurecr.io/twent-backend:latest'
+                  images: '${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest'
