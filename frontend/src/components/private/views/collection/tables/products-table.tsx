@@ -1,4 +1,5 @@
 "use client";
+
 import * as React from "react";
 import {
   ColumnDef,
@@ -15,11 +16,14 @@ import {
   MoreHorizontal,
   Edit2,
   Plus,
-  Check,
-  ChevronsUpDown,
-  CheckCircle2,
-  XCircle,
+  Image as ImageIcon,
 } from "lucide-react";
+
+import { useState } from "react";
+
+import CreateProductModal from "../forms/create-product-modal";
+import UploadImagesModal from "../forms/upload-image-form";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -38,29 +42,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 type Product = {
   id: string;
@@ -93,27 +75,17 @@ export default function CollectionProductsTable() {
   const [loading, setLoading] = React.useState(true);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [addModalOpen, setAddModalOpen] = React.useState(false);
-  const [editModalOpen, setEditModalOpen] = React.useState(false);
-  const [selectedCollectionId, setSelectedCollectionId] = React.useState("");
-  const [openCollectionCombo, setOpenCollectionCombo] = React.useState(false);
 
-  const [editingProduct, setEditingProduct] = React.useState<Product | null>(
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [productToEdit, setProductToEdit] = React.useState<Product | null>(
     null
   );
-  const [formName, setFormName] = React.useState("");
-  const [formDescription, setFormDescription] = React.useState("");
-  const [formPrice, setFormPrice] = React.useState("");
-  const [formCostPrice, setFormCostPrice] = React.useState("");
-  const [formLimited, setFormLimited] = React.useState(false);
-  const [formActive, setFormActive] = React.useState(true);
-  const [formCaseMaterial, setFormCaseMaterial] = React.useState("");
-  const [formCaseDiameter, setFormCaseDiameter] = React.useState("");
-  const [formMovement, setFormMovement] = React.useState("");
-  const [formWeight, setFormWeight] = React.useState("");
-  const [formGlass, setFormGlass] = React.useState("");
-  const [formCurrency, setFormCurrency] = React.useState("BRL");
-  const [files, setFiles] = React.useState<FileList | null>(null);
+
+  const [isUploadImageOpen, setIsUploadImageOpen] = useState(false);
+  const [selectedProductSku, setSelectedProductSku] = useState<string | null>(
+    null
+  );
 
   const loadData = React.useCallback(async () => {
     setLoading(true);
@@ -128,6 +100,8 @@ export default function CollectionProductsTable() {
 
       setProducts(productJson?.data?.products ?? []);
       setCollections(collectionJson?.data?.collections ?? []);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
     } finally {
       setLoading(false);
     }
@@ -137,84 +111,23 @@ export default function CollectionProductsTable() {
     loadData();
   }, [loadData]);
 
-  const openEdit = (p: Product) => {
-    setEditingProduct(p);
-    setFormName(p.name);
-    setFormDescription(p.description);
-    setFormPrice(p.price);
-    setFormCostPrice(p.cost_price);
-    setFormLimited(p.limited_edition);
-    setFormActive(p.is_active);
-    setFormCurrency(p.currency);
-    setSelectedCollectionId(p.collection_id);
-    setFormCaseMaterial(p.specifications.case_material);
-    setFormCaseDiameter(String(p.specifications.case_diameter));
-    setFormMovement(p.specifications.movement_type);
-    setFormWeight(String(p.specifications.total_weight));
-    setFormGlass(p.specifications.glass);
-    setEditModalOpen(true);
+  const handleEdit = (product: Product) => {
+    setProductToEdit(product);
+    setIsEditOpen(true);
   };
 
-  const submitUpdate = async () => {
-    if (!editingProduct) return;
-
-    const res = await fetch("/response/api/product", {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        product_id: editingProduct.sku,
-        name: formName,
-        description: formDescription,
-        price: Number(formPrice),
-        currency: formCurrency,
-        cost_price: Number(formCostPrice),
-        collection_id: selectedCollectionId,
-        limited_edition: formLimited,
-        is_active: formActive,
-        specifications: {
-          case_material: formCaseMaterial,
-          case_diameter: Number(formCaseDiameter),
-          movement_type: formMovement,
-          total_weight: Number(formWeight),
-          glass: formGlass,
-        },
-      }),
-    });
-
-    if (res.ok) {
-      setEditModalOpen(false);
-      loadData();
-    }
+  const handleCreate = () => {
+    setProductToEdit(null);
+    setIsCreateOpen(true);
   };
 
-  const submitCreate = async () => {
-    const res = await fetch("/response/api/product", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: formName,
-        description: formDescription,
-        price: Number(formPrice),
-        currency: formCurrency,
-        cost_price: Number(formCostPrice),
-        collection_id: selectedCollectionId,
-        limited_edition: formLimited,
-        specifications: {
-          case_material: formCaseMaterial,
-          case_diameter: Number(formCaseDiameter),
-          movement_type: formMovement,
-          total_weight: Number(formWeight),
-          glass: formGlass,
-        },
-      }),
-    });
+  const handleSuccess = () => {
+    loadData();
+  };
 
-    if (res.ok) {
-      setAddModalOpen(false);
-      loadData();
-    }
+  const handleUploadImage = (sku: string) => {
+    setSelectedProductSku(sku);
+    setIsUploadImageOpen(true);
   };
 
   const columns: ColumnDef<Product>[] = [
@@ -228,7 +141,6 @@ export default function CollectionProductsTable() {
           SKU <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => row.original.sku,
     },
     {
       accessorKey: "name",
@@ -240,81 +152,75 @@ export default function CollectionProductsTable() {
           Nome <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => row.original.name,
     },
     {
       accessorKey: "collection_id",
       header: "Coleção",
       cell: ({ row }) => {
-        const id = row.original.collection_id;
-        const collection = collections.find((c) => c.id === id);
+        const collection = collections.find(
+          (c) => c.id === row.original.collection_id
+        );
         return collection?.name ?? "-";
       },
     },
     {
       accessorKey: "limited_edition",
       header: "Edição",
-      cell: ({ row }) =>
-        row.original.limited_edition ? (
-          <Badge variant="default">Limitada</Badge>
-        ) : (
-          <Badge variant="secondary">Normal</Badge>
-        ),
+      cell: ({ row }) => (
+        <Badge variant={row.original.limited_edition ? "default" : "secondary"}>
+          {row.original.limited_edition ? "Limitada" : "Normal"}
+        </Badge>
+      ),
     },
-   {
-  accessorKey: "is_active",
-  header: "Status",
-  cell: ({ row }) => {
-    const active = row.original.is_active;
-    return (
-      <Badge
-        variant={active ? "default" : "secondary"}
-        className="w-24 justify-center"
-      >
-        {active ? (
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="h-4 w-4" /> Ativo
-          </div>
-        ) : (
-          <div className="flex items-center gap-1">
-            <XCircle className="h-4 w-4" /> Inativo
-          </div>
-        )}
-      </Badge>
-    );
-  },
-},
-
+    {
+      accessorKey: "is_active",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge
+          variant={row.original.is_active ? "default" : "secondary"}
+          className="w-24 justify-center"
+        >
+          {row.original.is_active ? "Ativo" : "Inativo"}
+        </Badge>
+      ),
+    },
     {
       id: "actions",
-      cell: ({ row }) => {
-        const product = row.original;
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => openEdit(product)}>
-                <Edit2 className="mr-2 h-4 w-4" /> Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              onClick={() => handleUploadImage(row.original.sku)}
+            >
+              <ImageIcon className="mr-2 h-4 w-4" />
+              Imagens
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+              <Edit2 className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
     },
   ];
 
   const table = useReactTable({
     data: products,
     columns,
-    onSortingChange: setSorting,
-    globalFilterFn: "includesString",
     state: { sorting, globalFilter },
+    onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -323,32 +229,33 @@ export default function CollectionProductsTable() {
     initialState: { pagination: { pageSize: 15 } },
   });
 
-  const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
-
   return (
     <>
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <Input
-          placeholder="Buscar produto"
+          placeholder="Buscar produto..."
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
         />
 
-        <Button onClick={() => setAddModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" /> Novo Relógio
+        <Button onClick={handleCreate}>
+          <Plus />
+          Novo Relógio
         </Button>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border mt-3">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((hg) => (
-              <TableRow key={hg.id}>
-                {hg.headers.map((h) => (
-                  <TableHead key={h.id}>
-                    {flexRender(h.column.columnDef.header, h.getContext())}
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -360,12 +267,12 @@ export default function CollectionProductsTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-32 text-center"
+                  className="text-center h-32"
                 >
                   Carregando...
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows.length > 0 ? (
+            ) : (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
@@ -378,15 +285,6 @@ export default function CollectionProductsTable() {
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-32 text-center"
-                >
-                  Nenhum produto encontrado
-                </TableCell>
-              </TableRow>
             )}
           </TableBody>
         </Table>
@@ -396,21 +294,32 @@ export default function CollectionProductsTable() {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          onClick={() => table.previousPage()}
         >
           Anterior
         </Button>
-
         <Button
           size="sm"
           variant="outline"
-          onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          onClick={() => table.nextPage()}
         >
           Próximo
         </Button>
       </div>
+
+      <CreateProductModal
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onSuccess={handleSuccess}
+      />
+
+      <UploadImagesModal
+        open={isUploadImageOpen}
+        sku={selectedProductSku}
+        onOpenChange={setIsUploadImageOpen}
+      />
     </>
   );
 }
