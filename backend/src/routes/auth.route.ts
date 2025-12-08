@@ -30,7 +30,7 @@ export async function authRoutes(app: fastifyTypedInstance) {
 				body: loginBodySchema,
 				response: {
 					200: LoginSuccessResponseSchema,
-					400: InvalidPasswordResponseSchema,
+					401: InvalidPasswordResponseSchema,
 					403: UserInactiveResponseSchema,
 					404: UserNotFoundResponseSchema,
                     409: ConflictUserResponseSchema,
@@ -101,7 +101,7 @@ export async function authRoutes(app: fastifyTypedInstance) {
 				body: changePasswordBodySchema,
 				response: {
 					200: changePasswordResponseSchema,
-					400: InvalidPasswordResponseSchema,
+					401: InvalidPasswordResponseSchema,
 					403: UserInactiveResponseSchema,
 					404: UserNotFoundResponseSchema,
 					500: ApiGenericErrorSchema,

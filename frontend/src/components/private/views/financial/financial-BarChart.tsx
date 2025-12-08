@@ -56,10 +56,7 @@ export default function FinancialBarChart() {
             <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-xl font-semibold">Comparativo de Despesas</CardTitle>
-                    <button className="text-teal-600 hover:text-teal-700 text-sm font-medium flex items-center gap-1">
-                        Ver detalhes
-                        <span className="text-lg">→</span>
-                    </button>
+
                 </div>
             </CardHeader>
 

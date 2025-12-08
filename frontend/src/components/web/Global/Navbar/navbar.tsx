@@ -1,7 +1,7 @@
 'use client'
 import { Logo } from "./logo";
 import { NavigationSheet } from "./navigation-sheet";
-import DropdownLanguageSelector from "./dropdownLanguageSelector";
+
 import { FaMapMarkerAlt } from "react-icons/fa";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -13,7 +13,7 @@ const Navbar = () => {
         <div className="h-full w-full mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-3 items-center">
           {/* left content */}
           <div className="flex items-center gap-2">
-            <DropdownLanguageSelector />
+        
             <Link href="/maps">
               <Button variant="languageButton" size="languageButton" className="flex items-center gap-1">
                 <FaMapMarkerAlt className="text-base" />
