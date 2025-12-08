@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/web/Global/ui/button';
 import { formatCurrency } from '@/utils/functions/formatCurrency';
@@ -36,9 +36,9 @@ interface Product {
 	images: Array<{ url: string }>;
 }
 
-export default function CollectionIdHero({ params }: any) {
+export default function CollectionIdHero() {
 	const router = useRouter();
-	const sku = params.id;
+	const { id: sku } = useParams();
 	const [product, setProduct] = useState<Product | null>(null);
 	const [loading, setLoading] = useState(true);
 
@@ -75,6 +75,11 @@ export default function CollectionIdHero({ params }: any) {
 	}
 
 	if (!product) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<p>Produto não encontrado.</p>
+			</div>
+		);
 	}
 
 	return (
