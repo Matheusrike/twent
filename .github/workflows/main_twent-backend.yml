@@ -1,68 +1,47 @@
-name: Build and deploy Node.js app to Azure Web App - twent-backend
+name: Build and Deploy Backend to Azure Web App (Docker + ACR)
 
 on:
     push:
         branches:
-            - main
+            - resolve-merge
     workflow_dispatch:
 
+permissions:
+    id-token: write
+    contents: read
+
 jobs:
-    build:
+    docker-deploy:
         runs-on: ubuntu-latest
-        permissions:
-            contents: read
 
         steps:
+            # Checkout do repositório
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Set up Node.js version
-              uses: actions/setup-node@v3
+            # Login no ACR
+            - name: Login to Azure Container Registry
+              uses: azure/docker-login@v1
               with:
-                  node-version: '22.x'
+                  login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+                  username: ${{ secrets.ACR_USERNAME }}
+                  password: ${{ secrets.ACR_PASSWORD }}
 
-            - name: Install pnpm
-              run: npm install -g pnpm
+            # Build da imagem Docker usando o Dockerfile dentro de /backend
+            - name: Build Docker image
+              run: |
+                  docker build -t ${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest ./backend
 
-            - name: Install dependencies
-              run: pnpm install --frozen-lockfile && pnpm prisma generate
-              working-directory: backend
+            # Push da imagem para o ACR
+            - name: Push Docker image
+              run: |
+                  docker push ${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest
 
-            - name: Build backend
-              run: pnpm build
-              working-directory: backend
-
-            - name: Upload artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: backend-app
-                  path: backend
-                  if-no-files-found: error
-
-    deploy:
-        runs-on: ubuntu-latest
-        needs: build
-        permissions:
-            id-token: write
-            contents: read
-
-        steps:
-            - name: Download artifact
-              uses: actions/download-artifact@v4
-              with:
-                  name: backend-app
-                  path: .
-
-            - name: Login to Azure
-              uses: azure/login@v2
-              with:
-                  client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_344F33E0313E49458AEB101102DB56B6 }}
-                  tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_29165FF121814D278BFDC67C0758988E }}
-                  subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8C7F6669DE38463EA96B3DC81FA2CFC7 }}
-
-            - name: Deploy to Azure Web App
+            # Deploy no Azure Web App for Containers
+            - name: Deploy image to Azure Web App
               uses: azure/webapps-deploy@v3
               with:
-                  app-name: 'twent-backend'
+                  app-name: '${{secrets.AZURE_WEBAPP_NAME}}'
                   slot-name: 'Production'
-                  package: .
+                  images: '${{secrets.ACR_LOGIN_SERVER}}/twent-backend:latest'
+                  publish-profile: ${{secrets.AZURE_PUBLISH_PROFILE}}

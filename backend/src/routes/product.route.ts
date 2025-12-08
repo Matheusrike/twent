@@ -148,9 +148,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				summary: 'Busca um produto pelo sku',
 			},
-			preHandler: [
-				app.authorization(),
-			],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
@@ -334,9 +332,7 @@ export async function productRoutes(app: fastifyTypedInstance) {
 				tags: ['Product'],
 				summary: 'Recupera o histórico de preços de um produto',
 			},
-			preHandler: [
-				app.authorization(),
-			],
+			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {
