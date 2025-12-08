@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 import ReactDOMServer from "react-dom/server";
 import { FaStore } from "react-icons/fa";
 import "leaflet/dist/leaflet.css";
@@ -23,9 +23,39 @@ const Popup = dynamic(
   { ssr: false }
 );
 
-export default function MapView({stores}: {stores: any[]}) {
-  const [customIcon, setCustomIcon] = useState<any>(null);
+interface MapViewProps {
+  stores: any[];
+}
 
+const MapView = forwardRef(({ stores }: MapViewProps, ref) => {
+  const [customIcon, setCustomIcon] = useState<any>(null);
+  const mapRef = useRef<any>(null);
+  const markersRef = useRef<{ [key: string]: any }>({});
+
+  useImperativeHandle(ref, () => ({
+    focusOnStore: (store: any) => {
+      const lat = parseFloat(store.latitude);
+      const lng = parseFloat(store.longitude);
+
+      if (mapRef.current && !isNaN(lat) && !isNaN(lng)) {
+        const map = mapRef.current;
+        
+        // Animar movimento do mapa até a loja
+        map.flyTo([lat, lng], 15, {
+          duration: 1.5,
+          easeLinearity: 0.25
+        });
+
+        // Abrir popup do marcador correspondente
+        setTimeout(() => {
+          const marker = markersRef.current[store.id];
+          if (marker) {
+            marker.openPopup();
+          }
+        }, 1600); // Espera a animação do flyTo terminar
+      }
+    },
+  }));
 
   useEffect(() => {
     import("leaflet").then(L => {
@@ -55,6 +85,7 @@ export default function MapView({stores}: {stores: any[]}) {
       minZoom={3}
       maxZoom={18}
       className="w-full h-full z-10 lg:z-0"
+      ref={mapRef}
     >
       <TileLayer
         attribution='&copy; OpenStreetMap contributors'
@@ -70,6 +101,11 @@ export default function MapView({stores}: {stores: any[]}) {
               parseFloat(store.latitude),
               parseFloat(store.longitude),
             ]}
+            ref={(markerRef) => {
+              if (markerRef) {
+                markersRef.current[store.id] = markerRef;
+              }
+            }}
           >
             <Popup>
               <h1 className="font-semibold uppercase text-sm">{store.name}</h1>
@@ -82,4 +118,8 @@ export default function MapView({stores}: {stores: any[]}) {
         ))}
     </MapContainer>
   );
-}
+});
+
+MapView.displayName = 'MapView';
+
+export default MapView;
