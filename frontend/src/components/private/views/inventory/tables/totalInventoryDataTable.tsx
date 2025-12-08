@@ -68,6 +68,7 @@ export type Product = {
 };
 
 export default function InventoryTable() {
+  const LIMIT = 10;
   const [page, setPage] = React.useState(1);
   const [products, setProducts] = React.useState<Product[]>([]);
   const [inventories, setInventories] = React.useState<Store[]>([]);
@@ -83,6 +84,7 @@ export default function InventoryTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [hasNextPage, setHasNextPage] = React.useState(false);
 
   const processInventoryData = React.useCallback(
     (stores: Store[], productsApi: any) => {
@@ -127,7 +129,7 @@ export default function InventoryTable() {
             method: "GET",
             credentials: "include",
           }),
-          fetch("/response/api/product?limit=10&page=" + page, {
+          fetch(`/response/api/product?limit=${LIMIT}&page=${page}`, {
             method: "GET",
             credentials: "include",
           }),
@@ -141,6 +143,43 @@ export default function InventoryTable() {
 
         setInventories(stores);
         processInventoryData(stores, productsApi);
+
+        // Detecta se há próxima página (usa metadados quando disponíveis, senão fallback pelo tamanho)
+        const meta =
+          prodJson?.data?.pagination ??
+          prodJson?.pagination ??
+          prodJson?.data?.meta ??
+          prodJson?.meta ??
+          null;
+
+        let next = false;
+        if (meta) {
+          if (typeof meta.hasNext === "boolean") next = meta.hasNext;
+          else if (typeof meta.has_next === "boolean") next = meta.has_next;
+          else if (typeof meta.nextPage === "number")
+            next = (meta.page ?? page) < meta.nextPage;
+          else if (typeof meta.next_page === "number")
+            next = (meta.page ?? page) < meta.next_page;
+          else if (
+            typeof meta.totalPages === "number" &&
+            typeof meta.page === "number"
+          )
+            next = meta.page < meta.totalPages;
+          else if (
+            typeof meta.total_pages === "number" &&
+            typeof meta.page === "number"
+          )
+            next = meta.page < meta.total_pages;
+          else if (
+            typeof meta.count === "number" &&
+            typeof meta.limit === "number" &&
+            typeof meta.page === "number"
+          )
+            next = meta.page * meta.limit < meta.count;
+        } else {
+          next = Array.isArray(productsApi) ? productsApi.length === LIMIT : false;
+        }
+        setHasNextPage(next);
       } catch (err: any) {
         setError(err.message || "Erro ao carregar dados");
       } finally {
@@ -400,6 +439,7 @@ export default function InventoryTable() {
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => p + 1)}
+            disabled={loading || !hasNextPage}
           >
             Próximo
           </Button>

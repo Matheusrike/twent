@@ -77,7 +77,7 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = !searchQuery.trim() || product.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-    const matchesCategory = !selectedCategories.length || selectedCategories.includes(product.collection.name)
+    const matchesCategory = !selectedCategories.length || selectedCategories.some(cat => cat.toLowerCase().trim() === product.collection.name.toLowerCase().trim())
     const matchesPrice = checkPriceRange(product.price, selectedPrices)
     return matchesSearch && matchesCategory && matchesPrice
   })

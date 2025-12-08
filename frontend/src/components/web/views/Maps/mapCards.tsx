@@ -2,14 +2,26 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { MapPin, Phone, Clock } from 'lucide-react';
 import React from 'react';
 
-export default function StoresList({ data }: { data: any }) {
+interface StoresListProps {
+    data: any[];
+    onStoreClick?: (store: any) => void;
+}
+
+export default function StoresList({ data, onStoreClick }: StoresListProps) {
     if (!data || !Array.isArray(data)) return null;
+
+    const handleCardClick = (store: any) => {
+        if (onStoreClick) {
+            onStoreClick(store);
+        }
+    };
 
     return (
         <div className="grid grid-cols-1 gap-0 p-0">
             {data.map((store: any) => (
                 <Card
                     key={store.id}
+                    onClick={() => handleCardClick(store)}
                     className="bg-gray-100 dark:bg-zinc-900 relative w-full lg:max-w-sm max-w-full shadow-none pt-0 border-none hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                     <CardHeader className="py-5">
@@ -34,6 +46,7 @@ export default function StoresList({ data }: { data: any }) {
                             <Phone className="w-4 h-4 text-muted-foreground dark:text-gray-400" />
                             <a
                                 href={`tel:${store.phone?.replace(/\D/g, '')}`}
+                                onClick={(e) => e.stopPropagation()}
                                 className="text-[15px] text-muted-foreground dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200 transition-colors"
                             >
                                 {store.phone || '—'}

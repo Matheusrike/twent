@@ -49,6 +49,7 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type Collection = {
   id: string;
@@ -71,6 +72,8 @@ export default function CollectionsTable() {
   const [modalAdd, setModalAdd] = React.useState(false);
   const [modalEdit, setModalEdit] = React.useState(false);
   const [editing, setEditing] = React.useState<Collection | null>(null);
+  const [errorAdd, setErrorAdd] = React.useState("");
+  const [errorEdit, setErrorEdit] = React.useState("");
 
   const [formName, setFormName] = React.useState("");
   const [formDescription, setFormDescription] = React.useState("");
@@ -78,6 +81,13 @@ export default function CollectionsTable() {
   const [formGender, setFormGender] = React.useState<"MALE" | "FEMALE">("MALE");
   const [formMin, setFormMin] = React.useState("");
   const [formMax, setFormMax] = React.useState("");
+
+  const LIMIT = 10;
+  const [pageIndex, setPageIndex] = React.useState(0);
+  const [hasNextPage, setHasNextPage] = React.useState(false);
+  const [hasPrevPage, setHasPrevPage] = React.useState(false);
+  const [firstLoadCompleted, setFirstLoadCompleted] = React.useState(false);
+  const abortRef = React.useRef<AbortController | null>(null);
 
   const resetForm = () => {
     setFormName("");
@@ -90,16 +100,49 @@ export default function CollectionsTable() {
 
   const loadCollections = React.useCallback(async () => {
     setLoading(true);
+    const controller = new AbortController();
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = controller;
     try {
-      const res = await fetch("/response/api/collection", { credentials: "include" });
+      const res = await fetch(`/response/api/collection?limit=${LIMIT}&page=${pageIndex + 1}`, { credentials: "include", signal: controller.signal });
       const json = await res.json();
-      setCollections(json?.data?.collections ?? []);
+      const items = json?.data?.collections ?? [];
+      setCollections(items);
+
+      const meta = json?.data?.pagination ?? json?.data?.meta ?? {};
+      const currentPage = typeof meta?.page === "number" ? meta.page : pageIndex + 1;
+      const totalPages = typeof meta?.totalPages === "number" ? meta.totalPages : meta?.total_pages;
+      const count = typeof meta?.total === "number" ? meta.total : meta?.count;
+      const limitMeta = typeof meta?.limit === "number" ? meta.limit : LIMIT;
+      const hasNext = meta?.hasNext ?? meta?.has_next;
+      const hasPrev = meta?.hasPrev ?? meta?.has_prev;
+
+      if (typeof hasNext === "boolean") {
+        setHasNextPage(hasNext);
+      } else if (typeof totalPages === "number" && typeof currentPage === "number") {
+        setHasNextPage(currentPage < totalPages);
+      } else if (typeof count === "number" && typeof limitMeta === "number") {
+        setHasNextPage(currentPage * limitMeta < count);
+      } else {
+        setHasNextPage(Array.isArray(items) ? items.length === LIMIT : false);
+      }
+
+      if (typeof hasPrev === "boolean") {
+        setHasPrevPage(hasPrev);
+      } else if (typeof currentPage === "number") {
+        setHasPrevPage(currentPage > 1);
+      } else {
+        setHasPrevPage(pageIndex > 0);
+      }
     } catch (err) {
-      console.error("Erro ao carregar coleções", err);
+      if (err?.name !== "AbortError") {
+        console.error("Erro ao carregar coleções", err);
+      }
     } finally {
       setLoading(false);
+      setFirstLoadCompleted(true);
     }
-  }, []);
+  }, [pageIndex]);
 
   React.useEffect(() => {
     loadCollections();
@@ -116,13 +159,19 @@ export default function CollectionsTable() {
     }
   }, [editing]);
 
+  // Resetar para primeira página ao alterar filtro/ordenação
+  React.useEffect(() => {
+    setPageIndex(0);
+  }, [globalFilter, sorting]);
+
   const openEdit = (collection: Collection) => {
     setEditing(collection);
     setModalEdit(true);
   };
 
   const submitPost = async () => {
-    if (!formName.trim()) return alert("Nome é obrigatório");
+    setErrorAdd("");
+    if (!formName.trim()) { setErrorAdd("Nome é obrigatório"); return; }
 
     const body = {
       name: formName.trim(),
@@ -144,17 +193,19 @@ export default function CollectionsTable() {
     if (res.ok) {
       setModalAdd(false);
       resetForm();
+      setPageIndex(0);
       loadCollections();
     } else {
       const data = await res.json().catch(() => null);
-      alert(data?.message || "Erro ao criar coleção");
+      setErrorAdd(data?.message || "Erro ao criar coleção");
     }
   };
 
   const submitPut = async () => {
     if (!editing) return;
-    if (!formName.trim()) return alert("Nome é obrigatório");
-    if (Number(formMin) > Number(formMax)) return alert("Preço mínimo não pode ser maior que o máximo");
+    setErrorEdit("");
+    if (!formName.trim()) { setErrorEdit("Nome é obrigatório"); return; }
+    if (Number(formMin) > Number(formMax)) { setErrorEdit("Preço mínimo não pode ser maior que o máximo"); return; }
 
     const body = {
       name: formName.trim(),
@@ -174,17 +225,18 @@ export default function CollectionsTable() {
       });
 
       if (res.ok) {
-        alert("Coleção atualizada com sucesso!");
+        // alinhado com o estilo dos formulários de relógio: fechar sem alertas
         setModalEdit(false);
         setEditing(null);
         resetForm();
+        setPageIndex(0);
         loadCollections();
       } else {
         const data = await res.json().catch(() => null);
-        alert(data?.message || `Erro ${res.status} ao atualizar`);
+        setErrorEdit(data?.message || `Erro ${res.status} ao atualizar`);
       }
     } catch (err) {
-      alert("Erro de conexão");
+      setErrorEdit("Erro de conexão");
     }
   };
 
@@ -198,6 +250,7 @@ export default function CollectionsTable() {
     const res = await fetch(endpoint, { method: "PATCH", credentials: "include" });
 
     if (res.ok) {
+      setPageIndex(0);
       loadCollections();
       setModalEdit(false);
       setEditing(null);
@@ -289,6 +342,8 @@ export default function CollectionsTable() {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: undefined,
+    initialState: { pagination: { pageSize: 10 } },
   });
 
   return (
@@ -319,7 +374,7 @@ export default function CollectionsTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {loading ? (
+            {!firstLoadCompleted && loading ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center h-32">
                   Carregando...
@@ -346,54 +401,173 @@ export default function CollectionsTable() {
         </Table>
       </div>
 
+      <div className="flex justify-end gap-3 mt-6">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
+          disabled={!hasPrevPage}
+        >
+          Anterior
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => hasNextPage && setPageIndex((p) => p + 1)}
+          disabled={loading || !hasNextPage}
+        >
+          Próximo
+        </Button>
+      </div>
+
       <Dialog open={modalAdd} onOpenChange={(open) => { setModalAdd(open); if (!open) resetForm(); }}>
-        <DialogContent className="max-w-lg rounded-2xl border shadow-xl p-0 overflow-hidden">
-          <DialogHeader className="px-6 py-4 border-b">
-            <DialogTitle>Nova Coleção</DialogTitle>
-            <DialogDescription>Preencha os dados para cadastrar uma nova coleção.</DialogDescription>
-          </DialogHeader>
-          <div className="px-6 py-4 space-y-4">
-            <div><Label>Nome</Label><Input value={formName} onChange={(e) => setFormName(e.target.value)} /></div>
-            <div><Label>Descrição</Label><Input value={formDescription} onChange={(e) => setFormDescription(e.target.value)} /></div>
-            <div><Label>Ano</Label><Input type="number" value={formYear} onChange={(e) => setFormYear(e.target.value)} /></div>
-            <div>
-              <Label>Gênero</Label>
-              <select className="w-full rounded-md border px-3 py-2" value={formGender} onChange={(e) => setFormGender(e.target.value as "MALE" | "FEMALE")}>
-                <option value="MALE">Masculino</option>
-                <option value="FEMALE">Feminino</option>
-              </select>
+        <DialogContent className="sm:max-w-4xl max-h-[95vh] overflow-y-auto p-0 gap-0">
+          <DialogHeader className="px-8 pt-8 pb-6 border-b bg-gradient-to-br from-primary/5 to-primary/3">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                <Plus className="h-8 w-8" />
+              </div>
+              <div>
+                <DialogTitle className="text-3xl font-bold tracking-tight">Nova Coleção</DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1">Cadastre uma nova coleção</p>
+              </div>
             </div>
-            <div><Label>Preço mínimo</Label><Input type="number" value={formMin} onChange={(e) => setFormMin(e.target.value)} /></div>
-            <div><Label>Preço máximo</Label><Input type="number" value={formMax} onChange={(e) => setFormMax(e.target.value)} /></div>
+          </DialogHeader>
+
+          <div className="px-8 py-6 space-y-8">
+            {errorAdd && (
+              <Alert variant="destructive">
+                <AlertDescription>{errorAdd}</AlertDescription>
+              </Alert>
+            )}
+
+            <section className="space-y-6">
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <MoreHorizontal className="h-4 w-4" />
+                <span>Informações da Coleção</span>
+                <div className="h-px flex-1 bg-border/50" />
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Nome <span className="text-destructive">*</span></Label>
+                  <Input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="Ex.: Clássicos 2025" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Ano de Lançamento</Label>
+                  <Input type="number" value={formYear} onChange={(e) => setFormYear(e.target.value)} placeholder="2025" />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>Descrição</Label>
+                  <Input value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder="Descrição breve da coleção" />
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-6">
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <Plus className="h-4 w-4" />
+                <span>Faixa de Preço e Público</span>
+                <div className="h-px flex-1 bg-border/50" />
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label>Preço mínimo</Label>
+                  <Input type="number" value={formMin} onChange={(e) => setFormMin(e.target.value)} placeholder="0" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Preço máximo</Label>
+                  <Input type="number" value={formMax} onChange={(e) => setFormMax(e.target.value)} placeholder="0" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Gênero</Label>
+                  <select className="w-full rounded-md border px-3 py-2" value={formGender} onChange={(e) => setFormGender(e.target.value as "MALE" | "FEMALE")}> 
+                    <option value="MALE">Masculino</option>
+                    <option value="FEMALE">Feminino</option>
+                  </select>
+                </div>
+              </div>
+            </section>
           </div>
-          <div className="px-6 py-4 border-t bg-muted/40 backdrop-blur-sm flex justify-end gap-4">
+
+          <div className="px-8 py-6 border-t bg-muted/40 backdrop-blur-sm flex justify-end gap-4">
             <Button variant="outline" className="rounded-xl px-8" onClick={() => setModalAdd(false)}>Cancelar</Button>
             <Button className="rounded-xl px-8" onClick={submitPost}>Criar Coleção</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={modalEdit} onOpenChange={(open) => { setModalEdit(open); if (!open) { resetForm(); setEditing(null); } }}>
-        <DialogContent className="max-w-lg rounded-2xl border shadow-xl p-0 overflow-hidden">
-          <DialogHeader className="px-6 py-4 border-b">
-            <DialogTitle>Editar Coleção</DialogTitle>
-            <DialogDescription>Atualize os dados desta coleção.</DialogDescription>
-          </DialogHeader>
-          <div className="px-6 py-4 space-y-4">
-            <div><Label>Nome</Label><Input value={formName} onChange={(e) => setFormName(e.target.value)} /></div>
-            <div><Label>Descrição</Label><Input value={formDescription} onChange={(e) => setFormDescription(e.target.value)} /></div>
-            <div><Label>Ano</Label><Input type="number" value={formYear} onChange={(e) => setFormYear(e.target.value)} /></div>
-            <div>
-              <Label>Gênero</Label>
-              <select className="w-full rounded-md border px-3 py-2" value={formGender} onChange={(e) => setFormGender(e.target.value as "MALE" | "FEMALE")}>
-                <option value="MALE">Masculino</option>
-                <option value="FEMALE">Feminino</option>
-              </select>
+      <Dialog open={modalEdit} onOpenChange={(open) => { setModalEdit(open); if (!open) { resetForm(); setEditing(null); setErrorEdit(""); } }}>
+        <DialogContent className="sm:max-w-4xl max-h-[95vh] overflow-y-auto p-0 gap-0">
+          <DialogHeader className="px-8 pt-8 pb-6 border-b bg-gradient-to-br from-primary/5 to-primary/3">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                <Edit2 className="h-8 w-8" />
+              </div>
+              <div>
+                <DialogTitle className="text-3xl font-bold tracking-tight">Editar Coleção</DialogTitle>
+                {editing && (
+                  <p className="text-sm text-muted-foreground mt-1">ID: <span className="font-mono font-semibold">{editing.id}</span></p>
+                )}
+              </div>
             </div>
-            <div><Label>Preço mínimo</Label><Input type="number" value={formMin} onChange={(e) => setFormMin(e.target.value)} /></div>
-            <div><Label>Preço máximo</Label><Input type="number" value={formMax} onChange={(e) => setFormMax(e.target.value)} /></div>
+          </DialogHeader>
+
+          <div className="px-8 py-6 space-y-8">
+            {errorEdit && (
+              <Alert variant="destructive">
+                <AlertDescription>{errorEdit}</AlertDescription>
+              </Alert>
+            )}
+
+            <section className="space-y-6">
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <MoreHorizontal className="h-4 w-4" />
+                <span>Informações da Coleção</span>
+                <div className="h-px flex-1 bg-border/50" />
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Nome <span className="text-destructive">*</span></Label>
+                  <Input value={formName} onChange={(e) => setFormName(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Ano de Lançamento</Label>
+                  <Input type="number" value={formYear} onChange={(e) => setFormYear(e.target.value)} />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>Descrição</Label>
+                  <Input value={formDescription} onChange={(e) => setFormDescription(e.target.value)} />
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-6">
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <Plus className="h-4 w-4" />
+                <span>Faixa de Preço e Público</span>
+                <div className="h-px flex-1 bg-border/50" />
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label>Preço mínimo</Label>
+                  <Input type="number" value={formMin} onChange={(e) => setFormMin(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Preço máximo</Label>
+                  <Input type="number" value={formMax} onChange={(e) => setFormMax(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Gênero</Label>
+                  <select className="w-full rounded-md border px-3 py-2" value={formGender} onChange={(e) => setFormGender(e.target.value as "MALE" | "FEMALE")}> 
+                    <option value="MALE">Masculino</option>
+                    <option value="FEMALE">Feminino</option>
+                  </select>
+                </div>
+              </div>
+            </section>
           </div>
-          <div className="px-6 py-4 border-t flex justify-between items-center bg-muted/40 backdrop-blur-sm">
+
+          <div className="px-8 py-6 border-t flex justify-between items-center bg-muted/40 backdrop-blur-sm">
             {editing?.is_active ? (
               <Button variant="destructive" className="rounded-xl px-6 flex items-center gap-2" onClick={() => toggleActiveStatus(false)}>
                 <XCircle className="h-4 w-4" /> Desativar
