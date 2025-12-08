@@ -12,19 +12,19 @@ import {
 import { Container } from "lucide-react";
 import { NavUser } from "@/components/private/global/sideBar/nav-user";
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarHeader,
-	SidebarGroup,
-	SidebarGroupLabel,
-	SidebarGroupContent,
-	SidebarMenu,
-	SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 type RoleName = "ADMIN" | "MANAGER_BRANCH" | "EMPLOYEE_BRANCH" | string;
 

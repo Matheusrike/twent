@@ -10,7 +10,6 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 export type IAppConfig = {
 	nodeEnv: string;
 	port: number;
-	frontendUrl: string;
 	databaseUrl: string;
 	cookieSecret: string;
 	jwtSecret: string;

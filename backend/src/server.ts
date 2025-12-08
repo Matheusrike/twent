@@ -11,17 +11,10 @@ async function startServer() {
 			host: '0.0.0.0',
 		});
 
-		if (config.nodeEnv !== 'prod') {
-			console.log('🛠️  Running in development mode');
-			console.log(
-				`🚀 Server running on http://localhost:${config.port}/api`,
-			);
-			console.log(
-				`📚 API Documentation available at http://localhost:${config.port}/docs`,
-			);
-		} else {
-			console.log('🚀 Server running in production mode');
-		}
+		console.log(`🚀 Server running on http://localhost:${config.port}/api`);
+		console.log(
+			`📚 API Documentation available at http://localhost:${config.port}/docs`,
+		);
 	} catch (error) {
 		console.error('❌ Error starting server:', error);
 		process.exit(1);

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState } from 'react'
 import Image from 'next/image'
@@ -27,7 +27,7 @@ export default function CollectionCard({
   badge,
   index = 0
 }: CollectionCardProps) {
-	const [liked, setLiked] = useState<boolean>(false);
+  const [liked, setLiked] = useState<boolean>(false)
 
   return (
     <Link href={`/collection/${sku}`} className='block'>
@@ -70,20 +70,20 @@ export default function CollectionCard({
           <span className='sr-only'>Like</span>
         </Button>
 
-				<Card className="border-none min-h-60 max-h-60 bg-white dark:bg-black">
-					<CardHeader className="px-6 pt-4">
-						<div className="flex items-center justify-between gap-2">
-							<CardTitle className="text-2xl font-bold text-primary dark:text-primary">
-								{title}
-							</CardTitle>
+        <Card className='border-none min-h-60 max-h-60 bg-white dark:bg-black'>
+          <CardHeader className='px-6 pt-4'>
+            <div className='flex items-center justify-between gap-2'>
+              <CardTitle className='text-2xl font-bold text-primary dark:text-primary'>
+                {title}
+              </CardTitle>
 
-							{badge && (
-								<Badge className="bg-primary text-white px-3 py-1 text-sm font-semibold uppercase">
-									{badge}
-								</Badge>
-							)}
-						</div>
-					</CardHeader>
+              {badge && (
+                <Badge className='bg-primary text-white px-3 py-1 text-sm font-semibold uppercase'>
+                  {badge}
+                </Badge>
+              )}
+            </div>
+          </CardHeader>
 
           <CardContent className='px-6 pt-2 pb-4'>
             <p className='text-gray-600 dark:text-gray-300 font-semibold'>
