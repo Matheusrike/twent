@@ -11,12 +11,12 @@ import "flag-icons/css/flag-icons.min.css";
 
 const AboutContainer: React.FC = () => {
   return (
-    <div className="md:min-h-screen flex justify-center items-center p-8 md:p-12 md:mt-20 mb-25  container">
+    <div className="md:min-h-screen flex justify-center items-center p-8 md:p-12 mb-25 container">
       <div className="container flex flex-col gap-12 items-center justify-center mx-auto">
 
         {/* tittle */}
-        <div className="max-w-4xl text-left  flex flex-col items-start justify-start self-start">
-          <h1 className="text-5xl md:text-6xl lg:text-6xl font-semibold text-primary mb-6">
+        <div className="max-w-4xl text-left flex flex-col items-start justify-start self-start">
+          <h1 className="text-5xl md:text-6xl lg:text-6xl font-semibold text-primary">
             Conheça nossa história e paixão pelos relógios
           </h1>
      

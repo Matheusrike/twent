@@ -72,21 +72,42 @@ export default function CollectionIdHero({ params }: any) {
 		fetchProduct();
 	}, [sku]);
 
-	if (loading) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p>Carregando produto...</p>
-			</div>
-		);
-	}
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg">Carregando produto...</p>
+      </div>
+    )
+  }
 
-	if (!product) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p>Produto não encontrado.</p>
-			</div>
-		);
-	}
+  if (!product) return null
+
+  // Helper para normalizar URLs vindas da API (remove crases/aspas/espaços e constrói URL do Cloudinary a partir do public_id)
+  const buildCloudinaryUrl = (input: string) => {
+    const cleaned = (input || "").replace(/[`'\"]/g, "").trim();
+    if (!cleaned) return "";
+    if (cleaned.startsWith("http")) return cleaned;
+    return `https://res.cloudinary.com/twent/image/upload/c_fill,q_auto/v1/${cleaned}.webp`;
+  };
+  // Imagens chamadas como antes do carrossel: usa a primeira imagem do produto ou a image_public_id da coleção; limita a 3
+  const images = (() => {
+    const normalized = (product.images ?? [])
+      .map((img) => {
+        const src = img?.url || img?.public_id || "";
+        const finalUrl = buildCloudinaryUrl(src);
+        return finalUrl ? { url: finalUrl } : null;
+      })
+      .filter(Boolean)
+      .slice(1, 3) as Array<{ url: string }>;
+  
+    if (normalized.length > 0) return normalized;
+  
+    const fallbackSrc = product.collection?.image_public_id || "";
+    const finalFallback = buildCloudinaryUrl(fallbackSrc) || "/img/web/collection/CollectionBanner.jpg";
+    return [{ url: finalFallback }];
+  })();
+
+  const hasMultipleImages = images.length > 1
 
 	return (
 		<div className="w-full">
@@ -149,18 +170,19 @@ export default function CollectionIdHero({ params }: any) {
 						</div>
 					</div>
 
-					<div className="w-full lg:h-220 lg:w-2/5 xl:w-1/2 flex flex-col px-6 py-8 lg:px-12 lg:py-15 lg:overflow-y-auto">
-						<div className="hidden lg:flex w-full mb-6 justify-end">
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() => router.back()}
-								className="cursor-pointer flex items-center text-muted-foreground hover:text-foreground"
-							>
-								<ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
-								Voltar à página anterior
-							</Button>
-						</div>
+        {/* ====================== INFORMAÇÕES DO PRODUTO ====================== */}
+        <div className="w-full lg:w-2/5 xl:w-1/2 flex flex-col px-6 py-8 lg:px-12 lg:py-16 lg:overflow-y-auto bg-white dark:bg-black">
+          <div className="hidden lg:flex w-full mb-8 justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+              className="flex items-center text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
+              Voltar à página anterior
+            </Button>
+          </div>
 
 						<div className="flex flex-col items-start w-full">
 							{product.collection.name && (

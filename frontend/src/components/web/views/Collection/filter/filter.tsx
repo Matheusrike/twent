@@ -5,12 +5,14 @@ import { X } from "lucide-react";
 import DropdownMenuWithCheckboxes from "./dropdown/dropdown";
 import SearchInput from "./search";
 import CollectionHero from "../hero/hero";
+import { useSearchParams } from "next/navigation";
 
 export default function FiltersSection() {
   const [collections, setCollections] = useState<string[]>([]);
   const [prices, setPrices] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [badgeOptions, setBadgeOptions] = useState<string[]>([]);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
   async function fetchBadges() {
@@ -42,6 +44,14 @@ export default function FiltersSection() {
 
   fetchBadges();
 }, []);
+
+  // Ler filtro inicial da URL (collection ou category)
+  useEffect(() => {
+    const initial = searchParams?.get("collection") ?? searchParams?.get("category");
+    if (initial && initial.trim().length > 0) {
+      setCollections([initial]);
+    }
+  }, [searchParams]);
 
 
   // Função genérica para atualizar filtros
