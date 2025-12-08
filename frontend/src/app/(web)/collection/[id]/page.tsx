@@ -302,7 +302,7 @@ export default function CollectionIdHero({ params }: { params: { id: string } })
             </div>
           </div>
 
-          <div className="mt-12 lg:mt-auto">
+          <div className="mt-12 md:mt-20 lg:mt-auto">
             <CollectionIdSideBar sku={product.sku} />
           </div>
         </div>

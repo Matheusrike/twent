@@ -52,23 +52,7 @@ export default function CollectionCard({
           />
         </div>
 
-        <Button
-          size='icon'
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            setLiked(!liked)
-          }}
-          className='bg-primary/10 hover:bg-primary/20 absolute top-4 right-4 rounded-full'
-        >
-          <HeartIcon
-            className={cn(
-              'size-4',
-              liked ? 'fill-destructive stroke-destructive' : 'stroke-white'
-            )}
-          />
-          <span className='sr-only'>Like</span>
-        </Button>
+       
 
         <Card className='border-none min-h-60 max-h-60 bg-white dark:bg-black'>
           <CardHeader className='px-6 pt-4'>
