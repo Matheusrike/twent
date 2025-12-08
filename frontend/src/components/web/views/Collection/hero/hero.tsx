@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react'
-import CollectionCard from "../card/CollectionCard";
-import PaginationWithIcon from "./pagination/pagination";
-import { truncateText } from "@/utils/functions/truncateText";
+import { useState, useEffect } from 'react';
+import CollectionCard from '../card/CollectionCard';
+import PaginationWithIcon from './pagination/pagination';
+import { truncateText } from '@/utils/functions/truncateText';
 
 interface Product {
-  sku: string
-  collection_id: string
-  name: string
-  description: string
-  limited_edition: boolean
-  price: string
-  collection: {
-    id: string
-    name: string
-    description: string
-    image_public_id: string | null
-  }
-  images: Array<{ url: string }>
+	sku: string;
+	collection_id: string;
+	name: string;
+	description: string;
+	limited_edition: boolean;
+	price: string;
+	collection: {
+		id: string;
+		name: string;
+		description: string;
+		image_public_id: string | null;
+	};
+	images: Array<{ url: string }>;
 }
 
 // Agora recebe a busca como prop
@@ -54,8 +54,8 @@ export default function CollectionHero({ searchQuery, selectedCategories = [], s
       }
     }
 
-    fetchProducts()
-  }, [])
+		fetchProducts();
+	}, []);
 
 function checkPriceRange(priceStr: string, ranges: string[]): boolean {
   if (!ranges.length) return true
@@ -91,21 +91,21 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
   const end = start + ITEMS_PER_PAGE
   const pagedProducts = filteredProducts.slice(start, end)
 
-  if (loading) {
-    return (
-      <section className="py-5 container mx-auto px-6">
-        <div className="text-center py-20">Carregando produtos...</div>
-      </section>
-    )
-  }
+	if (loading) {
+		return (
+			<section className="py-5 container mx-auto px-6">
+				<div className="text-center py-20">Carregando produtos...</div>
+			</section>
+		);
+	}
 
-  if (error) {
-    return (
-      <section className="py-5 container mx-auto px-6">
-        <div className="text-center py-20 text-red-500">{error}</div>
-      </section>
-    )
-  }
+	if (error) {
+		return (
+			<section className="py-5 container mx-auto px-6">
+				<div className="text-center py-20 text-red-500">{error}</div>
+			</section>
+		);
+	}
 
   return (
     <section className="py-5 container mx-auto">

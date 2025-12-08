@@ -1,30 +1,25 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+
+const API_URL = process.env.API_URL || 'http://localhost:3333';
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/response/:path*",
-        destination: "http://localhost:3333/:path*",
-      },
-    ];
-  },
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'res.cloudinary.com',
+			},
+		],
+	},
 
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3333",
-        pathname: "/**",
-      },
-    ],
-  },
+	async rewrites() {
+		return [
+			{
+				source: '/response/api/:path*',
+				destination: `${API_URL}/api/:path*`,
+			},
+		];
+	},
 };
 
 export default nextConfig;
