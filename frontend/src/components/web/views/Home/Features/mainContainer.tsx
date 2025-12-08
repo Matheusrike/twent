@@ -168,11 +168,11 @@ const MainContainer: React.FC = () => {
       {/* Badges Section */}
       <div className="container mx-auto px-6 lg:px-12 pb-24">
         <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-black dark:text-white uppercase">
-          Badges
+          Coleções
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {badges.map((badge) => (
-            <Link key={badge} href="/collection">
+            <Link key={badge} href={`/collection?collection=${encodeURIComponent(badge)}`}>
               <div className="group h-15 bg-white rounded-xl flex items-center justify-center transition-transform cursor-pointer px-4 relative overflow-hidden z-10 after:absolute after:h-1 after:w-1 after:bg-primary after:left-0 after:bottom-0 after:-z-10 after:rounded-full after:transition-all after:duration-1000 hover:after:scale-[300]">
                 <span className="uppercase text-lg md:text-md font-semibold text-center text-gray-800 transition-all duration-1000 relative z-20 group-hover:text-white">
                   {badge}
