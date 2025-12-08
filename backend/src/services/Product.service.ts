@@ -15,7 +15,6 @@ export class ProductService {
 
 	async create(data: CreateProductType, user: IJwtAuthPayload) {
 		try {
-
 			const sku = await generateUniqueSKU();
 
 			const product = await this.database.product.create({
@@ -61,6 +60,7 @@ export class ProductService {
 
 		const where: Prisma.ProductWhereInput = {
 			is_active: true,
+			images: { some: {} },
 		};
 
 		const [products, total] = await Promise.all([
@@ -157,7 +157,7 @@ export class ProductService {
 			},
 		});
 
-		if (!product) {
+		if (!product || product.images.length === 0) {
 			throw new AppError({
 				message: 'Product not found',
 				errorCode: 'PRODUCT_NOT_FOUND',
