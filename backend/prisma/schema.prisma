@@ -47,10 +47,6 @@ enum MovementType {
   ADJUSTMENT
 }
 
-enum CashSessionStatus {
-  OPEN
-  CLOSED
-}
 
 enum PaymentMethod {
   CASH
@@ -108,7 +104,6 @@ model Store {
 
   users                  User[]
   inventory              Inventory[]
-  cashRegisters          CashRegister[]
   sales                  Sale[]
   appointments           Appointment[]
   financial_transactions FinancialTransaction[]
@@ -177,7 +172,6 @@ model User {
   inventory_movements    InventoryMovement[]
   products_updated       Product[]              @relation("UpdatedBy")
   price_changes          ProductPriceHistory[]  @relation("ChangedBy")
-  cash_sessions          CashSession[]
   sales_created          Sale[]                 @relation("SalesCreatedBy")
   appointments           Appointment[]
   financial_transactions FinancialTransaction[]
@@ -329,36 +323,9 @@ model InventoryMovement {
   createdBy User    @relation(fields: [created_by], references: [id])
 }
 
-model CashRegister {
-  id         String   @id @default(uuid())
-  store_id   String
-  name       String
-  is_active  Boolean  @default(true)
-  created_at DateTime @default(now())
-
-  store    Store         @relation(fields: [store_id], references: [id])
-  sessions CashSession[]
-}
-
-model CashSession {
-  id               String            @id @default(uuid())
-  cash_register_id String
-  user_id          String
-  opening_amount   Decimal           @default(0) @db.Decimal(10, 2)
-  closing_amount   Decimal?          @db.Decimal(10, 2)
-  opened_at        DateTime          @default(now())
-  closed_at        DateTime?
-  status           CashSessionStatus @default(OPEN)
-
-  cashRegister CashRegister @relation(fields: [cash_register_id], references: [id])
-  user         User         @relation(fields: [user_id], references: [id])
-  sales        Sale[]
-}
-
 model Sale {
   id              String        @id @default(uuid())
   store_id        String
-  cash_session_id String
   customer_id     String?
   subtotal        Decimal       @db.Decimal(10, 2)
   discount        Decimal       @default(0) @db.Decimal(10, 2)
@@ -369,7 +336,6 @@ model Sale {
   created_at      DateTime      @default(now())
 
   store       Store       @relation(fields: [store_id], references: [id])
-  cashSession CashSession @relation(fields: [cash_session_id], references: [id])
   customer    User?       @relation(fields: [customer_id], references: [id])
   createdBy   User        @relation("SalesCreatedBy", fields: [created_by], references: [id])
   items       SaleItem[]
