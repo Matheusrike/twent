@@ -39,6 +39,7 @@ interface CartItem {
   quantity: number;
   availableStock: number;
   image?: string;
+  productId: string;
 }
 
 export default function Pdv() {
@@ -111,6 +112,7 @@ export default function Pdv() {
         }
 
         setAllProducts(json.data);
+        setFilteredProducts(json.data); // Mostra todos os produtos inicialmente
       } catch (err) {
         console.error(err);
         setError("Não foi possível carregar o estoque. Verifique a conexão.");
@@ -126,7 +128,7 @@ export default function Pdv() {
     const q = query.trim().toLowerCase();
 
     if (!q) {
-      setFilteredProducts([]);
+      setFilteredProducts(allProducts); // Mostra todos quando não há busca
       return;
     }
 
@@ -168,6 +170,7 @@ export default function Pdv() {
         quantity: 1,
         availableStock: stock,
         image: p.image,
+        productId: p.sku, // Adiciona o SKU/ID do produto
       };
 
       return [...prev, newItem];
@@ -210,28 +213,62 @@ export default function Pdv() {
     setIsProcessing(true);
 
     try {
+      // Mapear método de pagamento para o formato da API
+      const paymentMethodMap = {
+        pix: "PIX",
+        debito: "CARD",
+        credito: "CARD",
+      };
+
+      // Enviar cada item do carrinho como uma venda
       for (const item of cart) {
-        const res = await fetch(`/api/inventory/remove/${item.id}`, {
+        const saleData = {
+          product_id: item.productId, // Usa o productId (SKU) correto
+          quantity: item.quantity,
+          total_discount: "0",
+          product_discount: "0",
+          payment_method: paymentMethodMap[paymentMethod],
+        };
+
+        const res = await fetch("/response/api/sale", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ quantity: item.quantity }),
+          body: JSON.stringify(saleData),
           credentials: "include",
         });
 
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.message || "Erro ao baixar estoque");
+          throw new Error(err.message || "Erro ao registrar venda");
         }
       }
 
       setTimeout(() => {
         setIsProcessing(false);
         setShowSuccess(true);
-        setTimeout(() => {
+        setTimeout(async () => {
           setCart([]);
           setShowPayment(false);
           setShowSuccess(false);
           setPaymentMethod("");
+          
+          // Recarregar o estoque atualizado
+          try {
+            const res = await fetch("/response/api/inventory/", {
+              credentials: "include",
+            });
+
+            if (res.ok) {
+              const json = await res.json();
+              if (json.success && Array.isArray(json.data)) {
+                setAllProducts(json.data);
+                setFilteredProducts(json.data);
+              }
+            }
+          } catch (err) {
+            console.error("Erro ao recarregar estoque:", err);
+          }
+          
           inputRef.current?.focus();
         }, 2500);
       }, 1500);
@@ -288,48 +325,32 @@ export default function Pdv() {
               </p>
             )}
 
-            {!loading && filteredProducts.length === 0 && query && (
+            {!loading && filteredProducts.length === 0 && (
               <p className="text-center py-16 text-muted-foreground text-sm">
-                Nenhum produto encontrado para "{query}"
+                {query ? `Nenhum produto encontrado para "${query}"` : "Nenhum produto no estoque"}
               </p>
             )}
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3">
               {filteredProducts.map((item) => (
                 <Card
                   key={item.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow border"
+                  className="cursor-pointer hover:shadow-md hover:border-primary/50 transition-all border"
                   onClick={() => addToCart(item)}
                 >
-                  <CardContent className="p-5 flex  items-center">
-                    <div className="flex gap-4">
-                      {/* Imagem Quadrada Grande */}
-                      {item.product.image ? (
-                        <img
-                          src={item.product.image}
-                          alt={item.product.name}
-                          className="w-36 h-36 object-cover rounded flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="bg-gray-200 border-2 border-dashed rounded-lg w-36 h-36 flex-shrink-0" />
-                      )}
-
-                      {/* Informações do Produto */}
-                      <div className="flex-1 flex flex-col justify-center min-w-0">
-                        <p className="text-base text-muted-foreground mb-1">
-                          SKU: {item.product.sku}
-                        </p>
-                        <h3 className="font-semibold uppercase text-base line-clamp-2 mb-2">
-                          {item.product.name}
-                        </h3>
-                        <p className="text-sm font-medium uppercase font-semibold ">
-                          Estoque: {item.quantity}
-                        </p>
-                        <p className="text-3xl font-bold text-primary mt-2">
-                          R$ {parseFloat(item.product.price).toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
+                  <CardContent className="p-4">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      SKU: {item.product.sku}
+                    </p>
+                    <h3 className="font-semibold text-base mb-3 line-clamp-2 min-h-[3rem]">
+                      {item.product.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Estoque: <span className="font-semibold text-foreground">{item.quantity}</span>
+                    </p>
+                    <p className="text-2xl font-bold text-primary">
+                      R$ {parseFloat(item.product.price).toFixed(2)}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
