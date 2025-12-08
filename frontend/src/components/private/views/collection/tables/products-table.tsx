@@ -76,6 +76,12 @@ export default function CollectionProductsTable() {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
+  const LIMIT = 10;
+  const [pageIndex, setPageIndex] = React.useState(0);
+  const [hasNextPage, setHasNextPage] = React.useState(false);
+  const [hasPrevPage, setHasPrevPage] = React.useState(false);
+  const [firstLoadCompleted, setFirstLoadCompleted] = React.useState(false);
+  const abortRef = React.useRef<AbortController | null>(null);
   // Modais
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -89,27 +95,66 @@ export default function CollectionProductsTable() {
 
   const loadData = React.useCallback(async () => {
     setLoading(true);
+    const controller = new AbortController();
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = controller;
     try {
       const [productRes, collectionRes] = await Promise.all([
-        fetch("/response/api/product", { credentials: "include" }),
-        fetch("/response/api/collection", { credentials: "include" }),
+        fetch(`/response/api/product?limit=${LIMIT}&page=${pageIndex + 1}`, { credentials: "include", signal: controller.signal }),
+        fetch("/response/api/collection", { credentials: "include", signal: controller.signal }),
       ]);
 
       const productJson = await productRes.json();
       const collectionJson = await collectionRes.json();
 
-      setProducts(productJson?.data?.products ?? []);
+      const items = productJson?.data?.products ?? [];
+      setProducts(items);
       setCollections(collectionJson?.data?.collections ?? []);
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+
+      const meta = productJson?.data?.pagination ?? productJson?.data?.meta ?? {};
+      const currentPage = typeof meta?.page === "number" ? meta.page : pageIndex + 1;
+      const totalPages = typeof meta?.totalPages === "number" ? meta.totalPages : meta?.total_pages;
+      const count = typeof meta?.total === "number" ? meta.total : meta?.count;
+      const limitMeta = typeof meta?.limit === "number" ? meta.limit : LIMIT;
+      const hasNext = meta?.hasNext ?? meta?.has_next;
+      const hasPrev = meta?.hasPrev ?? meta?.has_prev;
+
+      if (typeof hasNext === "boolean") {
+        setHasNextPage(hasNext);
+      } else if (typeof totalPages === "number" && typeof currentPage === "number") {
+        setHasNextPage(currentPage < totalPages);
+      } else if (typeof count === "number" && typeof limitMeta === "number") {
+        setHasNextPage(currentPage * limitMeta < count);
+      } else {
+        setHasNextPage(Array.isArray(items) ? items.length === LIMIT : false);
+      }
+
+      if (typeof hasPrev === "boolean") {
+        setHasPrevPage(hasPrev);
+      } else if (typeof currentPage === "number") {
+        setHasPrevPage(currentPage > 1);
+      } else {
+        setHasPrevPage(pageIndex > 0);
+      }
+
+      setFirstLoadCompleted(true);
+    } catch (error: any) {
+      if (error?.name !== "AbortError") {
+        console.error("Erro ao carregar dados:", error);
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pageIndex]);
 
   React.useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Reiniciar para a primeira página quando filtro/ordenacao mudarem
+  React.useEffect(() => {
+    setPageIndex(0);
+  }, [globalFilter, sorting]);
 
   // Após qualquer operação (criar/editar/ativar-desativar), limpa o filtro pra não sumir produto
   const handleSuccess = () => {
@@ -288,7 +333,7 @@ export default function CollectionProductsTable() {
           </TableHeader>
 
           <TableBody>
-            {loading ? (
+            {!firstLoadCompleted && loading ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
@@ -324,23 +369,24 @@ export default function CollectionProductsTable() {
         </Table>
       </div>
 
-      <div className="flex justify-end gap-3 mt-6">
+      <div className="flex justify-end items-center gap-3 mt-6">
         <Button
           size="sm"
           variant="outline"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
+          disabled={!hasPrevPage}
         >
           Anterior
         </Button>
         <Button
           size="sm"
           variant="outline"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() => hasNextPage && setPageIndex((p) => p + 1)}
+          disabled={loading || !hasNextPage}
         >
           Próximo
         </Button>
+        {/* Indicador removido */}
       </div>
 
       <CreateProductModal
