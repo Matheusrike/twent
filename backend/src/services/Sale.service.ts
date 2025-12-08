@@ -8,23 +8,6 @@ export class SaleService {
 
 	async newSale(data: NewSale, store_id: string, id: string) {
 		try {
-			const sessionIsOpen = await this.database.cashSession.findUnique({
-				where: {
-					id: data.cash_session_id,
-				},
-			});
-			if (!sessionIsOpen) {
-				throw new AppError({
-					message: 'Sessao de caixa nao encontrada',
-					errorCode: 'NOT_FOUND',
-				});
-			}
-			if (sessionIsOpen.status !== 'OPEN') {
-				throw new AppError({
-					message: 'Sessao de caixa nao aberta',
-					errorCode: 'BAD_REQUEST',
-				});
-			}
 			if (data.customer_id) {
 				const customerExists = await this.database.user.findUnique({
 					where: {
@@ -58,7 +41,6 @@ export class SaleService {
 						total,
 						created_by: id,
 						discount: data.total_discount,
-						cash_session_id: data.cash_session_id,
 						customer_id: data.customer_id,
 						subtotal,
 						payment_method: data.payment_method,
@@ -106,7 +88,6 @@ export class SaleService {
 				where: {...filters, store_id: storeId},
 				select: {
 					id: true,
-					cash_session_id: true,
 					subtotal: true,
 					discount: true,
 					total: true,

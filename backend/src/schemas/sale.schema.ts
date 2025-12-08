@@ -5,7 +5,6 @@ import { z } from 'zod';
 export const SaleSchema = z.object({
 	id: z.uuid(),
 	store_id: z.uuid(),
-	cash_session_id: z.uuid(),
 	customer_id: z.uuid(),
 	subtotal: z
 		.union([z.string(), z.number(), z.instanceof(Decimal)])
@@ -32,7 +31,6 @@ export type Sale = z.infer<typeof SaleSchema>;
 export const newSaleSchema = z.object({
     product_id: z.string(),
     quantity: z.number(),
-	cash_session_id: z.uuid(),
 	customer_id: z.uuid().optional(),
 	total_discount: z
 		.union([z.string(), z.number(), z.instanceof(Decimal)])
@@ -54,7 +52,6 @@ export const newSaleSchema = z.object({
 export type NewSale = z.infer<typeof newSaleSchema>;
 
 export const salesFiltersSchema = z.object({
-	cash_session_id: z.uuid().optional(),
 	customer_id: z.uuid().optional(),
 	payment_method: z.enum(PaymentMethod).optional(),
 	status: z.enum(SaleStatus).optional(),
