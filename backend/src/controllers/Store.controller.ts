@@ -56,6 +56,22 @@ export class StoreController {
 		}
 	}
 
+    async getStoreByProduct(request: FastifyRequest) {
+        try {
+            const { sku } = request.params as { sku: string };
+            const response = await this.storeService.getStoreByProduct(sku);
+            return response;
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw new HttpError({
+                    message: error.message,
+                    errorCode: error.errorCode,
+                    statusCode: 500,
+                });
+            }
+        }
+    }
+
 	async create(request: FastifyRequest) {
 		try {
 			const data = request.body as CreateStore;

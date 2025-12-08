@@ -90,6 +90,36 @@ export function storeRoute(app: fastifyTypedInstance) {
 	);
 
 	app.get(
+		'/product/:sku',
+		{
+			schema: {
+				tags: ['Store'],
+				summary: 'Busca lojas por produto',
+				description: 'Faz busca de lojas por produto',
+			},
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response =
+					await storeController.getStoreByProduct(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Lojas encontradas',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	app.get(
 		'/:id',
 		{
 			schema: {

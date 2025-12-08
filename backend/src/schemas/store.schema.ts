@@ -274,14 +274,6 @@ export const StoreGetResponseSchema = ApiResponseSchema.extend({
 		state: z.string().meta({ examples: ['NY'] }),
 		zip_code: z.string().meta({ examples: ['01000-000'] }),
 		country: z.string().meta({ examples: ['US'] }),
-		latitude: z
-			.any()
-			.meta({ examples: ['-23.56019'] })
-			.nullable(),
-		longitude: z
-			.any()
-			.meta({ examples: ['-46.67812'] })
-			.nullable(),
 		opening_hours: z.array(
 			z.object({
 				day: z.enum(openingDays).meta({ examples: ['Monday'] }),

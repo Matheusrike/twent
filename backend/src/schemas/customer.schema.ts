@@ -3,7 +3,6 @@ import { ApiResponseSchema } from './api-response.schema';
 import { UserTypes } from './user.schema';
 import {
 	BadGatewayResponseSchema,
-	BadRequestResponseSchema,
 	GatewayTimeoutResponseSchema,
 	NotFoundResponseSchema,
 } from './generic.schema';
@@ -128,7 +127,7 @@ export const createCustomerSchema = z.object({
 	user_type: z.enum(UserTypes).meta({
 		examples: ['CUSTOMER'],
 		description: 'Tipo de usuário (CUSTOMER ou EMPLOYEE)',
-	}),
+	}).optional(),
 	document_number: z
 		.string()
 		.optional()
@@ -294,12 +293,6 @@ export const CustomerPutResponseSchema = z.object({
 	success: z.literal(true),
 	message: z.string().meta({ examples: ['Usuário atualizado com sucesso'] }),
 	data: customerSchema,
-});
-
-export const CustomerBadRequestSchema = BadRequestResponseSchema.extend({
-	message: z
-		.string()
-		.meta({ examples: ['Informações do usuário inválidas'] }),
 });
 
 export const CustomerNotFoundSchema = NotFoundResponseSchema.extend({
