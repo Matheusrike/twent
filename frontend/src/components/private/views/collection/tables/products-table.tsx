@@ -17,12 +17,12 @@ import {
   Edit2,
   Plus,
   Image as ImageIcon,
+  X,
 } from "lucide-react";
-
-import { useState } from "react";
 
 import CreateProductModal from "../forms/create-product-modal";
 import UploadImagesModal from "../forms/upload-image-form";
+import EditProductModal from "../forms/edit-product";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,16 +76,16 @@ export default function CollectionProductsTable() {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
+  // Modais
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [productToEdit, setProductToEdit] = React.useState<Product | null>(
     null
   );
-
-  const [isUploadImageOpen, setIsUploadImageOpen] = useState(false);
-  const [selectedProductSku, setSelectedProductSku] = useState<string | null>(
-    null
-  );
+  const [isUploadImageOpen, setIsUploadImageOpen] = React.useState(false);
+  const [selectedProductSku, setSelectedProductSku] = React.useState<
+    string | null
+  >(null);
 
   const loadData = React.useCallback(async () => {
     setLoading(true);
@@ -111,18 +111,15 @@ export default function CollectionProductsTable() {
     loadData();
   }, [loadData]);
 
+  // Após qualquer operação (criar/editar/ativar-desativar), limpa o filtro pra não sumir produto
+  const handleSuccess = () => {
+    setGlobalFilter("");
+    loadData();
+  };
+
   const handleEdit = (product: Product) => {
     setProductToEdit(product);
     setIsEditOpen(true);
-  };
-
-  const handleCreate = () => {
-    setProductToEdit(null);
-    setIsCreateOpen(true);
-  };
-
-  const handleSuccess = () => {
-    loadData();
   };
 
   const handleUploadImage = (sku: string) => {
@@ -186,33 +183,30 @@ export default function CollectionProductsTable() {
     },
     {
       id: "actions",
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Ações</DropdownMenuLabel>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              onClick={() => handleUploadImage(row.original.sku)}
-            >
-              <ImageIcon className="mr-2 h-4 w-4" />
-              Imagens
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-              <Edit2 className="mr-2 h-4 w-4" />
-              Editar
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Ações</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleUploadImage(product.sku)}>
+                <ImageIcon className="mr-2 h-4 w-4" />
+                Imagens
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEdit(product)}>
+                <Edit2 className="mr-2 h-4 w-4" />
+                Editar
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 
@@ -224,28 +218,59 @@ export default function CollectionProductsTable() {
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+
+    // Filtro global inteligente – não depende do texto renderizado
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const search = (filterValue || "").toString().toLowerCase().trim();
+      if (!search) return true;
+
+      const product = row.original;
+      const collectionName =
+        collections
+          .find((c) => c.id === product.collection_id)
+          ?.name?.toLowerCase() || "";
+
+      return (
+        product.sku.toLowerCase().includes(search) ||
+        product.name.toLowerCase().includes(search) ||
+        collectionName.includes(search) ||
+        (product.limited_edition ? "limitada" : "normal").includes(search) ||
+        (product.is_active ? "ativo" : "inativo").includes(search)
+      );
+    },
+
+    getFilteredRowModel: getFilteredRowModel(),
     initialState: { pagination: { pageSize: 15 } },
   });
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <Input
-          placeholder="Buscar produto..."
-          value={globalFilter ?? ""}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="max-w-sm"
-        />
+      <div className="flex items-center justify-between mb-6">
+        <div className="relative max-w-sm">
+          <Input
+            placeholder="Buscar por SKU, nome, coleção..."
+            value={globalFilter ?? ""}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="pr-10"
+          />
+          {globalFilter && (
+            <button
+              onClick={() => setGlobalFilter("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
 
-        <Button onClick={handleCreate}>
-          <Plus />
+        <Button onClick={() => setIsCreateOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
           Novo Relógio
         </Button>
       </div>
 
-      <div className="rounded-md border mt-3">
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -267,9 +292,18 @@ export default function CollectionProductsTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="text-center h-32"
+                  className="h-32 text-center text-muted-foreground"
                 >
-                  Carregando...
+                  Carregando produtos...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-32 text-center text-muted-foreground"
+                >
+                  Nenhum produto encontrado.
                 </TableCell>
               </TableRow>
             ) : (
@@ -290,20 +324,20 @@ export default function CollectionProductsTable() {
         </Table>
       </div>
 
-      <div className="flex justify-end gap-3 mt-4">
+      <div className="flex justify-end gap-3 mt-6">
         <Button
           size="sm"
           variant="outline"
-          disabled={!table.getCanPreviousPage()}
           onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
         >
           Anterior
         </Button>
         <Button
           size="sm"
           variant="outline"
-          disabled={!table.getCanNextPage()}
           onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
         >
           Próximo
         </Button>
@@ -315,10 +349,17 @@ export default function CollectionProductsTable() {
         onSuccess={handleSuccess}
       />
 
+      <EditProductModal
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        product={productToEdit}
+        onSuccess={handleSuccess}
+      />
+
       <UploadImagesModal
         open={isUploadImageOpen}
-        sku={selectedProductSku}
         onOpenChange={setIsUploadImageOpen}
+        sku={selectedProductSku}
       />
     </>
   );
