@@ -125,6 +125,12 @@ export class StoreService {
 				});
 			}
 
+			const { lat, lon } = await getCoordinates(
+				storeData.country,
+				storeData.city,
+				storeData.street,
+			);
+
 			const currentData = store[0];
 
 			if (storeData.opening_hours) {
@@ -148,7 +154,7 @@ export class StoreService {
 			}
 			const response = await this.database.store.update({
 				where: { id },
-				data: storeData,
+				data: {latitude: lat, longitude: lon, ...storeData},
 			});
 
 			return response;

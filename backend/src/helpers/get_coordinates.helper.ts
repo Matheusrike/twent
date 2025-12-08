@@ -1,6 +1,6 @@
 import { AppError } from "@/utils/errors.util";
 
-export async function getCoordinates(country: string, city: string, street: string) {
+export async function getCoordinates(country?: string, city?: string, street?: string) {
 	const query = `${street}, ${city}, ${country}`;
 	const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&q=${encodeURIComponent(
 		query,

@@ -2,7 +2,11 @@ import { z } from 'zod';
 import { StoreType } from '@prisma/generated/enums';
 import { ApiResponseSchema } from './api-response.schema';
 import { UuidSchema } from './generic.schema';
-import { BadRequestResponseSchema, ConflictResponseSchema, NotFoundResponseSchema } from './generic.schema';
+import {
+	BadRequestResponseSchema,
+	ConflictResponseSchema,
+	NotFoundResponseSchema,
+} from './generic.schema';
 
 export const isoCountries = [
 	'BR',
@@ -154,11 +158,19 @@ export const createStoreSchema = z.object({
 	phone: z
 		.string()
 		.regex(
-			/^\+55 \d{2} 9?\d{4}-\d{4}$/,
-			'Telefone deve seguir o padrão: +55 XX 9XXXX-XXXX',
+			/^\+[1-9]\d{1,14}$/,
+			'Número deve estar no padrão internacional E.164 (ex: +14155552671)',
 		)
 		.optional()
-		.meta({ examples: ['+55 11 99999-8888', '+55 11 3003-0000'] }),
+		.meta({
+			examples: [
+				'+14155552671',
+				'+447911123456',
+				'+5511999998888',
+				'+61293744000',
+				'+81312345678',
+			],
+		}),
 
 	street: z
 		.string()
@@ -191,8 +203,10 @@ export const createStoreSchema = z.object({
 		.meta({ examples: ['SW1A 0AA', '10001'] }),
 
 	country: z.enum(isoCountries).meta({ examples: ['BR', 'US', 'GB'] }),
-	opening_hours: z.array(
-			z.object({
+	opening_hours: z
+		.array(
+			z
+				.object({
 					day: z.enum(openingDays, {
 						error: 'Dia da semana inválido',
 					}),
@@ -338,9 +352,11 @@ export const StoreGetAllResponseSchema = ApiResponseSchema.extend({
 			updated_at: z
 				.date()
 				.meta({ examples: ['2025-10-09T19:23:48.922Z'] }),
-			sales: z.array(z.object({ 
-                total: z.any() 
-            })),
+			sales: z.array(
+				z.object({
+					total: z.any(),
+				}),
+			),
 		}),
 	),
 });
