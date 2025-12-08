@@ -1,63 +1,74 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { HeartIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import { useState } from 'react'
+import Image from 'next/image'
+import { HeartIcon } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 interface CollectionCardProps {
-	id: string;
-	image: string;
-	title: string;
-	description: string;
-	badge?: string;
-	href?: string;
+  sku: string
+  image: string
+  title: string
+  description: string
+  badge?: string
+  index?: number
 }
 
 export default function CollectionCard({
-	id,
-	image,
-	title,
-	href,
-	description,
-	badge,
+  sku,
+  image,
+  title,
+  description,
+  badge,
+  index = 0
 }: CollectionCardProps) {
 	const [liked, setLiked] = useState<boolean>(false);
 
-	return (
-		<Link href={`/collection/${id}`} className="block">
-			<div className="relative max-w-md rounded-xl bg-zinc-600 pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1">
-				<div className="relative h-60 w-full flex items-center justify-center">
-					{/* <Image
+  return (
+    <Link href={`/collection/${sku}`} className='block'>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}   
+        animate={{ opacity: 1, y: 0 }}    
+        transition={{ 
+          duration: 0.6, 
+          ease: 'easeOut',
+          delay: index * 0.1
+        }} 
+        className='relative max-w-md rounded-xl bg-zinc-600 pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1'
+      >
+
+        <div className='relative h-60 w-full flex items-center justify-center'>
+          <Image
             src={image}
             alt={title}
             fill
             className='object-contain'
-          /> */}
-				</div>
+          />
+        </div>
 
-				<Button
-					size="icon"
-					onClick={(e) => {
-						e.stopPropagation(); // impede o clique do botão acionar o Link
-						setLiked(!liked);
-					}}
-					className="bg-primary/10 hover:bg-primary/20 absolute top-4 right-4 rounded-full"
-				>
-					<HeartIcon
-						className={cn(
-							'size-4',
-							liked
-								? 'fill-destructive stroke-destructive'
-								: 'stroke-white'
-						)}
-					/>
-					<span className="sr-only">Like</span>
-				</Button>
+        <Button
+          size='icon'
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setLiked(!liked)
+          }}
+          className='bg-primary/10 hover:bg-primary/20 absolute top-4 right-4 rounded-full'
+        >
+          <HeartIcon
+            className={cn(
+              'size-4',
+              liked ? 'fill-destructive stroke-destructive' : 'stroke-white'
+            )}
+          />
+          <span className='sr-only'>Like</span>
+        </Button>
 
 				<Card className="border-none min-h-60 max-h-60 bg-white dark:bg-black">
 					<CardHeader className="px-6 pt-4">
@@ -74,13 +85,14 @@ export default function CollectionCard({
 						</div>
 					</CardHeader>
 
-					<CardContent className="px-6 pt-2 pb-4">
-						<p className="text-gray-600 dark:text-gray-300 font-semibold">
-							{description}
-						</p>
-					</CardContent>
-				</Card>
-			</div>
-		</Link>
-	);
+          <CardContent className='px-6 pt-2 pb-4'>
+            <p className='text-gray-600 dark:text-gray-300 font-semibold'>
+              {description}
+            </p>
+          </CardContent>
+        </Card>
+
+      </motion.div>
+    </Link>
+  )
 }

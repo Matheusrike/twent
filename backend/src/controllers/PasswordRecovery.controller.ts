@@ -17,6 +17,11 @@ export class PasswordRecoveryController {
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
 					case 'NOT_FOUND':
+                        throw new HttpError({
+                            statusCode: 404,
+                            message: error.message,
+                            errorCode: error.errorCode,
+                        });
 					case 'INACTIVE':
 						throw new HttpError({
 							statusCode: 400,

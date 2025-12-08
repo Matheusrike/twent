@@ -9,8 +9,14 @@ import { formatCurrency } from '@/utils/functions/formatCurrency';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import CollectionIdSideBar from '@/components/web/views/Collection/id/sideBar/navigation-sheet';
-import CollectionBannerId from '@/components/web/views/Collection/banner/banner';
-import TextCardsCollection from '@/components/web/views/Collection/id/card/TextCardsCollection';
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+	type CarouselApi,
+} from '@/components/web/views/Collection/id/carousel/carousel';
 
 interface Product {
 	sku: string;
@@ -36,7 +42,7 @@ interface Product {
 	images: Array<{ url: string }>;
 }
 
-export default function CollectionIdHero() {
+export default function CollectionIdHero({ params }: any) {
 	const router = useRouter();
 	const { id: sku } = useParams();
 	const [product, setProduct] = useState<Product | null>(null);
@@ -77,7 +83,7 @@ export default function CollectionIdHero() {
 	if (!product) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
-				<p>Produto não encontrado.</p>
+				<p>Produto não encontrado.</p>
 			</div>
 		);
 	}
@@ -90,10 +96,10 @@ export default function CollectionIdHero() {
 						<div className="relative w-full lg:h-2/3 md:h-1/2 rounded-2xl overflow-hidden">
 							<Image
 								src={
-									product!.images?.[0]?.url ||
+									product.images?.[0]?.url ||
 									'/images/collection/gradient.png'
 								}
-								alt={product!.name}
+								alt={product.name}
 								fill
 								className="object-cover object-center bg-gray-300"
 								priority
@@ -104,10 +110,10 @@ export default function CollectionIdHero() {
 							<div className="relative w-1/2 h-full rounded-2xl overflow-hidden">
 								<Image
 									src={
-										product!.images?.[1]?.url ||
+										product.images?.[1]?.url ||
 										'/images/collection/gradient.png'
 									}
-									alt={product!.name}
+									alt={product.name}
 									fill
 									className="object-cover object-center bg-gray-300"
 									priority
@@ -116,10 +122,10 @@ export default function CollectionIdHero() {
 							<div className="relative w-1/2 h-full rounded-2xl overflow-hidden">
 								<Image
 									src={
-										product!.images?.[2]?.url ||
+										product.images?.[2]?.url ||
 										'/images/collection/gradient.png'
 									}
-									alt={product!.name}
+									alt={product.name}
 									fill
 									className="object-cover object-center bg-gray-300"
 									priority
@@ -131,8 +137,11 @@ export default function CollectionIdHero() {
 					<div className="lg:hidden w-full px-4 pt-4 pb-2 flex flex-col gap-4">
 						<div className="relative w-full h-[300px] sm:h-[400px]">
 							<Image
-								src={product!.images?.[0]?.url}
-								alt={product!.name}
+								src={
+									product.images?.[0]?.url ||
+									'/images/collection/gradient.png'
+								}
+								alt={product.name}
 								fill
 								className="object-cover object-center bg-gray-300 rounded-2xl"
 								priority
@@ -154,26 +163,26 @@ export default function CollectionIdHero() {
 						</div>
 
 						<div className="flex flex-col items-start w-full">
-							{product!.collection.name && (
+							{product.collection.name && (
 								<Badge
 									variant="secondary"
 									className="rounded-full py-1 border-border dark:border-white/40 text-sm bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-gray-200"
 									asChild
 								>
-									<span>{product!.collection.name}</span>
+									<span>{product.collection.name}</span>
 								</Badge>
 							)}
 							<h1 className="mt-6 max-w-[17ch] text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-semibold leading-tight tracking-tighter dark:text-white">
-								{product!.name}
+								{product.name}
 							</h1>
-							{product!.price && (
+							{product.price && (
 								<p className="text-2xl sm:text-3xl font-bold text-primary mt-4">
-									{formatCurrency(parseFloat(product!.price))}
+									{formatCurrency(parseFloat(product.price))}
 								</p>
 							)}
 
 							<p className="mt-6 text-base sm:text-lg text-gray-600 dark:text-gray-200">
-								{product!.description}
+								{product.description}
 							</p>
 
 							<div className="mt-8 w-full space-y-4">
@@ -181,63 +190,63 @@ export default function CollectionIdHero() {
 									Especificações
 								</h2>
 								<div className="space-y-3 text-sm">
-									{product!.sku && (
+									{product.sku && (
 										<div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
 											<span className="text-gray-600 dark:text-red-500">
 												Referência
 											</span>
 											<span className="font-medium dark:text-white">
-												{product!.sku}
+												{product.sku}
 											</span>
 										</div>
 									)}
-									{product!.specifications.case_material && (
+									{product.specifications.case_material && (
 										<div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
 											<span className="text-gray-600 dark:text-red-500">
 												Material
 											</span>
 											<span className="font-medium dark:text-white">
 												{
-													product!.specifications
+													product.specifications
 														.case_material
 												}
 											</span>
 										</div>
 									)}
-									{product!.specifications.movement_type && (
+									{product.specifications.movement_type && (
 										<div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
 											<span className="text-gray-600 dark:text-red-500">
 												Movimento
 											</span>
 											<span className="font-medium dark:text-white">
 												{
-													product!.specifications
+													product.specifications
 														.movement_type
 												}
 											</span>
 										</div>
 									)}
-									{product!.specifications.case_diameter && (
+									{product.specifications.case_diameter && (
 										<div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
 											<span className="text-gray-600 dark:text-red-500">
 												Diâmetro
 											</span>
 											<span className="font-medium dark:text-white">
 												{
-													product!.specifications
+													product.specifications
 														.case_diameter
 												}
 												mm
 											</span>
 										</div>
 									)}
-									{product!.specifications.glass && (
+									{product.specifications.glass && (
 										<div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
 											<span className="text-gray-600 dark:text-red-500">
 												Vidro
 											</span>
 											<span className="font-medium dark:text-white">
-												{product!.specifications.glass}
+												{product.specifications.glass}
 											</span>
 										</div>
 									)}

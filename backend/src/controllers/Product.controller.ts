@@ -100,7 +100,8 @@ export class ProductController {
 	async findAllInternal(request: FastifyRequest) {
 		try {
 			const user = request.user as IJwtAuthPayload;
-			const products = await this.productService.findAllInternal(user);
+			const {limit, page} = request.query as IPaginationParams
+			const products = await this.productService.findAllInternal(user, {limit, page});
 			return products;
 		} catch (error) {
 			console.error(error);

@@ -10,6 +10,30 @@ import React, { useState, useEffect } from "react";
 export default function MapsHero() {
   const [loading, setLoading] = useState(true);
   const [showCards, setShowCards] = useState(false); // controls visibility on mobile
+  const [stores, setStores] = useState<any[]>([]);
+    useEffect(() => {
+      async function load() {
+        try {
+          const res = await fetch("/response/api/store/all");
+          const json = await res.json();
+          console.log(json)
+          if (json?.data) {
+            const valid = json.data.filter((s: any) => {
+              if (!s.latitude || !s.longitude) return false;
+              const lat = parseFloat(s.latitude);
+              const lng = parseFloat(s.longitude);
+              return !isNaN(lat) && !isNaN(lng);
+            });
+  
+            setStores(valid);
+          }
+        } catch (err) {
+          console.error("Erro ao carregar lojas:", err);
+        }
+      }
+  
+      load();
+    }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,13 +53,13 @@ export default function MapsHero() {
           </h1>
         </div>
         <div className="flex-1">
-          <TestimonialCard />
+          <TestimonialCard data={stores} />
         </div>
       </div>
 
       {/* Map container */}
       <div className="relative w-full lg:w-4/5 h-full flex items-center justify-center bg-transparent">
-        {loading ? <MapsLoader /> : <MapView />}
+        {loading ? <MapsLoader /> : <MapView stores={stores} />}
 
         {/* Fullscreen overlay on mobile */}
         {showCards && (
@@ -55,7 +79,7 @@ export default function MapsHero() {
 
             {/* Card list (fills the entire screen) */}
             <div className="flex-1 overflow-y-auto p-3">
-              <TestimonialCard />
+              <TestimonialCard data={stores}/>
             </div>
           </div>
         )}

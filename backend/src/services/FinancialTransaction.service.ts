@@ -113,108 +113,117 @@ export class FinancialTransactionService {
 		filters?: IFinancialTransactionFilters,
 		pagination?: IPaginationParams,
 	) {
-		const page =
-			pagination?.page && pagination.page > 0 ? pagination.page : 1;
-		const limit =
-			pagination?.limit && pagination.limit > 0 ? pagination.limit : 10;
-		const skip = (page - 1) * limit;
+		try {
+			const page =
+				pagination?.page && pagination.page > 0 ? pagination.page : 1;
+			const limit =
+				pagination?.limit && pagination.limit > 0
+					? pagination.limit
+					: 10;
+			const skip = (page - 1) * limit;
 
-		const where: Prisma.FinancialTransactionWhereInput = {};
+			const where: Prisma.FinancialTransactionWhereInput = {};
 
-		if (user.storeId) {
-			where.store_id = user.storeId;
-		} else if (filters?.store_id) {
-			where.store_id = filters.store_id;
-		}
-
-		if (filters?.type) {
-			where.type = filters.type as TransactionType;
-		}
-
-		if (filters?.category) {
-			where.category = {
-				contains: filters.category,
-				mode: 'insensitive',
-			};
-		}
-
-		if (filters?.supplier_id) {
-			where.supplier_id = filters.supplier_id;
-		}
-
-		if (filters?.start_date || filters?.end_date) {
-			where.transaction_date = {};
-			if (filters.start_date) {
-				where.transaction_date.gte = filters.start_date;
+			if (user.storeId) {
+				where.store_id = user.storeId;
+			} else if (filters?.store_id) {
+				where.store_id = filters.store_id;
 			}
-			if (filters.end_date) {
-				where.transaction_date.lte = filters.end_date;
-			}
-		}
 
-		if (
-			filters?.min_amount !== undefined ||
-			filters?.max_amount !== undefined
-		) {
-			where.amount = {};
-			if (filters.min_amount !== undefined) {
-				where.amount.gte = new Prisma.Decimal(filters.min_amount);
+			if (filters?.type) {
+				where.type = filters.type as TransactionType;
 			}
-			if (filters.max_amount !== undefined) {
-				where.amount.lte = new Prisma.Decimal(filters.max_amount);
-			}
-		}
 
-		const [transactions, total] = await Promise.all([
-			this.database.financialTransaction.findMany({
-				where,
-				include: {
-					store: {
-						select: {
-							id: true,
-							name: true,
-							code: true,
-							type: true,
+			if (filters?.category) {
+				where.category = {
+					contains: filters.category,
+					mode: 'insensitive',
+				};
+			}
+
+			if (filters?.supplier_id) {
+				where.supplier_id = filters.supplier_id;
+			}
+
+			if (filters?.start_date || filters?.end_date) {
+				where.transaction_date = {};
+				if (filters.start_date) {
+					where.transaction_date.gte = filters.start_date;
+				}
+				if (filters.end_date) {
+					where.transaction_date.lte = filters.end_date;
+				}
+			}
+
+			if (
+				filters?.min_amount !== undefined ||
+				filters?.max_amount !== undefined
+			) {
+				where.amount = {};
+				if (filters.min_amount !== undefined) {
+					where.amount.gte = new Prisma.Decimal(filters.min_amount);
+				}
+				if (filters.max_amount !== undefined) {
+					where.amount.lte = new Prisma.Decimal(filters.max_amount);
+				}
+			}
+
+			const [transactions, total] = await Promise.all([
+				this.database.financialTransaction.findMany({
+					where,
+					include: {
+						store: {
+							select: {
+								id: true,
+								name: true,
+								code: true,
+								type: true,
+							},
+						},
+						supplier: {
+							select: {
+								id: true,
+								name: true,
+								email: true,
+							},
+						},
+						createdBy: {
+							select: {
+								id: true,
+								first_name: true,
+								last_name: true,
+								email: true,
+							},
 						},
 					},
-					supplier: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-						},
-					},
-					createdBy: {
-						select: {
-							id: true,
-							first_name: true,
-							last_name: true,
-							email: true,
-						},
-					},
+					orderBy: { transaction_date: 'desc' },
+					skip,
+					take: limit,
+				}),
+				this.database.financialTransaction.count({ where }),
+			]);
+
+			const totalPages = Math.ceil(total / limit);
+			const hasNext = page < totalPages;
+			const hasPrev = page > 1;
+
+			return {
+				transactions,
+				pagination: {
+					page,
+					limit,
+					total,
+					totalPages,
+					hasNext,
+					hasPrev,
 				},
-				orderBy: { transaction_date: 'desc' },
-				skip,
-				take: limit,
-			}),
-			this.database.financialTransaction.count({ where }),
-		]);
-
-		const totalPages = Math.ceil(total / limit);
-		const hasNext = page < totalPages;
-		const hasPrev = page > 1;
-
-		return {
-			transactions,
-			pagination: {
-				page,
-				limit,
-				total,
-				totalPages,
-				hasNext,
-				hasPrev,
-			},
-		};
+			};
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
 	}
 
 	async findById(id: string, user: IJwtAuthPayload) {

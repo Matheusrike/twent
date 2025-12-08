@@ -5,6 +5,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import Loading from "@/app/loading";
+
 import {
   ShoppingCart,
   Trash2,
@@ -39,6 +42,39 @@ interface CartItem {
 }
 
 export default function Pdv() {
+
+   const router = useRouter();
+    const [authorized, setAuthorized] = useState<boolean | null>(null);
+  
+    useEffect(() => {
+      const verifyRole = async () => {
+        try {
+          const res = await fetch("/response/api/user/me", {
+            method: "GET",
+            credentials: "include",
+          });
+  
+          const data = await res.json().catch(() => null);
+  
+          const role = data?.data?.user_roles?.[0]?.role?.name ?? null;
+  
+          if (role === "ADMIN") {
+            router.replace("/private/dashboard");
+            return;
+          }
+  
+          setAuthorized(true);
+        } catch (err) {
+          router.replace("/private/pdv");
+        }
+      };
+  
+      verifyRole();
+    }, [router]);
+  
+    if (authorized === null) {
+      <Loading />;
+    }
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [allProducts, setAllProducts] = useState<InventoryItem[]>([]);
@@ -62,7 +98,7 @@ export default function Pdv() {
     const loadInventory = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/response/api/inventory/store", {
+        const res = await fetch("/response/api/inventory/", {
           credentials: "include",
         });
 

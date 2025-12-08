@@ -3,6 +3,8 @@ import { SupplierController } from '@/controllers/Supplier.controller';
 import { SupplierService } from '@/services/Supplier.service';
 import {
 	createSupplierSchema,
+	SupplierFiltersSchema,
+	SupplierGetResponseSchema,
 	updateSupplierSchema,
 } from '@/schemas/supplier.schema';
 import prisma from '@prisma/client';
@@ -17,7 +19,12 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 		'/',
 		{
 			schema: {
+                tags: ['Supplier'],
+                summary: 'Cria um novo fornecedor',
 				body: createSupplierSchema,
+                response : {
+
+                }
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
@@ -46,6 +53,14 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Busca todos os fornecedores',
+                querystring: SupplierFiltersSchema,
+                response: {
+                    200:SupplierGetResponseSchema
+                }
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
@@ -77,6 +92,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/:id',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Busca um fornecedor pelo ID',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],
@@ -109,6 +128,8 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 		'/:id',
 		{
 			schema: {
+				tags: ['Supplier'],
+                summary: 'Atualiza um fornecedor pelo ID',
 				body: updateSupplierSchema,
 			},
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
@@ -139,6 +160,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.patch(
 		'/:id/activate',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Ativa um fornecedor pelo ID',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -167,6 +192,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.delete(
 		'/:id',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Desativa um fornecedor pelo ID',
+            },
 			preHandler: [app.authorization({ requiredRoles: ['ADMIN'] })],
 		},
 		async (request, reply) => {
@@ -193,6 +222,10 @@ export async function supplierRoutes(app: fastifyTypedInstance) {
 	app.get(
 		'/:id/transactions',
 		{
+            schema: {
+                tags: ['Supplier'],
+                summary: 'Busca as transações de um fornecedor pelo ID',
+            },
 			preHandler: [
 				app.authorization({
 					requiredRoles: ['ADMIN', 'MANAGER'],

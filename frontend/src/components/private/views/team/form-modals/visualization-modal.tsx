@@ -15,7 +15,6 @@ import {
   User,
   MapPin,
   Building2,
-  HeartHandshake,
   Power,
   PowerOff,
 } from "lucide-react";
@@ -39,7 +38,7 @@ interface EmployeeFormData {
   salary: string;
   currency: string;
   role: string;
-  code: string;
+  store_code: string;
   benefits: string;
   emergency_name: string;
   emergency_phone: string;
@@ -78,7 +77,7 @@ export default function EmployeeModal({
     salary: "",
     currency: "BRL",
     role: "",
-    code: "",
+    store_code: "",
     benefits: "",
     emergency_name: "",
     emergency_phone: "",
@@ -130,7 +129,7 @@ export default function EmployeeModal({
           salary: data.employee?.salary?.toString() ?? "",
           currency: data.employee?.currency ?? "BRL",
           role: data.user_roles?.[0]?.role?.name ?? "EMPLOYEE_BRANCH",
-          code: data.store?.code ?? "",
+          store_code: data.store_code ,
           benefits: Array.isArray(data.employee?.benefits)
             ? data.employee.benefits.join(", ")
             : data.employee?.benefits ?? "",
@@ -141,8 +140,6 @@ export default function EmployeeModal({
               .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") ?? "",
           is_active: data.is_active ?? true,
         });
-
-        console.log("Store recebido:", data.store);
       } catch {
         setError("Falha ao carregar dados do funcionário");
       } finally {
@@ -231,7 +228,7 @@ export default function EmployeeModal({
         salary: Number(form.salary) || 0,
         currency: form.currency,
         role: form.role,
-        code: form.code,
+        store_code: form.store_code,
         benefits: form.benefits
           .split(",")
           .map((b) => b.trim())
@@ -266,10 +263,8 @@ export default function EmployeeModal({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-5xl">
-          <div className="flex items-center justify-center h-96">
-            <div className="text-lg text-muted-foreground">
-              Carregando funcionário...
-            </div>
+          <div className="flex items-center justify-center h-96 text-lg text-muted-foreground">
+            Carregando funcionário...
           </div>
         </DialogContent>
       </Dialog>
@@ -304,7 +299,6 @@ export default function EmployeeModal({
               </Alert>
             )}
 
-            {/* Informações Pessoais */}
             <section className="space-y-6">
               <div className="flex items-center gap-3 font-semibold">
                 <User className="h-5 w-5" />
@@ -331,7 +325,9 @@ export default function EmployeeModal({
                   <Label>Nome *</Label>
                   <Input
                     value={form.first_name}
-                    onChange={(e) => handleChange("first_name", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("first_name", e.target.value)
+                    }
                   />
                 </div>
 
@@ -339,7 +335,9 @@ export default function EmployeeModal({
                   <Label>Sobrenome *</Label>
                   <Input
                     value={form.last_name}
-                    onChange={(e) => handleChange("last_name", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("last_name", e.target.value)
+                    }
                   />
                 </div>
 
@@ -348,7 +346,9 @@ export default function EmployeeModal({
                   <Input
                     type="date"
                     value={form.birth_date}
-                    onChange={(e) => handleChange("birth_date", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("birth_date", e.target.value)
+                    }
                   />
                 </div>
 
@@ -364,7 +364,6 @@ export default function EmployeeModal({
               </div>
             </section>
 
-            {/* Endereço */}
             <section className="space-y-6">
               <div className="flex items-center gap-3 font-semibold">
                 <MapPin className="h-5 w-5" />
@@ -376,50 +375,62 @@ export default function EmployeeModal({
                   <Label>Rua</Label>
                   <Input
                     value={form.street}
-                    onChange={(e) => handleChange("street", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("street", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Número</Label>
                   <Input
                     value={form.number}
-                    onChange={(e) => handleChange("number", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("number", e.target.value)
+                    }
                   />
                 </div>
               </div>
+
               <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label>Bairro</Label>
                   <Input
                     value={form.district}
-                    onChange={(e) => handleChange("district", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("district", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Cidade</Label>
                   <Input
                     value={form.city}
-                    onChange={(e) => handleChange("city", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("city", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Estado</Label>
                   <Input
                     value={form.state}
-                    onChange={(e) => handleChange("state", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("state", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>CEP</Label>
                   <Input
                     value={form.zip_code}
-                    onChange={(e) => handleChange("zip_code", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("zip_code", e.target.value)
+                    }
                   />
                 </div>
               </div>
             </section>
 
-           
             <section className="space-y-6">
               <div className="flex items-center gap-3 font-semibold">
                 <Building2 className="h-5 w-5" />
@@ -440,9 +451,11 @@ export default function EmployeeModal({
                 <div className="space-y-2">
                   <Label>Código da Loja</Label>
                   <Input
-                    value={form.code}
-                    onChange={(e) => handleChange("code", e.target.value)}
-                    placeholder="CHE001"
+                    value={form.store_code}
+                    onChange={(e) =>
+                      handleChange("store_code", e.target.value)
+                    }
+                    placeholder="BRA001"
                     className="font-mono text-lg font-semibold"
                   />
                 </div>
@@ -468,7 +481,9 @@ export default function EmployeeModal({
                   <Label>Benefícios (separados por vírgula)</Label>
                   <Input
                     value={form.benefits}
-                    onChange={(e) => handleChange("benefits", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("benefits", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -476,7 +491,7 @@ export default function EmployeeModal({
           </div>
         </div>
 
-        <div className="p-6 border-t bg-muted/30 flex justify-between items-center">
+        <div className="p-3 border-t bg-muted/30 flex justify-between items-center">
           <Button
             variant={form.is_active ? "destructive" : "default"}
             onClick={handleToggleActive}

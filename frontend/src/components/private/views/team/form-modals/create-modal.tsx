@@ -56,7 +56,7 @@ export default function CreateEmployeeModal({
     salary: "",
     currency: "BRL",
     role: "",
-    code: "",
+    store_code: "",
     benefits: "",
     emergency_name: "",
     emergency_phone: "",
@@ -87,7 +87,10 @@ export default function CreateEmployeeModal({
 
     if (key === "zip_code") {
       const cleaned = value.replace(/\D/g, "").slice(0, 8);
-      const formatted = cleaned.length > 5 ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}` : cleaned;
+      const formatted =
+        cleaned.length > 5
+          ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`
+          : cleaned;
       setForm((prev) => ({ ...prev, [key]: formatted }));
       return;
     }
@@ -145,7 +148,7 @@ export default function CreateEmployeeModal({
           salary: Number(form.salary) || 0,
           currency: form.currency,
           role: form.role || "EMPLOYEE_BRANCH",
-          code: form.code || null,
+          store_code: form.store_code || null,
           benefits: form.benefits
             .split(",")
             .map((b) => b.trim())
@@ -185,7 +188,7 @@ export default function CreateEmployeeModal({
         salary: "",
         currency: "BRL",
         role: "",
-        code: "",
+        store_code: "",
         benefits: "",
         emergency_name: "",
         emergency_phone: "",
@@ -315,29 +318,53 @@ export default function CreateEmployeeModal({
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2 space-y-2">
                   <Label>Rua</Label>
-                  <Input placeholder="Rua das Flores" value={form.street} onChange={(e) => handleChange("street", e.target.value)} />
+                  <Input
+                    placeholder="Rua das Flores"
+                    value={form.street}
+                    onChange={(e) => handleChange("street", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Número</Label>
-                  <Input placeholder="120" value={form.number} onChange={(e) => handleChange("number", e.target.value)} />
+                  <Input
+                    placeholder="120"
+                    value={form.number}
+                    onChange={(e) => handleChange("number", e.target.value)}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label>Bairro</Label>
-                  <Input placeholder="Centro" value={form.district} onChange={(e) => handleChange("district", e.target.value)} />
+                  <Input
+                    placeholder="Centro"
+                    value={form.district}
+                    onChange={(e) => handleChange("district", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Cidade</Label>
-                  <Input placeholder="Santo André" value={form.city} onChange={(e) => handleChange("city", e.target.value)} />
+                  <Input
+                    placeholder="Santo André"
+                    value={form.city}
+                    onChange={(e) => handleChange("city", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Estado</Label>
-                  <Input placeholder="SP" value={form.state} onChange={(e) => handleChange("state", e.target.value)} />
+                  <Input
+                    placeholder="SP"
+                    value={form.state}
+                    onChange={(e) => handleChange("state", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>CEP</Label>
-                  <Input placeholder="09010-000" value={form.zip_code} onChange={(e) => handleChange("zip_code", e.target.value)} />
+                  <Input
+                    placeholder="09010-000"
+                    value={form.zip_code}
+                    onChange={(e) => handleChange("zip_code", e.target.value)}
+                  />
                 </div>
               </div>
             </section>
@@ -351,26 +378,41 @@ export default function CreateEmployeeModal({
               <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label>Departamento</Label>
-                  <Input placeholder="Vendas" value={form.department} onChange={(e) => handleChange("department", e.target.value)} />
+                  <Input
+                    placeholder="Vendas"
+                    value={form.department}
+                    onChange={(e) => handleChange("department", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
                     <DollarSign className="h-3.5 w-3.5" /> Salário
                   </Label>
-                  <Input placeholder="3500" value={form.salary} onChange={(e) => handleChange("salary", e.target.value)} />
+                  <Input
+                    placeholder="3500"
+                    value={form.salary}
+                    onChange={(e) => handleChange("salary", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Código da Loja <span className="text-destructive">*</span></Label>
-                  <Input placeholder="BRA001" value={form.code} onChange={(e) => handleChange("code", e.target.value)} />
+                  <Label>Código da Loja *</Label>
+                  <Input
+                    placeholder="BRA001"
+                    value={form.store_code}
+                    onChange={(e) => handleChange("store_code", e.target.value)}
+                  />
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Função (Role)</Label>
                   <select
                     className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     value={form.role}
-                    onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, role: e.target.value }))
+                    }
                   >
                     <option value="EMPLOYEE_HQ">EMPLOYEE_HQ</option>
                     <option value="EMPLOYEE_BRANCH">EMPLOYEE_BRANCH</option>
@@ -382,7 +424,9 @@ export default function CreateEmployeeModal({
                   <Input
                     placeholder="Vale Alimentação, Plano de Saúde"
                     value={form.benefits}
-                    onChange={(e) => handleChange("benefits", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("benefits", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -397,19 +441,35 @@ export default function CreateEmployeeModal({
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Nome</Label>
-                  <Input placeholder="Maria Souza" value={form.emergency_name} onChange={(e) => handleChange("emergency_name", e.target.value)} />
+                  <Input
+                    placeholder="Maria Souza"
+                    value={form.emergency_name}
+                    onChange={(e) =>
+                      handleChange("emergency_name", e.target.value)
+                    }
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
-                  <Input placeholder="(11) 99876-5432" value={form.emergency_phone} onChange={(e) => handleChange("emergency_phone", e.target.value)} />
+                  <Input
+                    placeholder="(11) 99876-5432"
+                    value={form.emergency_phone}
+                    onChange={(e) =>
+                      handleChange("emergency_phone", e.target.value)
+                    }
+                  />
                 </div>
               </div>
             </section>
           </div>
         </div>
 
-        <div className="p-6 border-t bg-muted/30 backdrop-blur-sm flex justify-end gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+        <div className="p-3 border-t bg-muted/30 backdrop-blur-sm flex justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={loading} className="px-8">

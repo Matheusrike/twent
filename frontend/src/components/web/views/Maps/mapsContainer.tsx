@@ -23,9 +23,9 @@ const Popup = dynamic(
   { ssr: false }
 );
 
-export default function MapView() {
-  const position: [number, number] = [-23.5686379, -46.4789122];
+export default function MapView({stores}: {stores: any[]}) {
   const [customIcon, setCustomIcon] = useState<any>(null);
+
 
   useEffect(() => {
     import("leaflet").then(L => {
@@ -42,9 +42,14 @@ export default function MapView() {
     });
   }, []);
 
+  const initialCenter =
+    stores.length > 0
+      ? [parseFloat(stores[0].latitude), parseFloat(stores[0].longitude)]
+      : [-23.5686, -46.4789];
+
   return (
     <MapContainer
-      center={position}
+      center={initialCenter as any}
       zoom={4.5}
       scrollWheelZoom
       minZoom={3}
@@ -52,18 +57,29 @@ export default function MapView() {
       className="w-full h-full z-10 lg:z-0"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='&copy; OpenStreetMap contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {customIcon && (
-        <Marker position={position} icon={customIcon}>
-          <Popup>
-            <h1 className="font-semibold uppercase text-sm">
-              Casa do soalheiro
-            </h1>
-          </Popup>
-        </Marker>
-      )}
+
+      {customIcon &&
+        stores.map(store => (
+          <Marker
+            key={store.id}
+            icon={customIcon}
+            position={[
+              parseFloat(store.latitude),
+              parseFloat(store.longitude),
+            ]}
+          >
+            <Popup>
+              <h1 className="font-semibold uppercase text-sm">{store.name}</h1>
+              <p className="text-xs">{store.city} — {store.country}</p>
+              {store.phone && (
+                <p className="text-xs mt-1">📞 {store.phone}</p>
+              )}
+            </Popup>
+          </Marker>
+        ))}
     </MapContainer>
   );
 }

@@ -61,6 +61,45 @@ export class EmployeeController {
 			}
 		}
 	}
+	async getAllEmployee(request: FastifyRequest) {
+		try {
+			const { skip, take, ...filters } = request.query as {
+				skip: number;
+				take: number;
+			} & EmployeeQuerystring;
+			const response = await this.employeeService.getEmployees(
+                filters as EmployeeQuerystring,
+				skip,
+				take,
+			);
+
+			return response;
+		} catch (error) {
+			if (error instanceof AppError) {
+				switch (error?.errorCode) {
+					case 'BAD_REQUEST':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 400,
+						});
+					case 'NOT_FOUND':
+						throw new HttpError({
+							message: error.message,
+							errorCode: error.errorCode,
+							statusCode: 404,
+						});
+					default:
+						console.error(error);
+						throw new HttpError({
+							message: error?.message ?? 'Erro interno',
+							errorCode: error.errorCode,
+							statusCode: 500,
+						});
+				}
+			}
+		}
+	}
 	async getEmployee(request: FastifyRequest) {
 		try {
 			const { skip, take, ...filters } = request.query as {
@@ -69,10 +108,10 @@ export class EmployeeController {
 			} & EmployeeQuerystring;
 			const { storeId } = request.user as IJwtAuthPayload;
 			const response = await this.employeeService.getEmployees(
-				storeId!,
-				filters as EmployeeQuerystring,
+                filters as EmployeeQuerystring,
 				skip,
 				take,
+				storeId!,
 			);
 
 			return response;

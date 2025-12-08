@@ -1,16 +1,50 @@
 "use client";
 
-import { useState } from "react";
-import { Table2, List, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import DropdownMenuWithCheckboxes from "./dropdown/dropdown";
 import SearchInput from "./search";
-import CollectionHero from "../hero/hero"
+import CollectionHero from "../hero/hero";
 
 export default function FiltersSection() {
   const [collections, setCollections] = useState<string[]>([]);
   const [prices, setPrices] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState(""); // ← ESTADO DA BUSCA
+  const [searchQuery, setSearchQuery] = useState("");
+  const [badgeOptions, setBadgeOptions] = useState<string[]>([]);
 
+  useEffect(() => {
+  async function fetchBadges() {
+    try {
+      const res = await fetch("/response/api/product/public?limit=9");
+      const json = await res.json();
+
+      const list =
+        Array.isArray(json?.data)
+          ? json.data
+          : Array.isArray(json?.data?.products)
+          ? json.data.products
+          : [];
+
+      // Extrai nome da coleção e remove tudo que não seja string válida
+      const validNames = list
+        .map((p: any) => p?.collection?.name)
+        .filter((n: unknown): n is string => typeof n === "string" && n.trim().length > 0);
+
+      // Remove duplicatas — sempre string[]
+      const names: string[] = Array.from(new Set(validNames));
+
+      setBadgeOptions(names);
+    } catch (error) {
+      console.error("Erro ao carregar badges:", error);
+      setBadgeOptions([]);
+    }
+  }
+
+  fetchBadges();
+}, []);
+
+
+  // Função genérica para atualizar filtros
   const handleChange =
     (setter: React.Dispatch<React.SetStateAction<string[]>>) =>
     (option: string, checked: boolean) => {
@@ -19,35 +53,42 @@ export default function FiltersSection() {
       );
     };
 
+  // Mostra os filtros ativos
   const activeFilters = [...collections, ...prices];
 
   return (
     <section id="filters" className="py-8 container">
       <div className="max-w-8xl mx-auto px-6">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          {/* search input */}
+          {/* Campo de busca */}
           <div className="flex items-center gap-4 w-full md:w-auto">
-            <SearchInput onSearch={setSearchQuery} /> {/* ← PASSA A FUNÇÃO */}
+            <SearchInput onSearch={setSearchQuery} />
           </div>
-           
+
           {/* Dropdowns */}
           <div className="flex flex-wrap gap-4">
             <DropdownMenuWithCheckboxes
-              label="Collections"
-              options={["Heritage", "Diamond", "Royal", "Limited"]}
+              label="Coleções"
+              options={badgeOptions}
               selected={collections}
               onChange={handleChange(setCollections)}
             />
+
             <DropdownMenuWithCheckboxes
-              label="Price Range"
-              options={["$5,000 - $10,000", "$10,000 - $25,000", "$25,000 - $50,000", "$50,000+"]}
+              label="Faixa de preço"
+              options={[
+                "50.000 - 100.000",
+                "100.000 - 200.000",
+                "200.000 - 500.000",
+                "500.000+",
+              ]}
               selected={prices}
               onChange={handleChange(setPrices)}
             />
           </div>
         </div>
 
-        {/* active filters */}
+        {/* Filtros ativos */}
         <div className="flex items-center justify-between mt-6">
           <div className="flex flex-wrap gap-2">
             {activeFilters.map((filter) => (
@@ -65,9 +106,10 @@ export default function FiltersSection() {
                 />
               </span>
             ))}
+
             {activeFilters.length > 0 && (
               <button
-                className="text-muted-foreground hover:text-gray-400 hover:dark:text-muted text-sm font-medium cursor-pointer"
+                className="text-muted-foreground hover:text-gray-400 text-sm font-medium cursor-pointer"
                 onClick={() => {
                   setCollections([]);
                   setPrices([]);
@@ -79,9 +121,13 @@ export default function FiltersSection() {
           </div>
         </div>
 
-        {/* AQUI VEM O GRID COM A BUSCA JÁ FUNCIONANDO */}
+        {/* GRID */}
         <div className="mt-12">
-          <CollectionHero searchQuery={searchQuery} />
+          <CollectionHero
+            searchQuery={searchQuery}
+            selectedCategories={collections}
+            selectedPrices={prices}
+          />
         </div>
       </div>
     </section>

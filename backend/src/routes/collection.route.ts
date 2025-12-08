@@ -1,10 +1,17 @@
 import { CollectionController } from '@/controllers/Collection.controller';
+import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import {
 	CreateCollectionSchema,
 	UpdateCollectionSchema,
 	UploadCollectionImageBodySchema,
 	CollectionParamsSchema,
 	CollectionQuerySchema,
+    CollectionPostResponseSchema,
+    CollectionConflictResponseSchema,
+    CollectionNotFoundResponseSchema,
+    CollectionGetByIdResponseSchema,
+    CollectionGetResponseSchema,
+    CollectionPutResponseSchema,
 } from '@/schemas/collection.schema';
 import { CollectionService } from '@/services/Collection.service';
 import { ImageService } from '@/services/Image.service';
@@ -25,6 +32,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Criação de coleção',
 				tags: ['Collection'],
 				body: CreateCollectionSchema,
+                response: {
+                    201: CollectionPostResponseSchema,
+                    409: CollectionConflictResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization()],
 		},
@@ -57,6 +69,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
 				body: UploadCollectionImageBodySchema,
+                response: {
+                    200: UploadCollectionImageBodySchema,
+                    404: CollectionNotFoundResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization()],
 		},
@@ -88,6 +105,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Buscar coleção por ID',
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
+                response: {
+                    200: CollectionGetByIdResponseSchema,
+                    404: CollectionNotFoundResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
@@ -117,6 +139,10 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Buscar todas as coleções com filtros e paginação',
 				tags: ['Collection'],
 				querystring: CollectionQuerySchema,
+                response: {
+                    200: CollectionGetResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization()],
 		},
@@ -148,6 +174,12 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
 				body: UpdateCollectionSchema,
+                response: {
+                    200: CollectionPutResponseSchema,
+                    404: CollectionNotFoundResponseSchema,
+                    409: CollectionConflictResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization()],
 		},
@@ -178,6 +210,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Desativar coleção',
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
+                response: {
+                    200: CollectionPutResponseSchema,
+                    404: CollectionNotFoundResponseSchema,
+                    500: ApiGenericErrorSchema
+                }
 			},
 			preHandler: [app.authorization()],
 		},
@@ -209,6 +246,11 @@ export async function collectionRoutes(app: fastifyTypedInstance) {
 				description: 'Ativar coleção',
 				tags: ['Collection'],
 				params: CollectionParamsSchema,
+				response: {
+					200: CollectionPutResponseSchema,
+					404: CollectionNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
 			},
 			preHandler: [app.authorization()],
 		},

@@ -6,7 +6,6 @@ import prisma from '@prisma/client';
 import { fastifyTypedInstance } from '@/types/types';
 import {
 	createEmployeeSchema,
-	EmployeeBadRequestSchema,
 	EmployeeGetResponseSchema,
 	EmployeePostResponseSchema,
 	EmployeePutResponseSchema,
@@ -33,7 +32,6 @@ export function employeeRoute(app: fastifyTypedInstance) {
 				body: createEmployeeSchema,
 				response: {
 					201: EmployeePostResponseSchema,
-					400: EmployeeBadRequestSchema,
 					401: UnauthorizedUserResponseSchema,
 					500: ApiGenericErrorSchema,
 					502: CustomerBadGatewaySchema,
@@ -69,12 +67,11 @@ export function employeeRoute(app: fastifyTypedInstance) {
 		{
 			schema: {
 				tags: ['Employee'],
-				summary: 'Busca todos os funcionários',
+				summary: 'Busca todos os funcionários da filial',
 				description: 'Busca todos os funcionários, com ou sem filtros',
 				querystring: employeeQuerystringSchema,
 				response: {
 					200: EmployeeGetResponseSchema,
-					400: EmployeeBadRequestSchema,
 					401: UnauthorizedUserResponseSchema,
 					500: ApiGenericErrorSchema,
 					502: CustomerBadGatewaySchema,
@@ -102,6 +99,43 @@ export function employeeRoute(app: fastifyTypedInstance) {
 			}
 		},
 	);
+	app.get(
+		'/all',
+		{
+			schema: {
+				tags: ['Employee'],
+				summary: 'Busca todos os funcionários',
+				description: 'Busca todos os funcionários, com ou sem filtros',
+				querystring: employeeQuerystringSchema,
+				response: {
+					200: EmployeeGetResponseSchema,
+					401: UnauthorizedUserResponseSchema,
+					500: ApiGenericErrorSchema,
+					502: CustomerBadGatewaySchema,
+					504: CustomerGatewayTimeoutSchema,
+				},
+			},
+			preHandler: app.authorization(),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await employeeController.getAllEmployee(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Funcionarios encontrados com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode,
+					message: error.message,
+					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
 
 	app.put(
 		'/:id',
@@ -113,7 +147,6 @@ export function employeeRoute(app: fastifyTypedInstance) {
 				body: createEmployeeSchema.partial(),
 				response: {
 					200: EmployeePutResponseSchema,
-					400: EmployeeBadRequestSchema,
 					401: UnauthorizedUserResponseSchema,
 					500: ApiGenericErrorSchema,
 					502: CustomerBadGatewaySchema,

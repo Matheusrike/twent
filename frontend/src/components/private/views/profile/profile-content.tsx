@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { Key } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -30,27 +30,20 @@ function ResetPasswordModal({
   open: boolean;
   onOpenChange: (value: boolean) => void;
 }) {
-  const [currentPassword, setCurrentPassword] = useState("");
+  const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"error" | "success" | "">("");
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
-      // 1️⃣ Verificar campos
-      if (!currentPassword || !newPassword || !confirmPassword) {
+      if (!password || !newPassword) {
         alert("Preencha todos os campos!");
         return;
       }
 
-      if (newPassword !== confirmPassword) {
-        alert("A nova senha e a confirmação não coincidem!");
-        return;
-      }
-
-      // 2️⃣ Buscar ID do usuário logado
       const resUserId = await fetch("/response/api/user/me", {
         method: "GET",
         credentials: "include",
@@ -61,50 +54,38 @@ function ResetPasswordModal({
         return;
       }
 
-      const userData = await resUserId.json();
-      const employeeId = userData.data.id;
-
-      // 3️⃣ Verificar senha atual no backend
-      const verifyRes = await fetch("/response/api/auth/", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: currentPassword }),
-      });
-
-      if (!verifyRes.ok) {
-        alert("Senha atual incorreta!");
-        return;
-      }
-
-      // 4️⃣ Atualizar senha
-      const updateRes = await fetch(`/response/api/employee/${employeeId}`, {
-        method: "PUT",
+      const updateRes = await fetch(`/response/api/auth/change-password`, {
+        method: "PATCH",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          password: newPassword,
+          password,
+          newPassword,
         }),
       });
 
+      const resJson = await updateRes.json();
+
       if (!updateRes.ok) {
-        const err = await updateRes.json();
-        alert(err.message || "Erro ao atualizar a senha");
+        setMessageType("error");
+        setMessage(resJson.message || "Erro ao atualizar a senha");
         return;
       }
 
-      alert("Senha atualizada com sucesso!");
+      setMessageType("success");
+      setMessage(resJson.message || "Senha atualizada com sucesso!");
 
-      setCurrentPassword("");
+      setPassword("");
       setNewPassword("");
-      setConfirmPassword("");
 
-      onOpenChange(false);
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao se comunicar com o servidor.");
+      setTimeout(() => {
+        onOpenChange(false);
+      }, 1500);
+    } catch {
+      setMessageType("error");
+      setMessage("Erro ao se comunicar com o servidor.");
     } finally {
       setLoading(false);
     }
@@ -127,8 +108,8 @@ function ResetPasswordModal({
             <Input
               type="password"
               placeholder="••••••••"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -142,15 +123,17 @@ function ResetPasswordModal({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Confirmar Nova Senha</Label>
-            <Input
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
+          {message && (
+            <div
+              className={`px-3 py-2 rounded-md text-sm mt-2 ${
+                messageType === "error"
+                  ? "bg-red-100 text-red-700 border border-red-300"
+                  : "bg-green-100 text-green-700 border border-green-300"
+              }`}
+            >
+              {message}
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -167,10 +150,8 @@ function ResetPasswordModal({
   );
 }
 
-
 export default function ProfileContent() {
   const [open, setOpen] = useState(false);
-  // get profile data
   const [user, setUser] = useState({
     id: "",
     first_name: "",
@@ -199,6 +180,7 @@ export default function ProfileContent() {
           (updatedAt.getMonth() + 1).toString().padStart(2, "0") +
           "/" +
           updatedAt.getFullYear();
+
         setUser({
           id: data.id,
           first_name: data.first_name,
@@ -208,9 +190,7 @@ export default function ProfileContent() {
           updated_at: formattedDate,
           store: data.store?.name || null,
         });
-      } catch (err) {
-        console.error("Erro ao buscar dados do usuário", err);
-      }
+      } catch {}
     };
     fetchUser();
   }, []);
@@ -277,7 +257,6 @@ export default function ProfileContent() {
         </TabsContent>
       </Tabs>
 
-      {/* modal */}
       <ResetPasswordModal open={open} onOpenChange={setOpen} />
     </>
   );

@@ -1,3 +1,4 @@
+import { getCoordinates } from '@/helpers/get_coordinates.helper';
 import { CreateStore, StoreQuerystring } from '@/schemas/store.schema';
 import { OpeningHours } from '@/types/store.types';
 import { AppError } from '@/utils/errors.util';
@@ -24,9 +25,9 @@ export class StoreService {
 				take: take || 10,
 				skip: skip || 0,
 				where,
-                include: {
-                    sales: true 
-                }
+				include: {
+					sales: true,
+				},
 			});
 
 			return response;
@@ -38,12 +39,62 @@ export class StoreService {
 		}
 	}
 
+	async getAll(skip: number, take: number) {
+		try {
+			const response = await this.database.store.findMany({
+				take: take || 10,
+				skip: skip || 0,
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					city: true,
+					country: true,
+					latitude: true,
+					longitude: true,
+					phone: true,
+					opening_hours: true,
+				},
+			});
+
+			return response;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	getStoreByProduct(sku: string) {
+		try {
+			const response = this.database.store.findMany({
+				where: { inventory: { some: { product_id: sku } } },
+			});
+			return response;
+		} catch (error) {
+			throw new AppError({
+				message: error.message,
+				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
 	async create(storeData: CreateStore) {
 		try {
 			const storeCode = await generateStoreCode(storeData.country);
+			const { lat, lon } = await getCoordinates(
+				storeData.country,
+				storeData.city,
+				storeData.street,
+			);
 
 			const response = await this.database.store.create({
-				data: { ...storeData, code: storeCode },
+				data: {
+					...storeData,
+					latitude: lat,
+					longitude: lon,
+					code: storeCode,
+				},
 			});
 
 			return response;

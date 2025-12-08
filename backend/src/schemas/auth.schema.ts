@@ -15,6 +15,23 @@ export const loginBodySchema = z.object({
 		}),
 });
 
+export const changePasswordBodySchema = z.object({
+	password: z
+		.string('Senha deve ser uma string.')
+		.trim()
+		.meta({
+			description: 'Senha do usuário.',
+			examples: ['Exemplo123!', 'Senha@2023'],
+		}),
+    newPassword: z
+        .string('Senha deve ser uma string.')
+        .trim()
+        .meta({
+            description: 'Nova senha do usuário.',
+            examples: ['Exemplo123!', 'Senha@2023'],
+        }),
+});
+
 // Responses Schemas
 
 // Login Responses
@@ -35,6 +52,13 @@ export const LoginSuccessResponseSchema = ApiResponseSchema.extend({
 		.nullish(),
 }).meta({
 	description: `Resposta para login bem-sucedido (200).`,
+});
+
+export const changePasswordResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true),
+	message: z.string().meta({ examples: ['Senha alterada com sucesso'] }),
+}).meta({
+	description: 'Resposta para alteração de senha bem-sucedida (200).',
 });
 
 export const UserNotFoundResponseSchema = ApiResponseSchema.extend({
@@ -62,12 +86,12 @@ export const InvalidPasswordResponseSchema = ApiResponseSchema.extend({
 });
 
 export const UnauthorizedUserResponseSchema = ApiResponseSchema.extend({
-    success: z.literal(false),
-    message: z.string().meta({ examples: ['Usuário não autorizado'] }),
-    errorCode: z.string().meta({ examples: ['UNAUTHORIZED_USER'] }),
+	success: z.literal(false),
+	message: z.string().meta({ examples: ['Usuário não autorizado'] }),
+	errorCode: z.string().meta({ examples: ['UNAUTHORIZED_USER'] }),
 }).meta({
-    description: 'Resposta para usuário não autorizado (401).',
-})
+	description: 'Resposta para usuário não autorizado (401).',
+});
 
 export const ConflictUserResponseSchema = ApiResponseSchema.extend({
     success: z.literal(false),
@@ -84,4 +108,3 @@ export const LogoutSuccessResponseSchema = ApiResponseSchema.extend({
 }).meta({
 	description: 'Resposta para logout bem-sucedido (200).',
 });
-

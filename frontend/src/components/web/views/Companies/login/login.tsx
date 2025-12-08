@@ -38,7 +38,6 @@ const Login = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<FormData>({
@@ -49,11 +48,10 @@ const Login = () => {
     resolver: zodResolver(formSchema),
   });
 
-  // Handle form submission
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-
+  
       const response = await fetch("/response/api/auth/login", {
         method: "POST",
         headers: {
@@ -61,9 +59,9 @@ const Login = () => {
         },
         body: JSON.stringify(data),
       });
-
+  
       const result = await response.json().catch(() => null);
-
+  
       if (!response.ok) {
         const message =
           result?.message ||
@@ -71,11 +69,39 @@ const Login = () => {
         form.setError("root", { message });
         return;
       }
+  
+     
+      const meResponse = await fetch("/response/api/user/me", {
+        method: "GET",
+        credentials: "include", 
+      });
+  
+      const meData = await meResponse.json().catch(() => null);
+  
+      if (!meResponse.ok || !meData) {
+        form.setError("root", {
+          message: "Erro ao carregar perfil do usuário.",
+        });
+        return;
+      }
+  
 
-      
+      const userRole = meData?.data?.user_roles?.[0]?.role?.name;
+  
+      if (!userRole) {
+        form.setError("root", {
+          message: "Nenhuma role encontrada para o usuário.",
+        });
+        return;
+      }
+  
+     
+      if (userRole === "ADMIN") {
         router.push("/private/dashboard");
-
-      
+      } else {
+        router.push("/private/pdv");
+      }
+  
     } catch (error) {
       form.setError("root", {
         message: "Erro de conexão. Tente novamente mais tarde.",
@@ -84,6 +110,9 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+  
+  
+  
 
   return (
     <div className="min-h-screen flex flex-col">

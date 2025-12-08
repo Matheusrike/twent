@@ -4,7 +4,7 @@ import { CustomerService } from '@/services/Customer.service';
 import { ApiResponse } from '@/utils/api-response.util';
 import { fastifyTypedInstance } from '@/types/types';
 import prisma from '@prisma/client';
-import { createCustomerSchema, CustomerBadGatewaySchema, CustomerBadRequestSchema, CustomerGatewayTimeoutSchema, CustomerGetResponseSchema, CustomerPostResponseSchema, CustomerPutResponseSchema, customerQuerystringSchema } from '@/schemas/customer.schema';
+import { createCustomerSchema, CustomerBadGatewaySchema, CustomerGatewayTimeoutSchema, CustomerGetResponseSchema, CustomerPostResponseSchema, CustomerPutResponseSchema, customerQuerystringSchema } from '@/schemas/customer.schema';
 import { UnauthorizedUserResponseSchema, UserNotFoundResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
 import { ConflictStatusResponseSchema } from '@/schemas/user.schema';
@@ -60,7 +60,6 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 			    body: createCustomerSchema,
 				response: {
 					201: CustomerPostResponseSchema,
-					400: CustomerBadRequestSchema,
 					401: UnauthorizedUserResponseSchema,
 					409: ConflictStatusResponseSchema,
 					500: ApiGenericErrorSchema,
@@ -100,7 +99,6 @@ export function customerRoute(fastify: fastifyTypedInstance) {
 			    body: createCustomerSchema.partial(),
 				response: {
 					200: CustomerPutResponseSchema,
-					400: CustomerBadRequestSchema,
 					401: UnauthorizedUserResponseSchema,
 					404: UserNotFoundResponseSchema,
 					500: ApiGenericErrorSchema,
