@@ -173,7 +173,7 @@ export function BranchesTable() {
 
     {
       accessorKey: "zip_code",
-      header: "CEP",
+      header: "Código Postal",
       cell: ({ row }) => (
         <div className="font-mono text-xs">{row.getValue("zip_code")}</div>
       ),
@@ -292,7 +292,7 @@ export function BranchesTable() {
         </div>
       )}
 
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Buscar por nome ou código..."
           value={filterValue}
@@ -303,11 +303,7 @@ export function BranchesTable() {
         />
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Colunas <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
+        
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()

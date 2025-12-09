@@ -54,7 +54,7 @@ export default function SalesRankingCard() {
     const formatRevenue = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     return (
-        <div className="w-full max-w-5xl mx-auto">
+        <div className="w-full max-w-5xl mx-auto h-full!">
             <Card className="w-full shadow-lg">
                 <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -78,7 +78,7 @@ export default function SalesRankingCard() {
                         {stores.map((store: any, index: any) => (
                             <div
                                 key={store.id}
-                                className={`px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted/50 transition-colors ${
+                                className={`px-4 sm:px-6 py-5 sm:py-4 hover:bg-muted/50 transition-colors ${
                                     index === 0 ? 'bg-yellow-50/50 dark:bg-yellow-950/20' : ''
                                 }`}
                             >

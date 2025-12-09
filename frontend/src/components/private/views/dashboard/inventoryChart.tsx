@@ -77,12 +77,12 @@ export function StockDonutChart() {
 
     return (
         <Card className="flex flex-col h-full">
-            <CardHeader className="pb-4 space-y-1">
+            <CardHeader className=" space-y-1">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-xl font-semibold">Estoque — {filial.name}</CardTitle>
 
                     <select
-                        className="border rounded-md px-2 py-1 text-sm"
+                        className="border rounded-md px-2  text-sm"
                         value={selected}
                         onChange={(e) => setSelected(Number(e.target.value))}
                     >
@@ -137,7 +137,7 @@ export function StockDonutChart() {
                 {/* gráfico */}
                 <ChartContainer
                     config={chartConfig}
-                    className="hidden md:flex flex-1 mx-auto aspect-square max-h-[250px]"
+                    className="hidden md:flex flex-1 mx-auto aspect-square max-h-[200px]"
                 >
                     <PieChart>
                         <Pie data={chartData} dataKey="quantity" innerRadius={70} startAngle={90} endAngle={-270}>
