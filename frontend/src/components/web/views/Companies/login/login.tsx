@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Logo } from "./logo";
 import { Button } from "@/components/private/global/ui/button";
 import {
@@ -9,83 +8,171 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/private/views/login/input";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import companyPortalData from "../json/companyPortalData.json";
-import { Shield, Lock, Mail, Loader2, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { Shield, Lock, Mail, Loader2, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
-const ICON_MAP: Record<string, any> = {
-  shield: Shield,
-};
+const ICON_MAP: Record<string, any> = { shield: Shield };
 
-const formSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
 });
 
-type FormData = z.infer<typeof formSchema>;
+const forgotSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
 
-const Login = () => {
+const resetSchema = z.object({
+  password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
+  password_confirmation: z.string(),
+}).refine((data) => data.password === data.password_confirmation, {
+  message: "As senhas não coincidem",
+  path: ["password_confirmation"],
+});
+
+type LoginData = z.infer<typeof loginSchema>;
+type ForgotData = z.infer<typeof forgotSchema>;
+type ResetData = z.infer<typeof resetSchema>;
+
+export default function Login() {
   const content = companyPortalData;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [step, setStep] = useState<"request" | "reset" | "success">("request");
+  const [emailSentTo, setEmailSentTo] = useState("");
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const loginForm = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = async (data: FormData) => {
-    setIsLoading(true);
+  const forgotForm = useForm<ForgotData>({
+    resolver: zodResolver(forgotSchema),
+    defaultValues: { email: "" },
+  });
 
+  const resetForm = useForm<ResetData>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: { password: "", password_confirmation: "" },
+  });
+
+  useEffect(() => {
+    if (token) {
+      setStep("reset");
+      setDialogOpen(true);
+    }
+  }, [token]);
+
+  const onLogin = async (data: LoginData) => {
+    setIsLoading(true);
     try {
-      const response = await fetch("/response/api/auth/login", {
+      const res = await fetch("/response/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      const result = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        form.setError("root", {
-          message: result?.message || "Credenciais inválidas. Verifique seu email e senha.",
-        });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        loginForm.setError("root", { message: err.message || "Credenciais inválidas" });
         setIsLoading(false);
         return;
       }
 
-      const meResponse = await fetch("/response/api/user/me", {
-        method: "GET",
-        credentials: "include",
-      });
+      const meRes = await fetch("/response/api/user/me", { credentials: "include" });
+      const meData = await meRes.json();
 
-      const meData = await meResponse.json().catch(() => null);
-
-      if (!meResponse.ok || !meData) {
-        form.setError("root", { message: "Erro ao carregar perfil do usuário." });
+      if (!meRes.ok || !meData?.data) {
+        loginForm.setError("root", { message: "Erro ao carregar perfil" });
         setIsLoading(false);
         return;
       }
 
-      const userRole = meData?.data?.user_roles?.[0]?.role?.name;
-
-      if (userRole === "ADMIN") {
-        router.push("/private/dashboard");
-      } else {
-        router.push("/private/pdv");
-      }
-    } catch (error) {
-      form.setError("root", { message: "Erro de conexão. Tente novamente mais tarde." });
+      const role = meData.data.user_roles?.[0]?.role?.name;
+      router.push(role === "ADMIN" ? "/private/dashboard" : "/private/pdv");
+    } catch {
+      loginForm.setError("root", { message: "Erro de conexão" });
       setIsLoading(false);
     }
+  };
+
+  const requestRecovery = async (data: ForgotData) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/response/api/password-recovery/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email }),
+      });
+
+      if (res.ok) {
+        setEmailSentTo(data.email);
+        setStep("success");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        forgotForm.setError("email", { message: err.message || "Erro ao enviar" });
+      }
+    } catch {
+      forgotForm.setError("email", { message: "Erro de conexão" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetPassword = async (data: ResetData) => {
+    if (!token) {
+      resetForm.setError("root", { message: "Token inválido" });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/response/api/password-recovery/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, ...data }),
+      });
+
+      if (res.ok) {
+        setStep("success");
+        router.replace("/login");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        resetForm.setError("root", { message: err.message || "Erro ao redefinir senha" });
+      }
+    } catch {
+      resetForm.setError("root", { message: "Erro de conexão" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setStep("request");
+    forgotForm.reset();
+    resetForm.reset();
+    loginForm.clearErrors();
   };
 
   return (
@@ -95,16 +182,8 @@ const Login = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-primary to-primary dark:from-zinc-800 dark:to-zinc-900" />
           <div className="absolute inset-0 opacity-20">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-              <path
-                fill="currentColor"
-                fillOpacity="1"
-                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,144C960,149,1056,139,1152,122.7C1248,107,1344,85,1392,74.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-              />
+              <path fill="currentColor" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,144C960,149,1056,139,1152,122.7C1248,107,1344,85,1392,74.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
             </svg>
-          </div>
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
           </div>
         </div>
 
@@ -120,23 +199,17 @@ const Login = () => {
               Bem-vindo de volta
             </h1>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-5">
                 <FormField
-                  control={form.control}
+                  control={loginForm.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-                          <Input
-                            type="email"
-                            placeholder="Digite seu e-mail"
-                            className="pl-12"
-                            disabled={isLoading}
-                            {...field}
-                          />
+                          <Input type="email" placeholder="Digite seu e-mail" className="pl-12" disabled={isLoading} {...field} />
                         </div>
                       </FormControl>
                       <FormMessage className="text-red-500" />
@@ -145,7 +218,7 @@ const Login = () => {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={loginForm.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
@@ -173,13 +246,7 @@ const Login = () => {
                   )}
                 />
 
-                <Button
-                  variant="standartButton"
-                  size="standartButton"
-                  type="submit"
-                  className="w-full!"
-                  disabled={isLoading}
-                >
+                <Button variant="standartButton" size="standartButton" type="submit" className="w-full!" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -190,9 +257,9 @@ const Login = () => {
                   )}
                 </Button>
 
-                {form.formState.errors.root && (
+                {loginForm.formState.errors.root && (
                   <p className="text-center text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                    {form.formState.errors.root.message}
+                    {loginForm.formState.errors.root.message}
                   </p>
                 )}
               </form>
@@ -200,9 +267,16 @@ const Login = () => {
 
             <p className="text-center mt-6 text-gray-600 dark:text-gray-400">
               Esqueceu a senha?{" "}
-              <Link href="/forgot-password" className="font-semibold text-primary hover:underline">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("request");
+                  setDialogOpen(true);
+                }}
+                className="font-semibold text-primary hover:underline cursor-pointer"
+              >
                 Clique aqui
-              </Link>
+              </button>
             </p>
           </div>
         </div>
@@ -211,40 +285,28 @@ const Login = () => {
       <section className="py-24 px-6 bg-gray-50 dark:bg-zinc-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
-              {content.features.title}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-              {content.features.subtitle}
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">{content.features.title}</h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">{content.features.subtitle}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {content.features.items.map((feature, index) => {
-              const IconComponent = ICON_MAP[feature.icon] || Shield;
-
+            {content.features.items.map((feature: any, index: number) => {
+              const Icon = ICON_MAP[feature.icon] || Shield;
               return (
                 <div
                   key={index}
-                  className="group relative p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 
-                             border border-gray-100 dark:border-gray-500 
-                             hover:border-red-500/50 dark:hover:border-red-500/50 
-                             hover:-translate-y-2"
+                  className="group relative p-8 rounded-2xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-500 hover:border-red-500/50 dark:hover:border-red-500/50 hover:-translate-y-2"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   <div className="relative z-10">
                     <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                      <IconComponent className="text-white w-8 h-8" />
+                      <Icon className="text-white w-8 h-8" />
                     </div>
-
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                       {feature.title}
                     </h3>
-
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                      {feature.description}
-                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               );
@@ -256,13 +318,129 @@ const Login = () => {
       <footer className="py-16 px-6 border-t border-gray-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto text-center">
           <div className="w-12 h-1 bg-gradient-to-r from-primary to-primary-600 rounded-full mx-auto mb-4" />
-          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            {content.help}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">{content.help}</p>
         </div>
       </footer>
+
+      <Dialog open={dialogOpen} onOpenChange={closeDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {step === "request" && "Recuperar senha"}
+              {step === "reset" && "Nova senha"}
+              {step === "success" && "Concluído"}
+            </DialogTitle>
+            <DialogDescription>
+              {step === "request" && "Digite seu e-mail para receber o link de recuperação."}
+              {step === "reset" && "Defina uma nova senha segura."}
+              {step === "success" &&
+                (emailSentTo
+                  ? `Link enviado para ${emailSentTo}. Verifique sua caixa de entrada.`
+                  : "Senha alterada com sucesso! Faça login com a nova senha.")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {step === "request" && (
+            <Form {...forgotForm}>
+              <form onSubmit={forgotForm.handleSubmit(requestRecovery)} className="space-y-4">
+                <FormField
+                  control={forgotForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>E-mail</FormLabel>
+                      <FormControl>
+                        <div className="relative pt-2">
+                        
+                          <Input type="email" placeholder="seu@email.com" className="" disabled={isLoading} {...field} />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={closeDialog} disabled={isLoading}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" variant="standartButton" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Enviar link"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+
+          {step === "reset" && (
+            <Form {...resetForm}>
+              <form onSubmit={resetForm.handleSubmit(resetPassword)} className="space-y-4">
+                <FormField
+                  control={resetForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nova senha</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 text-gray-500" size={18} />
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Mínimo 8 caracteres"
+                            className="pl-10 pr-10"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-3 text-gray-500"
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={resetForm.control}
+                  name="password_confirmation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirmar senha</FormLabel>
+                      <FormControl>
+                        <Input type={showPassword ? "text" : "password"} placeholder="Digite novamente" disabled={isLoading} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {resetForm.formState.errors.root && (
+                  <p className="text-sm text-red-600">{resetForm.formState.errors.root.message}</p>
+                )}
+
+                <Button type="submit" variant="standartButton" className="w-full" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Redefinir senha"}
+                </Button>
+              </form>
+            </Form>
+          )}
+
+          {step === "success" && (
+            <div className="text-center py-8">
+              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <CheckCircle className="w-12 h-12 text-green-600" />
+              </div>
+              <Button variant="standartButton" onClick={closeDialog} className="w-full">
+                OK
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
-};
-
-export default Login;
+}
