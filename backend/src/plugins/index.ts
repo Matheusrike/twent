@@ -25,7 +25,19 @@ export async function registerPlugins(
 	});
 
 	await app.register(fastifyCors, {
-		origin: ['http://localhost:3000'],
+		origin: (origin, callback) => {
+			const allowedOrigins = [config.frontendUrl].filter(Boolean);
+
+			if (!origin) {
+				return callback(null, true);
+			}
+
+			if (allowedOrigins.includes(origin)) {
+				return callback(null, true);
+			}
+
+			return callback(new Error(`Origin not allowed: ${origin}`), false);
+		},
 		credentials: true,
 	});
 
