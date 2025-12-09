@@ -6,6 +6,7 @@ import TestimonialCard from "./mapCards";
 import MapView from "./mapsContainer";
 import MapsLoader from "./mapsLoader";
 import React, { useState, useEffect, useRef } from "react";
+import { FaStore } from "react-icons/fa";
 
 export default function MapsHero() {
   const [loading, setLoading] = useState(true);
@@ -18,7 +19,6 @@ export default function MapsHero() {
       try {
         const res = await fetch("/response/api/store/all");
         const json = await res.json();
-        console.log(json);
         if (json?.data) {
           const valid = json.data.filter((s: any) => {
             if (!s.latitude || !s.longitude) return false;
@@ -26,14 +26,10 @@ export default function MapsHero() {
             const lng = parseFloat(s.longitude);
             return !isNaN(lat) && !isNaN(lng);
           });
-
           setStores(valid);
         }
-      } catch (err) {
-        console.error("Erro ao carregar lojas:", err);
-      }
+      } catch {}
     }
-
     load();
   }, []);
 
@@ -45,33 +41,28 @@ export default function MapsHero() {
   }, []);
 
   const handleStoreClick = (store: any) => {
-    // Fechar a lista no mobile
     if (showCards) {
       setShowCards(false);
     }
-
-    // Mover o mapa para a loja clicada
     if (mapRef.current && mapRef.current.focusOnStore) {
       mapRef.current.focusOnStore(store);
     }
   };
 
   return (
-    <div className="w-full h-screen flex md:fixed relative ">
-      {/* Fixed sidebar (desktop) */}
+    <div className="w-full h-screen flex md:fixed relative">
       <div className="w-full lg:w-1/5 z-20 lg:flex flex-col hidden bg-background overflow-auto">
-        <div className="flex justify-center items-center bg-gray-100 dark:bg-zinc-900 text-xl py-4 px-2 shrink-0">
-          <FaMapMarkerAlt size={25} className="text-primary dark:text-white" />
-          <h1 className="font-semibold text-black ml-4 dark:text-white">
-            Resultados em Brasil
+        <div className="gap-5 flex justify-center items-center bg-gray-100 dark:bg-zinc-900 text-xl py-4 px-2 shrink-0">
+          <FaStore size={25} className="text-primary dark:text-white" />
+          <h1 className="font-semibold text-black  dark:text-white">
+           Boutiques
           </h1>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 overflow-y-auto  pb-15 pt-5 scroll-smooth">
           <TestimonialCard data={stores} onStoreClick={handleStoreClick} />
         </div>
       </div>
 
-      {/* Map container */}
       <div className="relative w-full lg:w-4/5 h-full flex items-center justify-center bg-transparent">
         {loading ? (
           <MapsLoader />
@@ -79,30 +70,16 @@ export default function MapsHero() {
           <MapView stores={stores} ref={mapRef} />
         )}
 
-        {/* Fullscreen overlay on mobile */}
         {showCards && (
           <div className="fixed inset-0 z-30 bg-white dark:bg-zinc-900 flex flex-col animate-fadeIn">
-            {/* Header */}
-            <div className="flex justify-between items-center bg-gray-100 dark:bg-zinc-800 text-lg py-4 px-4 shadow-md">
-              <div className="flex items-center">
-                <FaMapMarkerAlt
-                  size={22}
-                  className="text-primary dark:text-white mr-2"
-                />
-                <h2 className="font-semibold text-black dark:text-white">
-                  Resultados em Brasil
-                </h2>
-              </div>
-            </div>
+           
 
-            {/* Card list (fills the entire screen) */}
-            <div className="flex-1 overflow-y-auto p-3">
+            <div className="flex-1 overflow-y-auto scroll-smooth">
               <TestimonialCard data={stores} onStoreClick={handleStoreClick} />
             </div>
           </div>
         )}
 
-        {/* Mobile toggle button */}
         <Button
           variant="standartButton"
           size="mapButton"

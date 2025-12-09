@@ -1,27 +1,33 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import ReactDOMServer from "react-dom/server";
 import { FaStore } from "react-icons/fa";
 import "leaflet/dist/leaflet.css";
+import { Clock } from "lucide-react";
 
 const MapContainer = dynamic(
-  () => import("react-leaflet").then(mod => mod.MapContainer),
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }
 );
 const TileLayer = dynamic(
-  () => import("react-leaflet").then(mod => mod.TileLayer),
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
   { ssr: false }
 );
 const Marker = dynamic(
-  () => import("react-leaflet").then(mod => mod.Marker),
+  () => import("react-leaflet").then((mod) => mod.Marker),
   { ssr: false }
 );
-const Popup = dynamic(
-  () => import("react-leaflet").then(mod => mod.Popup),
-  { ssr: false }
-);
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
+  ssr: false,
+});
 
 interface MapViewProps {
   stores: any[];
@@ -39,11 +45,11 @@ const MapView = forwardRef(({ stores }: MapViewProps, ref) => {
 
       if (mapRef.current && !isNaN(lat) && !isNaN(lng)) {
         const map = mapRef.current;
-        
+
         // Animar movimento do mapa até a loja
         map.flyTo([lat, lng], 15, {
           duration: 1.5,
-          easeLinearity: 0.25
+          easeLinearity: 0.25,
         });
 
         // Abrir popup do marcador correspondente
@@ -58,7 +64,7 @@ const MapView = forwardRef(({ stores }: MapViewProps, ref) => {
   }));
 
   useEffect(() => {
-    import("leaflet").then(L => {
+    import("leaflet").then((L) => {
       setCustomIcon(
         L.divIcon({
           className: "custom-div-icon",
@@ -88,31 +94,52 @@ const MapView = forwardRef(({ stores }: MapViewProps, ref) => {
       ref={mapRef}
     >
       <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
+        attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
       {customIcon &&
-        stores.map(store => (
+        stores.map((store) => (
           <Marker
             key={store.id}
             icon={customIcon}
-            position={[
-              parseFloat(store.latitude),
-              parseFloat(store.longitude),
-            ]}
+            position={[parseFloat(store.latitude), parseFloat(store.longitude)]}
             ref={(markerRef) => {
               if (markerRef) {
                 markersRef.current[store.id] = markerRef;
               }
             }}
           >
-            <Popup>
+            <Popup className="">
               <h1 className="font-semibold uppercase text-sm">{store.name}</h1>
-              <p className="text-xs">{store.city} — {store.country}</p>
-              {store.phone && (
-                <p className="text-xs mt-1">📞 {store.phone}</p>
-              )}
+              <p className="text-xs">
+                {store.city} — {store.country}
+              </p>
+              {store.phone && <p className="text-xs mt-1">📞 {store.phone}</p>}
+              <div className="flex items-start gap-2 mt-2">
+            
+
+                <div className="text-xs text-muted-foreground space-y-1">
+                  {store.opening_hours?.length ? (
+                    store.opening_hours.map((hour: any, idx: any) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between border-b border-muted-foreground/10 pb-1 last:border-none last:pb-0"
+                      >
+                        <span className="font-semibold uppercase w-[85px]">
+                          {hour.day}
+                        </span>
+
+                        <span className="text-right">
+                          {hour.open} — {hour.close}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p>Horário não informado</p>
+                  )}
+                </div>
+              </div>
             </Popup>
           </Marker>
         ))}
@@ -120,6 +147,6 @@ const MapView = forwardRef(({ stores }: MapViewProps, ref) => {
   );
 });
 
-MapView.displayName = 'MapView';
+MapView.displayName = "MapView";
 
 export default MapView;
