@@ -31,7 +31,7 @@ const TrustSection = () => {
           <h2 className="text-5xl font-bold text-primary mb-6 tracking-tight">
             Sua Confiança, Nossa Prioridade
           </h2>
-          <p className="text-xl text-slate-600 leading-relaxed">
+          <p className="text-xl text-slate-600 dark:text-white leading-relaxed">
             Compromisso com excelência e satisfação em cada detalhe
           </p>
         </div>
