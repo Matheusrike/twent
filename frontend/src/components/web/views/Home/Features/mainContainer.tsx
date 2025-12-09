@@ -85,7 +85,7 @@ const MainContainer: React.FC = () => {
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-screen py-12">
             {/* Text Content */}
-            <div className="max-w-xl flex flex-col space-y-6 animate-fade-in">
+            <div className="max-w-xl flex flex-col space-y-6 -all duration-300 group-hover:w-24">
               <div className="inline-flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider mb-2">
                 <span className="w-8 h-0.5 bg-primary"></span>
                 Coleção Premium
