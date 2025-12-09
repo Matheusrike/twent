@@ -31,7 +31,6 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 					500: ApiGenericErrorSchema,
 				},
 			},
-			preHandler: [app.authorization()],
 		},
 		async (request, reply) => {
 			try {

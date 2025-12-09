@@ -19,18 +19,33 @@ export class AppointmentService {
 		this.resend = new Resend(apiKey);
 		this.fromEmail = process.env.FROM_EMAIL || 'noreply@twent.com';
 	}
-	async create(appointmentData: CreateAppointment, id: string) {
+	async create(appointmentData: CreateAppointment) {
 		try {
             appointmentData.appointment_date = new Date(
 				appointmentData.appointment_date,
 			);
-            console.log(this.fromEmail);
+
+            const customer = await this.database.user.findUnique({
+                where: {
+                    email: appointmentData.customer_email
+                },
+                select: {
+                    id: true
+                }
+            })
+
+            if (!customer) {
+                throw new AppError({
+                    message: 'Cliente nao encontrado.',
+                    errorCode: 'NOT_FOUND',
+                });
+            }
             const { data, error } = await this.resend.emails.send({
 				from: this.fromEmail,
 				to: 'noreply.twent@gmail.com',
 				subject: 'Novo Agendamento - TWENT',
 				html: `<h1>Novo Agendamento</h1>
-                <p>Cliente ID: ${id}</p>
+                <p>Cliente ID: ${customer!.id}</p>
                 <p>Nome: ${appointmentData.customer_name}</p>
                 <p>Telefone: ${appointmentData.customer_phone}</p>
                 <p>Email: ${appointmentData.customer_email}</p>

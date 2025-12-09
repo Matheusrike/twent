@@ -1,87 +1,66 @@
-import * as React from "react"
-import { Mail } from "lucide-react"
+import { cn } from "@/lib/utils";
+import React from "react";
 
-import { cn } from "@/lib/utils"
+function InputEmail({ className, value, onChange, ...props }: React.ComponentProps<'input'>) {
+    const [error, setError] = React.useState('');
+    const [isFocused, setIsFocused] = React.useState(false);
+    const [hasValue, setHasValue] = React.useState(Boolean(value));
 
-function InputEmail({ className, ...props }: React.ComponentProps<"input">) {
-  const [error, setError] = React.useState<string>("")
-  const [isFocused, setIsFocused] = React.useState(false)
-  const [hasValue, setHasValue] = React.useState(false)
+    React.useEffect(() => {
+        setHasValue(Boolean(value));
+    }, [value]);
 
-  const validateEmail = (email: string) => {
-    if (!email) {
-      setError("")
-      return
-    }
+    const validateEmail = (email: string) => {
+        if (!email) return setError('');
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setError("Por favor, insira um email válido")
-    } else {
-      setError("")
-    }
-  }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setError(emailRegex.test(email) ? '' : 'Por favor, insira um email válido');
+    };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(false)
-    validateEmail(e.target.value)
-    props.onBlur?.(e)
-  }
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setHasValue(Boolean(e.target.value));
+        if (error) validateEmail(e.target.value);
+        onChange?.(e);
+    };
 
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(true)
-    props.onFocus?.(e)
-  }
+    return (
+        <div className="w-full">
+            <div className="relative">
+                <label
+                    className={cn(
+                        'absolute left-4 text-muted-foreground transition-all pointer-events-none',
+                        isFocused || hasValue ? '-top-7 text-xs px-1' : 'top-1/2 -translate-y-1/2 text-base'
+                    )}
+                >
+                    E-mail
+                </label>
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHasValue(e.target.value.length > 0)
-    if (error) {
-      validateEmail(e.target.value)
-    }
-    props.onChange?.(e)
-  }
+                <input
+                    type="email"
+                    value={value}
+                    onChange={handleChange}
+                    onBlur={(e) => {
+                        setIsFocused(false);
+                        validateEmail(e.target.value);
+                        props.onBlur?.(e);
+                    }}
+                    onFocus={(e) => {
+                        setIsFocused(true);
+                        props.onFocus?.(e);
+                    }}
+                    className={cn(
+                        'w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary dark:text-white dark:bg-background',
+                        error && 'border-destructive',
+                        className
+                    )}
+                    aria-invalid={!!error}
+                    {...props}
+                />
+            </div>
 
-  const isLabelFloating = isFocused || hasValue
-
-
-
-  return (
-    <div className="w-full">
-      <div className="relative">
-      <label
-          className={cn(
-            "absolute left-4 text-muted-foreground transition-all duration-200 ease-out pointer-events-none ",
-            isLabelFloating
-              ? "-top-7 text-xs px-1"
-              : "top-1/2 -translate-y-1/2 text-base"
-          )}
-        >
-          E-mail 
-        </label>
-        <input
-          type="email"
-          data-slot="input"
-          className={cn(
-            "w-full rounded-lg border-gray-300  p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300 ease-in-out transform focus:-translate-y-1 dark:text-white dark:bg-background",
-          
-            error && "border-destructive",
-            error && "border-destructive",
-            className
-          )}
-          aria-invalid={!!error}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-          onChange={handleChange}
-          {...props}
-        />
-      </div>
-      {error && (
-        <p className="text-destructive text-xs mt-1.5 ml-0.5">
-          {error}
-        </p>
-      )}
-    </div>
-  )
+            {error && <p className="text-destructive text-xs mt-1.5 ml-0.5">{error}</p>}
+        </div>
+    );
 }
 
-export { InputEmail }
+export { InputEmail };

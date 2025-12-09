@@ -1,6 +1,5 @@
 import { CreateAppointment } from '@/schemas/appointment.schema';
 import { AppointmentService } from '@/services/Appoiment.service';
-import { IJwtAuthPayload } from '@/types/authorization.types';
 import { AppError, HttpError } from '@/utils/errors.util';
 import { FastifyRequest } from 'fastify';
 
@@ -10,8 +9,7 @@ export class AppointmentController {
 	async create(request: FastifyRequest) {
 		try {
 			const data = request.body as CreateAppointment;
-            const { id } = request.user as IJwtAuthPayload
-			const appointment = await this.appointmentService.create(data, id);
+			const appointment = await this.appointmentService.create(data);
 			return appointment;
 		} catch (error) {
 			if (error instanceof AppError) {
