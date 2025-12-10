@@ -8,7 +8,10 @@ const envSchema = z.object({
 	NODE_ENV: z.enum(['prod', 'dev']).default('prod'),
 	PORT: z.coerce.number().default(3333),
 	DATABASE_URL: z.string().min(1, 'Database URL is required'),
-	FRONTEND_URL: z.url('Frontend URL must be a valid URL').optional(),
+	FRONTEND_URL: z
+		.string()
+		.url('Frontend URL must be a valid URL')
+		.optional(),
 
 	COOKIE_SECRET: z.string().min(1, 'Cookie secret is required'),
 	JWT_SECRET: z.string().min(1, 'JWT secret is required'),
@@ -43,12 +46,20 @@ export function loadConfig(): IAppConfig {
 		console.warn('⚠ PORT not specified in .env, defaulting to 3333\n');
 	}
 
+	// Valida FRONTEND_URL em produção
+	if (env.NODE_ENV === 'prod' && !env.FRONTEND_URL) {
+		console.error(
+			'❌ FRONTEND_URL is required in production mode. Please set FRONTEND_URL environment variable.',
+		);
+		process.exit(1);
+	}
+
 	return {
 		nodeEnv: env.NODE_ENV,
 		port: env.PORT,
 		frontendUrl:
 			env.NODE_ENV === 'prod'
-				? env.FRONTEND_URL!
+				? env.FRONTEND_URL || 'https://twent.store'
 				: 'http://localhost:3000',
 		databaseUrl: env.DATABASE_URL,
 		cookieSecret: env.COOKIE_SECRET,

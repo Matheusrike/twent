@@ -57,12 +57,24 @@ export default function CollectionIdHero({ params }: { params: { id: string } })
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`/response/api/product/public/${sku}`)
+        const response = await fetch(`/response/api/product/public/${sku}`, {
+          credentials: 'include',
+        })
+        
+        if (!response.ok) {
+          console.error('Erro na resposta:', response.status, response.statusText)
+          const errorText = await response.text()
+          console.error('Detalhes do erro:', errorText)
+          notFound()
+          return
+        }
+
         const result = await response.json()
 
         if (result.success && result.data) {
           setProduct(result.data)
         } else {
+          console.error('Resposta sem dados válidos:', result)
           notFound()
         }
       } catch (error) {

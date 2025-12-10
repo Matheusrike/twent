@@ -26,15 +26,48 @@ export async function registerPlugins(
 
 	await app.register(fastifyCors, {
 		origin: (origin, callback) => {
-			const allowedOrigins = [config.frontendUrl].filter(Boolean);
+			// Lista de origens permitidas
+			const allowedOrigins: string[] = [];
+			
+			// Adiciona a URL do frontend configurada
+			if (config.frontendUrl) {
+				allowedOrigins.push(config.frontendUrl);
+			}
+			
+			// Em produção, aceita também variações com/sem www e protocolo
+			if (config.nodeEnv === 'prod' && config.frontendUrl) {
+				try {
+					const url = new URL(config.frontendUrl);
+					// Adiciona versão com www
+					if (!url.hostname.startsWith('www.')) {
+						allowedOrigins.push(`${url.protocol}//www.${url.hostname}${url.pathname === '/' ? '' : url.pathname}`);
+					}
+					// Adiciona versão sem www
+					if (url.hostname.startsWith('www.')) {
+						allowedOrigins.push(`${url.protocol}//${url.hostname.replace('www.', '')}${url.pathname === '/' ? '' : url.pathname}`);
+					}
+				} catch (e) {
+					// Ignora erros de parsing
+				}
+			}
+			
+			// Em desenvolvimento, sempre aceita localhost
+			if (config.nodeEnv !== 'prod') {
+				allowedOrigins.push('http://localhost:3000');
+			}
 
+			// Se não há origem (ex: requisições do Postman, curl, etc), permite
 			if (!origin) {
 				return callback(null, true);
 			}
 
+			// Verifica se a origem está na lista de permitidas
 			if (allowedOrigins.includes(origin)) {
 				return callback(null, true);
 			}
+
+			// Log para debug (pode remover em produção se necessário)
+			console.warn(`⚠️  Origin not allowed: ${origin}. Allowed origins:`, allowedOrigins);
 
 			return callback(new Error(`Origin not allowed: ${origin}`), false);
 		},
