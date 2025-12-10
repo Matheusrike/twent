@@ -17,24 +17,6 @@ export class FinancialTransactionService {
 
 	async create(data: CreateFinancialTransactionType, user: IJwtAuthPayload) {
 		try {
-			const store = await this.database.store.findUnique({
-				where: { id: data.store_id },
-			});
-
-			if (!store) {
-				throw new AppError({
-					message: 'Loja não encontrada',
-					errorCode: 'STORE_NOT_FOUND',
-				});
-			}
-
-			if (user.storeId && user.storeId !== data.store_id) {
-				throw new AppError({
-					message:
-						'Você não tem permissão para criar transações nesta loja',
-					errorCode: 'STORE_ACCESS_DENIED',
-				});
-			}
 
 			if (data.supplier_id) {
 				const supplier = await this.database.supplier.findUnique({
@@ -52,7 +34,7 @@ export class FinancialTransactionService {
 			const transaction = await this.database.financialTransaction.create(
 				{
 					data: {
-						store_id: data.store_id || user!.storeId!,
+						store_id: user!.storeId!,
 						supplier_id: data.supplier_id || undefined,
 						type: data.type as TransactionType,
 						category: data.category,
