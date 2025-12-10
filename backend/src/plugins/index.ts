@@ -46,6 +46,10 @@ export async function registerPlugins(
 	await app.register(authorizationPlugin);
 
 	await app.register(fastifyMultipart, {
+		limits: {
+			fileSize: 20 * 1024 * 1024,
+			files: 10,
+		},
 		attachFieldsToBody: true,
 	});
 
