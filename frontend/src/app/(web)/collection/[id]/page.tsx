@@ -118,7 +118,7 @@ export default function CollectionIdHero({ params }: { params: { id: string } })
     if (normalized.length > 0) return normalized;
   
     const fallbackSrc = product.collection?.image_public_id || "";
-    const finalFallback = buildCloudinaryUrl(fallbackSrc) || "/img/web/collection/CollectionBanner.jpg";
+    const finalFallback = buildCloudinaryUrl(fallbackSrc) || "";
     return [{ url: finalFallback }];
   })();
 

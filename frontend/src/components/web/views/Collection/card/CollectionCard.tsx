@@ -43,14 +43,15 @@ export default function CollectionCard({
         className='relative max-w-md rounded-xl bg-zinc-600 pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1'
       >
 
-        <div className='relative h-60 w-full flex items-center justify-center'>
-          <Image
-            src={image}
-            alt={title}
-            fill
-            className='object-contain'
-          />
-        </div>
+     <div className='relative h-60 w-full overflow-hidden'>
+  <Image
+    src={image}
+    alt={title}
+    fill
+    className='absolute inset-0 object-cover'
+  />
+</div>
+
 
        
 
