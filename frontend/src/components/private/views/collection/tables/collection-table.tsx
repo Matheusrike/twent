@@ -135,7 +135,8 @@ export default function CollectionsTable() {
         setHasPrevPage(pageIndex > 0);
       }
     } catch (err) {
-      if (err?.name !== "AbortError") {
+      const error = err as Error | DOMException;
+      if (error?.name !== "AbortError") {
         console.error("Erro ao carregar coleções", err);
       }
     } finally {

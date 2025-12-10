@@ -213,18 +213,16 @@ export default function EmployeeModal({
       const payload = {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
-        phone: cleanedPhone ? `+55${cleanedPhone}` : null,
-        document_number: form.document_number || null,
-        birth_date: form.birth_date || null,
-        street: form.street || null,
-        number: form.number || null,
-        district: form.district || null,
-        city: form.city || null,
-        state: form.state || null,
-        zip_code: form.zip_code.replace(/\D/g, "") || null,
+        phone: cleanedPhone ? `+55${cleanedPhone}` : undefined,
+        birth_date: form.birth_date || undefined,
+        street: form.street || undefined,
+        number: form.number || undefined,
+        district: form.district || undefined,
+        city: form.city || undefined,
+        state: form.state || undefined,
+        zip_code: form.zip_code.replace(/\D/g, "") || undefined,
         country: form.country,
-        national_id: form.national_id || null,
-        department: form.department || null,
+        department: form.department || undefined,
         salary: Number(form.salary) || 0,
         currency: form.currency,
         role: form.role,
@@ -236,11 +234,13 @@ export default function EmployeeModal({
         emergency_contact: form.emergency_name
           ? {
               name: form.emergency_name.trim(),
-              phone: cleanedEmergency ? `+55${cleanedEmergency}` : null,
+              phone: cleanedEmergency ? `+55${cleanedEmergency}` : undefined,
             }
-          : null,
+          : undefined,
         is_active: form.is_active,
       };
+
+      console.log(payload)
 
       const res = await fetch(`/response/api/employee/${employeeId}`, {
         method: "PUT",

@@ -67,12 +67,11 @@ const valuesCards = () => {
 
           {/* Media */}
           <div className="relative overflow-hidden w-full h-full md:basis-7/12 lg:basis-1/2 aspect-[4/2] bg-muted rounded-xl border border-border/50 shadow-m">
-            <img
+            <Image
               src="/img/web/about/aboutImgValue.png"
-              width={"auto"}
-              height={"auto"}
+              fill
               alt="Imagem de valores"
-              className="object-cover rounded-xl w-full h-full"
+              className="object-cover rounded-xl"
             />
           </div>
         </div>

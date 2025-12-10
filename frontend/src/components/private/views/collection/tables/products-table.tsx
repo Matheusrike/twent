@@ -64,6 +64,26 @@ type Product = {
   };
 };
 
+// Formato esperado pelo EditProductModal (preços numéricos)
+type EditProductPayload = {
+  sku: string;
+  name: string;
+  description: string | null;
+  price: number;
+  cost_price: number | null;
+  currency: string;
+  collection_id: string;
+  limited_edition: boolean;
+  is_active: boolean;
+  specifications: {
+    case_material: string | null;
+    case_diameter: number | null;
+    movement_type: string | null;
+    total_weight: number | null;
+    glass: string | null;
+  };
+};
+
 type Collection = {
   id: string;
   name: string;
@@ -85,9 +105,8 @@ export default function CollectionProductsTable() {
   // Modais
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
-  const [productToEdit, setProductToEdit] = React.useState<Product | null>(
-    null
-  );
+  const [productToEdit, setProductToEdit] =
+    React.useState<EditProductPayload | null>(null);
   const [isUploadImageOpen, setIsUploadImageOpen] = React.useState(false);
   const [selectedProductSku, setSelectedProductSku] = React.useState<
     string | null
@@ -163,7 +182,32 @@ export default function CollectionProductsTable() {
   };
 
   const handleEdit = (product: Product) => {
-    setProductToEdit(product);
+    // Converter o produto do formato local (preço em string) para o formato do modal (número)
+    const convertedProduct: EditProductPayload = {
+      sku: product.sku,
+      name: product.name,
+      description: product.description || null,
+      price: parseFloat(product.price) || 0,
+      cost_price: product.cost_price ? parseFloat(product.cost_price) : null,
+      currency: product.currency,
+      collection_id: product.collection_id,
+      limited_edition: product.limited_edition,
+      is_active: product.is_active,
+      specifications: {
+        case_material: product.specifications.case_material ?? null,
+        case_diameter:
+          typeof product.specifications.case_diameter === "number"
+            ? product.specifications.case_diameter
+            : null,
+        movement_type: product.specifications.movement_type ?? null,
+        total_weight:
+          typeof product.specifications.total_weight === "number"
+            ? product.specifications.total_weight
+            : null,
+        glass: product.specifications.glass ?? null,
+      },
+    };
+    setProductToEdit(convertedProduct);
     setIsEditOpen(true);
   };
 

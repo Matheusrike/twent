@@ -39,7 +39,7 @@ interface Product {
     description: string
     image_public_id: string | null
   }
-  images: Array<{ url?: string; public_id?: string }>
+  images: Array<{ url?: string; public_id?: string; is_primary?: boolean }>
 }
 
 export default function CollectionIdHero({ params }: { params: { id: string } }) {
@@ -104,22 +104,34 @@ export default function CollectionIdHero({ params }: { params: { id: string } })
     if (cleaned.startsWith("http")) return cleaned;
     return `https://res.cloudinary.com/twent/image/upload/c_fill,q_auto/v1/${cleaned}.webp`;
   };
-  // Imagens chamadas como antes do carrossel: usa a primeira imagem do produto ou a image_public_id da coleção; limita a 3
+  // Imagens para o carrossel: prioriza a imagem principal, depois as outras; exibe todas as imagens
   const images = (() => {
-    const normalized = (product.images ?? [])
+    if (!product.images || product.images.length === 0) {
+      const fallbackSrc = product.collection?.image_public_id || "";
+      const finalFallback = buildCloudinaryUrl(fallbackSrc) || "";
+      return finalFallback ? [{ url: finalFallback }] : [];
+    }
+    
+    // Ordena colocando a imagem principal primeiro
+    const sortedImages = [...product.images].sort((a, b) => {
+      if (a.is_primary === true && b.is_primary !== true) return -1;
+      if (a.is_primary !== true && b.is_primary === true) return 1;
+      return 0;
+    });
+    
+    const normalized = sortedImages
       .map((img) => {
         const src = img?.url || img?.public_id || "";
         const finalUrl = buildCloudinaryUrl(src);
         return finalUrl ? { url: finalUrl } : null;
       })
-      .filter(Boolean)
-      .slice(0, 3) as Array<{ url: string }>;
+      .filter(Boolean) as Array<{ url: string }>;
   
     if (normalized.length > 0) return normalized;
   
     const fallbackSrc = product.collection?.image_public_id || "";
     const finalFallback = buildCloudinaryUrl(fallbackSrc) || "";
-    return [{ url: finalFallback }];
+    return finalFallback ? [{ url: finalFallback }] : [];
   })();
 
   const hasMultipleImages = images.length > 1

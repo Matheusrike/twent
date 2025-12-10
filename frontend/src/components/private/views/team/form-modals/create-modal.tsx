@@ -7,6 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 import {
     User,
@@ -20,6 +27,8 @@ import {
     Shield,
     HeartHandshake,
     AlertCircle,
+    Eye,
+    EyeOff,
 } from 'lucide-react';
 
 interface CreateEmployeeModalProps {
@@ -57,6 +66,42 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
 
     const [error, setError] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [stores, setStores] = React.useState<Array<{ id: string; code: string; name: string }>>([]);
+    const [loadingStores, setLoadingStores] = React.useState(false);
+
+    // Buscar lojas quando o modal abrir
+    React.useEffect(() => {
+        if (open) {
+            const fetchStores = async () => {
+                setLoadingStores(true);
+                try {
+                    const response = await fetch('/response/api/store', {
+                        method: 'GET',
+                        credentials: 'include',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Falha ao carregar lojas');
+                    }
+
+                    const json = await response.json();
+                    const storesData = json?.data || [];
+                    setStores(storesData.map((store: any) => ({
+                        id: store.id,
+                        code: store.code,
+                        name: store.name,
+                    })));
+                } catch (err: any) {
+                    setError(err.message || 'Erro ao carregar lojas');
+                } finally {
+                    setLoadingStores(false);
+                }
+            };
+
+            fetchStores();
+        }
+    }, [open]);
 
     const handleChange = (key: string, value: string) => {
         setError('');
@@ -76,7 +121,15 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
         // CPF
         if (key === 'document_number') {
             const cleaned = value.replace(/\D/g, '').slice(0, 11);
-            setForm((prev) => ({ ...prev, [key]: cleaned }));
+            let formatted = cleaned;
+            if (cleaned.length > 9) {
+                formatted = cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            } else if (cleaned.length > 6) {
+                formatted = cleaned.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+            } else if (cleaned.length > 3) {
+                formatted = cleaned.replace(/(\d{3})(\d+)/, '$1.$2');
+            }
+            setForm((prev) => ({ ...prev, [key]: formatted }));
             return;
         }
 
@@ -89,40 +142,60 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
             return;
         }
 
-        // SALÁRIO
+        // SALÁRIO (máscara de dinheiro)
         if (key === 'salary') {
             const cleaned = value.replace(/\D/g, '');
-            setForm((prev) => ({ ...prev, [key]: cleaned }));
+            if (cleaned === '') {
+                setForm((prev) => ({ ...prev, [key]: '' }));
+                return;
+            }
+            // Converte para número e formata como moeda brasileira
+            // Trata como centavos (ex: 350000 = R$ 3.500,00)
+            const numValue = parseInt(cleaned, 10) / 100;
+            const formatted = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }).format(numValue);
+            setForm((prev) => ({ ...prev, [key]: formatted }));
             return;
         }
 
-        // NATIONAL ID (CNPJ / EIN / RUT)
+        // NATIONAL ID
         if (key === 'national_id') {
             const country = form.country;
-            let cleaned = value.replace(/\W/g, '');
+            let cleaned: string;
 
-            // BRASIL → CNPJ
+            // BRASIL → CNPJ (apenas números)
             if (country === 'Brasil') {
-                cleaned = cleaned.slice(0, 14);
-                if (cleaned.length >= 12)
+                cleaned = value.replace(/\D/g, '').slice(0, 14);
+                // Aplica máscara de CNPJ: XX.XXX.XXX/XXXX-XX
+                if (cleaned.length >= 12) {
                     cleaned = cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-                else if (cleaned.length >= 8) cleaned = cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d+)/, '$1.$2.$3/$4');
-                else if (cleaned.length >= 5) cleaned = cleaned.replace(/(\d{2})(\d{3})(\d+)/, '$1.$2.$3');
-                else if (cleaned.length >= 3) cleaned = cleaned.replace(/(\d{2})(\d+)/, '$1.$2');
+                } else if (cleaned.length >= 8) {
+                    cleaned = cleaned.replace(/(\d{2})(\d{3})(\d{3})(\d+)/, '$1.$2.$3/$4');
+                } else if (cleaned.length >= 5) {
+                    cleaned = cleaned.replace(/(\d{2})(\d{3})(\d+)/, '$1.$2.$3');
+                } else if (cleaned.length >= 3) {
+                    cleaned = cleaned.replace(/(\d{2})(\d+)/, '$1.$2');
+                }
             }
-
-            // USA → EIN
+            // USA → EIN (apenas números)
             else if (country === 'USA') {
-                cleaned = cleaned.slice(0, 9);
+                cleaned = value.replace(/\D/g, '').slice(0, 9);
                 if (cleaned.length > 2) cleaned = cleaned.replace(/(\d{2})(\d+)/, '$1-$2');
             }
-
-            // CHILE → RUT
+            // CHILE → RUT (permite letras no final)
             else if (country === 'Chile') {
-                cleaned = cleaned.slice(0, 9);
-                if (cleaned.length >= 8) cleaned = cleaned.replace(/(\d{1,2})(\d{3})(\d{3})([\dkK])/, '$1.$2.$3-$4');
+                cleaned = value.replace(/[^\d\dkK]/gi, '').slice(0, 9);
+                if (cleaned.length >= 8) cleaned = cleaned.replace(/(\d{1,2})(\d{3})(\d{3})([\dkK])/i, '$1.$2.$3-$4');
                 else if (cleaned.length >= 5) cleaned = cleaned.replace(/(\d{1,2})(\d{3})(\d+)/, '$1.$2.$3');
                 else if (cleaned.length >= 3) cleaned = cleaned.replace(/(\d{1,2})(\d+)/, '$1.$2');
+            }
+            // Outros países - remove apenas caracteres especiais
+            else {
+                cleaned = value.replace(/\W/g, '');
             }
 
             setForm((prev) => ({ ...prev, national_id: cleaned }));
@@ -151,6 +224,8 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
             const cleanedPhone = form.phone.replace(/\D/g, '');
             const cleanedEmergency = form.emergency_phone.replace(/\D/g, '');
             const cleanedNational = form.national_id.replace(/\W/g, '');
+            // Remove R$ e espaços, substitui vírgula por ponto para conversão numérica
+            const cleanedSalary = form.salary.replace(/[^\d,]/g, '').replace(',', '.');
 
             const response = await fetch('/response/api/employee', {
                 method: 'POST',
@@ -163,7 +238,7 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                     last_name: form.last_name.trim(),
                     phone: cleanedPhone ? `+55${cleanedPhone}` : null,
                     user_type: 'EMPLOYEE',
-                    document_number: form.document_number || null,
+                    document_number: form.document_number.replace(/\D/g, '') || null,
                     birth_date: form.birth_date || null,
                     street: form.street || null,
                     number: form.number || null,
@@ -171,11 +246,11 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                     city: form.city || null,
                     state: form.state || null,
                     zip_code: form.zip_code.replace(/\D/g, '') || null,
-                    country: form.country || 'Brasil',
+                    country: form.country,
                     is_active: true,
                     national_id: cleanedNational || null,
                     department: form.department || null,
-                    salary: Number(form.salary) || 0,
+                    salary: cleanedSalary ? Number(cleanedSalary) : 0,
                     currency: form.currency,
                     role: form.role || 'EMPLOYEE_BRANCH',
                     store_code: form.store_code || null,
@@ -279,12 +354,22 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                     <Label className="flex items-center gap-2">
                                         <Shield className="h-3.5 w-3.5" /> Senha *
                                     </Label>
-                                    <Input
-                                        type="password"
-                                        placeholder="Mínimo 8 caracteres"
-                                        value={form.password_hash}
-                                        onChange={(e) => handleChange('password_hash', e.target.value)}
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            type={showPassword ? 'text' : 'password'}
+                                            placeholder="Mínimo 8 caracteres"
+                                            value={form.password_hash}
+                                            onChange={(e) => handleChange('password_hash', e.target.value)}
+                                            className="pr-10"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
@@ -332,13 +417,12 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                         <CreditCard className="h-3.5 w-3.5" /> CPF
                                     </Label>
                                     <Input
-                                        placeholder="12345678900"
+                                        placeholder="123.456.789-00"
                                         value={form.document_number}
                                         onChange={(e) => handleChange('document_number', e.target.value)}
                                     />
                                 </div>
 
-                                {/* NOVO CAMPO — NATIONAL ID */}
                                 <div className="space-y-2">
                                     <Label className="flex items-center gap-2">
                                         <CreditCard className="h-3.5 w-3.5" /> National ID
@@ -358,6 +442,47 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                 <MapPin className="h-4 w-4" />
                                 <span>Endereço</span>
                                 <div className="h-px flex-1 bg-border/50" />
+                            </div>
+
+                            {/* PAÍS */}
+                            <div className="space-y-2">
+                                <Label>País</Label>
+                                <select
+                                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                    value={form.country}
+                                    onChange={(e) => handleChange('country', e.target.value)}
+                                >
+                                    <option value="BR">Brasil</option>
+                                    <option value="US">Estados Unidos</option>
+                                    <option value="CL">Chile</option>
+                                    <option value="AR">Argentina</option>
+                                    <option value="MX">México</option>
+                                    <option value="CA">Canadá</option>
+                                    <option value="GB">Reino Unido</option>
+                                    <option value="DE">Alemanha</option>
+                                    <option value="FR">França</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="JP">Japão</option>
+                                    <option value="AU">Austrália</option>
+                                    <option value="ES">Espanha</option>
+                                    <option value="IT">Itália</option>
+                                    <option value="ZA">África do Sul</option>
+                                    <option value="CN">China</option>
+                                    <option value="KR">Coreia do Sul</option>
+                                    <option value="IN">Índia</option>
+                                    <option value="RU">Rússia</option>
+                                    <option value="NL">Holanda</option>
+                                    <option value="SE">Suécia</option>
+                                    <option value="NO">Noruega</option>
+                                    <option value="DK">Dinamarca</option>
+                                    <option value="FI">Finlândia</option>
+                                    <option value="NZ">Nova Zelândia</option>
+                                    <option value="IE">Irlanda</option>
+                                    <option value="CH">Suíça</option>
+                                    <option value="BE">Bélgica</option>
+                                    <option value="AT">Áustria</option>
+                                    <option value="PL">Polônia</option>
+                                </select>
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
@@ -442,7 +567,7 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                         <DollarSign className="h-3.5 w-3.5" /> Salário
                                     </Label>
                                     <Input
-                                        placeholder="3500"
+                                        placeholder="R$ 3.500,00"
                                         value={form.salary}
                                         onChange={(e) => handleChange('salary', e.target.value)}
                                     />
@@ -450,11 +575,22 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
 
                                 <div className="space-y-2">
                                     <Label>Código da Loja *</Label>
-                                    <Input
-                                        placeholder="BRA001"
+                                    <Select
                                         value={form.store_code}
-                                        onChange={(e) => handleChange('store_code', e.target.value)}
-                                    />
+                                        onValueChange={(value) => handleChange('store_code', value)}
+                                        disabled={loadingStores || loading}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder={loadingStores ? 'Carregando...' : 'Selecione uma loja'} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {stores.map((store) => (
+                                                <SelectItem key={store.id} value={store.code}>
+                                                    {store.code} - {store.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
 

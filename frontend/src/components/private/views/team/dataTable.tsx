@@ -85,7 +85,7 @@ export function TeamTable() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`/response/api/employee?skip=${skip}&take=${take}`, {
+      const res = await fetch(`/response/api/employee/all?skip=${skip}&take=${take}`, {
         credentials: "include",
       });
 
@@ -327,11 +327,14 @@ export function TeamTable() {
         onCreated={handleEmployeeCreated}
       />
 
-      <EmployeeViewModal
-        open={isViewModalOpen}
-        onOpenChange={setIsViewModalOpen}
-        employeeId={selectedEmployeeId}
-      />
+      {selectedEmployeeId && (
+        <EmployeeViewModal
+          open={isViewModalOpen}
+          onOpenChange={setIsViewModalOpen}
+          onSuccess={handleEmployeeCreated}
+          employeeId={selectedEmployeeId}
+        />
+      )}
     </div>
   );
 }

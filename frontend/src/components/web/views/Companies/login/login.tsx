@@ -77,11 +77,11 @@ export default function Login() {
   });
 
   useEffect(() => {
+    // Se houver token na URL, redireciona para a página de reset
     if (token) {
-      setStep("reset");
-      setDialogOpen(true);
+      router.push(`/reset-password?token=${token}`);
     }
-  }, [token]);
+  }, [token, router]);
 
   const onLogin = async (data: LoginData) => {
     setIsLoading(true);

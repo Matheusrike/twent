@@ -18,7 +18,7 @@ interface Product {
     description: string
     image_public_id: string | null
   }
-  images: Array<{ url: string }>
+  images: Array<{ url: string; is_primary?: boolean }>
 }
 
 // Agora recebe a busca como prop
@@ -82,14 +82,33 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
     return matchesSearch && matchesCategory && matchesPrice
   })
 
+  const categoriesKey = selectedCategories.join(',');
+  const pricesKey = selectedPrices.join(',');
+  
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedCategories.join(','), selectedPrices.join(',')])
+  }, [searchQuery, categoriesKey, pricesKey])
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE))
   const start = (currentPage - 1) * ITEMS_PER_PAGE
   const end = start + ITEMS_PER_PAGE
   const pagedProducts = filteredProducts.slice(start, end)
+
+  // Função helper para obter a imagem principal ou a primeira disponível
+  const getPrimaryImage = (product: Product): string | null => {
+    if (!product.images || product.images.length === 0) {
+      return product.collection.image_public_id || null
+    }
+    
+    // Busca a imagem com is_primary: true
+    const primaryImage = product.images.find(img => img.is_primary === true)
+    if (primaryImage?.url) {
+      return primaryImage.url
+    }
+    
+    // Fallback para a primeira imagem se não houver principal definida
+    return product.images[0]?.url || product.collection.image_public_id || null
+  }
 
   if (loading) {
     return (
@@ -125,11 +144,7 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
             <CollectionCard
               key={product.sku}
               sku={product.sku}
-              image={
-                product.images?.[0]?.url ||
-                product.collection.image_public_id ||
-                '/placeholder.png'
-              }
+              image={getPrimaryImage(product) || '/placeholder.png'}
               title={product.name}
               description={truncateText(product.description, 100)}
               badge={product.collection.name}

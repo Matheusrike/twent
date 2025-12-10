@@ -40,7 +40,7 @@ export default function CollectionIdSideBar({ sku }: { sku: string }) {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [sku]);
 
     const handleCardClick = (store: Store) => {
         setSelectedStore(store);
