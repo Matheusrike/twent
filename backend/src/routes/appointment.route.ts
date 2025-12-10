@@ -25,7 +25,6 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 				summary: 'Cria um novo agendamento',
 				body: CreateAppointmentSchema,
 				response: {
-					201: AppointmentResponseSchema,
 					404: AppointmentNotFoundSchema,
 					409: AppointmentConflictSchema,
 					500: ApiGenericErrorSchema,
