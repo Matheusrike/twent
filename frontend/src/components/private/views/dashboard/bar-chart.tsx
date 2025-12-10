@@ -3,87 +3,108 @@
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	CardDescription,
+} from '@/components/ui/card';
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import {
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+} from '@/components/ui/chart';
 
 export function ChartBarInteractive() {
-    const [chartData, setChartData] = useState([]);
+	const [chartData, setChartData] = useState([]);
 
-    // -------------------------------
-    // 1 - Busca da API
-    // -------------------------------
-    async function loadData() {
-        try {
-            const res = await fetch('http://localhost:3333/api/financial-transaction?page=1&limit=200', {
-                method: 'GET',
-                credentials: 'include',
-            });
-            const json = await res.json();
-            
-            console.log(json)
-            if (!json.success) return;
+	// -------------------------------
+	// 1 - Busca da API
+	// -------------------------------
+	async function loadData() {
+		try {
+			const res = await fetch(
+				'/response/api/financial-transaction?page=1&limit=200',
+				{
+					method: 'GET',
+					credentials: 'include',
+				}
+			);
+			const json = await res.json();
 
-            const transactions = json.data.transactions;
+			console.log(json);
+			if (!json.success) return;
 
-            // -------------------------------
-            // 2 - Agrupar por data somando os amounts
-            // -------------------------------
-            const grouped: Record<string, number> = {};
+			const transactions = json.data.transactions;
 
-            transactions.forEach((t: any) => {
-                const d = t.transaction_date.split('T')[0]; // yyyy-mm-dd
-                const value = Number(t.amount);
+			// -------------------------------
+			// 2 - Agrupar por data somando os amounts
+			// -------------------------------
+			const grouped: Record<string, number> = {};
 
-                if (!grouped[d]) grouped[d] = 0;
-                grouped[d] += value;
-            });
+			transactions.forEach((t: any) => {
+				const d = t.transaction_date.split('T')[0]; // yyyy-mm-dd
+				const value = Number(t.amount);
 
-            // -------------------------------
-            // 3 - Transformar no formato do Recharts
-            // -------------------------------
-            const finalData = Object.entries(grouped).map(([date, amount]) => ({
-                date,
-                total: amount,
-            }));
+				if (!grouped[d]) grouped[d] = 0;
+				grouped[d] += value;
+			});
 
-            setChartData(finalData as any);
-        } catch (err) {
-            console.error('Erro ao carregar transações:', err);
-        }
-    }
+			// -------------------------------
+			// 3 - Transformar no formato do Recharts
+			// -------------------------------
+			const finalData = Object.entries(grouped).map(([date, amount]) => ({
+				date,
+				total: amount,
+			}));
 
-    useEffect(() => {
-        loadData();
-    }, []);
+			setChartData(finalData as any);
+		} catch (err) {
+			console.error('Erro ao carregar transações:', err);
+		}
+	}
 
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Transações Financeiras</CardTitle>
-                <CardDescription>Total por dia</CardDescription>
-            </CardHeader>
+	useEffect(() => {
+		loadData();
+	}, []);
 
-            <CardContent>
-                <ChartContainer
-                    config={{
-                        total: {
-                            label: 'Total',
-                            color: 'hsl(var(--chart-1))',
-                        },
-                    }}
-                    className="h-[350px]"
-                >
-                    <BarChart data={chartData}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Transações Financeiras</CardTitle>
+				<CardDescription>Total por dia</CardDescription>
+			</CardHeader>
 
-                        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+			<CardContent>
+				<ChartContainer
+					config={{
+						total: {
+							label: 'Total',
+							color: 'hsl(var(--chart-1))',
+						},
+					}}
+					className="h-[350px]"
+				>
+					<BarChart data={chartData}>
+						<CartesianGrid vertical={false} />
+						<XAxis
+							dataKey="date"
+							tickLine={false}
+							axisLine={false}
+							fontSize={12}
+						/>
 
-                        <Bar dataKey="total" radius={4} fill='red' />
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
-    );
+						<ChartTooltip
+							cursor={false}
+							content={<ChartTooltipContent />}
+						/>
+
+						<Bar dataKey="total" radius={4} fill="red" />
+					</BarChart>
+				</ChartContainer>
+			</CardContent>
+		</Card>
+	);
 }
