@@ -157,7 +157,7 @@ export class ProductService {
 			},
 		});
 
-		if (!product || product.images.length === 0) {
+		if (!product) {
 			throw new AppError({
 				message: 'Product not found',
 				errorCode: 'PRODUCT_NOT_FOUND',
