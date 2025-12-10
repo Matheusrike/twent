@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from "next/image"
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/web/Global/ui/button"
 import { formatCurrency } from "@/utils/functions/formatCurrency"
@@ -42,9 +42,10 @@ interface Product {
   images: Array<{ url?: string; public_id?: string; is_primary?: boolean }>
 }
 
-export default function CollectionIdHero({ params }: { params: { id: string } }) {
+export default function CollectionIdHero() {
   const router = useRouter()
-  const sku = params.id
+  const params = useParams()
+  const sku = params?.id as string
 
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
@@ -55,6 +56,13 @@ export default function CollectionIdHero({ params }: { params: { id: string } })
   const [mobileCurrent, setMobileCurrent] = useState(0)
 
   useEffect(() => {
+    // Verifica se o SKU está disponível antes de fazer a requisição
+    if (!sku) {
+      console.error('SKU não encontrado nos parâmetros')
+      notFound()
+      return
+    }
+
     async function fetchProduct() {
       try {
         const response = await fetch(`/response/api/product/public/${sku}`, {
