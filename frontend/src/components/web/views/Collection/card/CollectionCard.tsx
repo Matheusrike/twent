@@ -40,7 +40,7 @@ export default function CollectionCard({
           ease: 'easeOut',
           delay: index * 0.1
         }} 
-        className='relative max-w-md rounded-xl bg-black pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1'
+        className='relative max-w-md rounded-xl bg-gray-200 dark:bg-black pt-0 shadow-lg duration-500 overflow-hidden hover:shadow-xl hover:-translate-y-1'
       >
 
      <div className='relative h-60 w-full overflow-hidden'>
