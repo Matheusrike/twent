@@ -52,8 +52,8 @@ export class FinancialTransactionService {
 			const transaction = await this.database.financialTransaction.create(
 				{
 					data: {
-						store_id: data.store_id,
-						supplier_id: data.supplier_id,
+						store_id: data.store_id || user!.storeId!,
+						supplier_id: data.supplier_id || undefined,
 						type: data.type as TransactionType,
 						category: data.category,
 						amount: new Prisma.Decimal(data.amount),
