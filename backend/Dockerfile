@@ -23,5 +23,3 @@ COPY . .
 RUN pnpm build
 
 EXPOSE 3333
-
-CMD ["pnpm", "start"]
