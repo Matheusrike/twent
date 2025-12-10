@@ -11,7 +11,8 @@ const Hero = () => {
         relative w-full h-screen 
         flex items-end md:items-center
         bg-[url('/img/web/home/bannerMobile.webp')] 
-        md:bg-[url('/img/web/home/banner.png')] 
+    md:bg-[url('/img/web/home/bannerWhite.png')] 
+        dark:md:bg-[url('/img/web/home/banner.png')] 
         bg-cover bg-center bg-no-repeat
         overflow-hidden
       "
