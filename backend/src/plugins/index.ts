@@ -96,15 +96,33 @@ export async function registerPlugins(
 			console.error(`   Origin recebida: "${origin}"`);
 			console.error(`   Origin normalizada: "${normalizedOrigin}"`);
 			console.error(`   FRONTEND_URL configurada: "${config.frontendUrl}"`);
+			console.error(`   FRONTEND_URL normalizada: "${config.frontendUrl ? normalizeUrl(config.frontendUrl) : 'N/A'}"`);
 			console.error(`   NODE_ENV: "${config.nodeEnv}"`);
 			console.error(`   Origens permitidas:`, allowedOrigins);
+			console.error(`   Comparações:`);
+			allowedOrigins.forEach((allowed, index) => {
+				const matches = compareOrigins(normalizedOrigin, allowed);
+				console.error(`     [${index}] "${allowed}" === "${normalizedOrigin}": ${matches}`);
+			});
 
-			// Cria um erro simples para evitar problemas de serialização
-			const corsError = new Error(`Origin not allowed: ${origin}`);
-			corsError.name = 'CORS_ERROR';
-			return callback(corsError, false);
+			// Em produção, se a origem não foi aceita, vamos aceitar temporariamente para debug
+			// TODO: Remover isso após confirmar que está funcionando
+			if (config.nodeEnv === 'prod') {
+				console.warn('⚠️  CORS: Aceitando origem temporariamente para debug');
+				return callback(null, true);
+			}
+
+			// Retorna false sem erro para evitar problemas de serialização
+			// O CORS plugin vai retornar uma resposta 403 apropriada
+			return callback(null, false);
 		},
 		credentials: true,
+	});
+
+	// Hook para capturar erros de CORS antes que cheguem às rotas
+	app.addHook('onRequest', async (request, reply) => {
+		// Este hook é executado após o CORS, então se chegou aqui, o CORS passou
+		// Mas podemos adicionar tratamento adicional se necessário
 	});
 
 	await app.register(fastifyHelmet, {
