@@ -150,12 +150,15 @@ export default function Login() {
       const res = await fetch("/response/api/password-recovery/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, ...data }),
+        body: JSON.stringify({ token, password: data.password, password_confirmation: data.password_confirmation }),
       });
 
       if (res.ok) {
         setStep("success");
-        router.replace("/login");
+        setEmailSentTo("");
+        setTimeout(() => {
+          closeDialog();
+        }, 2000);
       } else {
         const err = await res.json().catch(() => ({}));
         resetForm.setError("root", { message: err.message || "Erro ao redefinir senha" });
@@ -170,9 +173,13 @@ export default function Login() {
   const closeDialog = () => {
     setDialogOpen(false);
     setStep("request");
+    setEmailSentTo("");
     forgotForm.reset();
     resetForm.reset();
     loginForm.clearErrors();
+    if (token) {
+      router.replace("/login");
+    }
   };
 
   return (
@@ -351,7 +358,6 @@ export default function Login() {
                       <FormLabel>E-mail</FormLabel>
                       <FormControl>
                         <div className="relative pt-2">
-                        
                           <Input type="email" placeholder="seu@email.com" className="" disabled={isLoading} {...field} />
                         </div>
                       </FormControl>
