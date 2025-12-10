@@ -57,7 +57,6 @@ export class FinancialTransactionController {
 
 	async findAll(request: FastifyRequest) {
 		try {
-			const user = request.user as IJwtAuthPayload;
 			const query = request.query as QueryParams;
 
 			const pagination: IPaginationParams = {
@@ -83,7 +82,6 @@ export class FinancialTransactionController {
 			};
 
 			const result = await this.financialTransactionService.findAll(
-				user,
 				filters,
 				pagination,
 			);

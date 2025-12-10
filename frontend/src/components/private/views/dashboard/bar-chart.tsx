@@ -26,7 +26,7 @@ export function ChartBarInteractive() {
 	async function loadData() {
 		try {
 			const res = await fetch(
-				'/response/api/financial-transaction?page=1&limit=200',
+				'/response/api/financial-transaction',
 				{
 					method: 'GET',
 					credentials: 'include',
@@ -34,7 +34,7 @@ export function ChartBarInteractive() {
 			);
 			const json = await res.json();
 
-			console.log(json);
+			console.log(json.data);
 			if (!json.success) return;
 
 			const transactions = json.data.transactions;

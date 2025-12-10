@@ -91,7 +91,6 @@ export class FinancialTransactionService {
 	}
 
 	async findAll(
-		user: IJwtAuthPayload,
 		filters?: IFinancialTransactionFilters,
 		pagination?: IPaginationParams,
 	) {
@@ -105,12 +104,6 @@ export class FinancialTransactionService {
 			const skip = (page - 1) * limit;
 
 			const where: Prisma.FinancialTransactionWhereInput = {};
-
-			if (user.storeId) {
-				where.store_id = user.storeId;
-			} else if (filters?.store_id) {
-				where.store_id = filters.store_id;
-			}
 
 			if (filters?.type) {
 				where.type = filters.type as TransactionType;
