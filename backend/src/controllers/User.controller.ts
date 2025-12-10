@@ -16,6 +16,7 @@ export class UserController {
 
 			return response;
 		} catch (error) {
+			console.log(error);
 			if (error instanceof AppError) {
 				switch (error.errorCode) {
 					case 'USER_NOT_FOUND':
@@ -65,6 +66,4 @@ export class UserController {
 			}
 		}
 	}
-
-	
 }
