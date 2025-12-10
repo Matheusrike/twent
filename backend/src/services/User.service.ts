@@ -89,7 +89,7 @@ export class UserService {
 				take: Number(take),
 				skip: Number(skip),
 				orderBy: { created_at: 'desc' },
-				where: {store_id: storeId, ...filters},
+				where: { store_id: storeId, ...filters },
 				select: {
 					id: true,
 					email: true,
@@ -193,6 +193,7 @@ export class UserService {
 
 			return user;
 		} catch (error) {
+			console.log(error);
 			throw new AppError({
 				message: error.message,
 				errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
