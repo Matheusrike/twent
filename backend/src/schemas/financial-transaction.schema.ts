@@ -15,7 +15,7 @@ export const createFinancialTransactionSchema = z.object({
 	store_id: z.uuid('ID da loja deve ser um UUID válido').meta({
 		description: 'ID da loja onde a transação ocorreu',
 		examples: ['a3bb88f5-1c4d-4e2b-9f3a-123456789abc'],
-	}),
+	}).optional(),
 
 	supplier_id: z
 		.uuid('ID do fornecedor deve ser um UUID válido')
