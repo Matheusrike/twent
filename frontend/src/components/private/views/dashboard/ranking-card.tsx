@@ -53,6 +53,7 @@ export default function SalesRankingCard() {
 		}
 
 		load();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const getRankIcon = (rank: number) => {

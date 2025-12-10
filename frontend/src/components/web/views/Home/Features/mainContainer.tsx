@@ -22,7 +22,7 @@ interface Product {
     name: string;
     image_public_id: string | null;
   };
-  images: Array<{ url: string }>;
+  images: Array<{ url: string; is_primary?: boolean }>;
 }
 
 interface MainContainerData {
@@ -173,25 +173,27 @@ const MainContainer: React.FC = () => {
           <>
             {/* Collection Preview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product, index) => (
-                <div
-                  key={product.sku}
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <CollectionCard
-                    sku={product.sku}
-                    image={
-                      product.images?.[0]?.url ||
-                      product.collection.image_public_id ||
-                      "/placeholder.png"
-                    }
-                    title={product.name}
-                    description={truncateText(product.description, 100)}
-                    badge={product.collection.name}
-                  />
-                </div>
-              ))}
+              {products.map((product, index) => {
+                // Busca a imagem principal ou usa a primeira disponível
+                const primaryImage = product.images?.find(img => img.is_primary === true)
+                const imageUrl = primaryImage?.url || product.images?.[0]?.url || product.collection.image_public_id || "/placeholder.png"
+                
+                return (
+                  <div
+                    key={product.sku}
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <CollectionCard
+                      sku={product.sku}
+                      image={imageUrl}
+                      title={product.name}
+                      description={truncateText(product.description, 100)}
+                      badge={product.collection.name}
+                    />
+                  </div>
+                )
+              })}
             </div>
 
             {products.length === 0 && (

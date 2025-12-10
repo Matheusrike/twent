@@ -327,11 +327,13 @@ export function TeamTable() {
         onCreated={handleEmployeeCreated}
       />
 
-      <EmployeeViewModal
-        open={isViewModalOpen}
-        onOpenChange={setIsViewModalOpen}
-        employeeId={selectedEmployeeId}
-      />
+      {selectedEmployeeId && (
+        <EmployeeViewModal
+          open={isViewModalOpen}
+          onOpenChange={setIsViewModalOpen}
+          employeeId={selectedEmployeeId}
+        />
+      )}
     </div>
   );
 }

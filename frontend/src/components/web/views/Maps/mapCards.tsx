@@ -16,7 +16,7 @@ export default function StoresList({ data, onStoreClick }: StoresListProps) {
       setSelectedId(data[0].id);
       if (onStoreClick) onStoreClick(data[0]); 
     }
-  }, [data]);
+  }, [data, onStoreClick]);
 
   const handleCardClick = (store: any) => {
     setSelectedId(store.id);

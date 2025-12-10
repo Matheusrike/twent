@@ -222,7 +222,7 @@ export default function VisualizationModal({ open, onOpenChange, onSuccess, stor
 
                 const sliced = onlyNumbers.slice(0, maxLength);
 
-                let formatted = '+' + sliced;
+                const formatted = '+' + sliced;
 
                 setForm((prev) => ({ ...prev, [key]: formatted }));
                 return;
