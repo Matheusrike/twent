@@ -54,8 +54,6 @@ export class EmailService {
                     errorCode: 'INTERNAL_SERVER_ERROR',
                 })
             }
-
-			console.log(`Password reset email sent to: ${to}`);
 		} catch (error) {
 			console.error('Error sending password reset email:', error);
 			throw new AppError({
