@@ -331,6 +331,7 @@ export function TeamTable() {
         <EmployeeViewModal
           open={isViewModalOpen}
           onOpenChange={setIsViewModalOpen}
+          onSuccess={handleEmployeeCreated}
           employeeId={selectedEmployeeId}
         />
       )}

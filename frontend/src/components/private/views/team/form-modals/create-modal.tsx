@@ -162,7 +162,7 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
             return;
         }
 
-        // NATIONAL ID (CNPJ / EIN / RUT)
+        // NATIONAL ID
         if (key === 'national_id') {
             const country = form.country;
             let cleaned: string;
@@ -246,7 +246,7 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                     city: form.city || null,
                     state: form.state || null,
                     zip_code: form.zip_code.replace(/\D/g, '') || null,
-                    country: form.country || 'Brasil',
+                    country: form.country,
                     is_active: true,
                     national_id: cleanedNational || null,
                     department: form.department || null,
@@ -423,7 +423,6 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                     />
                                 </div>
 
-                                {/* NOVO CAMPO — NATIONAL ID */}
                                 <div className="space-y-2">
                                     <Label className="flex items-center gap-2">
                                         <CreditCard className="h-3.5 w-3.5" /> National ID
@@ -443,6 +442,47 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                 <MapPin className="h-4 w-4" />
                                 <span>Endereço</span>
                                 <div className="h-px flex-1 bg-border/50" />
+                            </div>
+
+                            {/* PAÍS */}
+                            <div className="space-y-2">
+                                <Label>País</Label>
+                                <select
+                                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                    value={form.country}
+                                    onChange={(e) => handleChange('country', e.target.value)}
+                                >
+                                    <option value="BR">Brasil</option>
+                                    <option value="US">Estados Unidos</option>
+                                    <option value="CL">Chile</option>
+                                    <option value="AR">Argentina</option>
+                                    <option value="MX">México</option>
+                                    <option value="CA">Canadá</option>
+                                    <option value="GB">Reino Unido</option>
+                                    <option value="DE">Alemanha</option>
+                                    <option value="FR">França</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="JP">Japão</option>
+                                    <option value="AU">Austrália</option>
+                                    <option value="ES">Espanha</option>
+                                    <option value="IT">Itália</option>
+                                    <option value="ZA">África do Sul</option>
+                                    <option value="CN">China</option>
+                                    <option value="KR">Coreia do Sul</option>
+                                    <option value="IN">Índia</option>
+                                    <option value="RU">Rússia</option>
+                                    <option value="NL">Holanda</option>
+                                    <option value="SE">Suécia</option>
+                                    <option value="NO">Noruega</option>
+                                    <option value="DK">Dinamarca</option>
+                                    <option value="FI">Finlândia</option>
+                                    <option value="NZ">Nova Zelândia</option>
+                                    <option value="IE">Irlanda</option>
+                                    <option value="CH">Suíça</option>
+                                    <option value="BE">Bélgica</option>
+                                    <option value="AT">Áustria</option>
+                                    <option value="PL">Polônia</option>
+                                </select>
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
