@@ -113,7 +113,7 @@ export default function CollectionIdHero({ params }: { params: { id: string } })
         return finalUrl ? { url: finalUrl } : null;
       })
       .filter(Boolean)
-      .slice(1, 3) as Array<{ url: string }>;
+      .slice(0, 3) as Array<{ url: string }>;
   
     if (normalized.length > 0) return normalized;
   

@@ -10,7 +10,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Edit2, Trash2, Plus, Check, ChevronsUpDown } from "lucide-react";
+import {
+  ArrowUpDown,
+  MoreHorizontal,
+  Edit2,
+  Plus,
+  Minus,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -76,6 +86,7 @@ export default function InventoryTable() {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
+  // Modais originais
   const [addModalOpen, setAddModalOpen] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [editingItem, setEditingItem] = React.useState<InventoryItem | null>(null);
@@ -86,8 +97,15 @@ export default function InventoryTable() {
   const [editQuantity, setEditQuantity] = React.useState("");
   const [editMinimum, setEditMinimum] = React.useState("");
 
+  // Modal + / -
+  const [adjustOpen, setAdjustOpen] = React.useState(false);
+  const [adjustItem, setAdjustItem] = React.useState<InventoryItem | null>(null);
+  const [isAdding, setIsAdding] = React.useState(true);
+  const [adjustAmount, setAdjustAmount] = React.useState("");
+  const [adjusting, setAdjusting] = React.useState(false);
+
   // ===============================================
-  // LOAD DATA
+  // CARREGAR DADOS
   // ===============================================
   const loadData = React.useCallback(async () => {
     try {
@@ -119,7 +137,7 @@ export default function InventoryTable() {
   }, [loadData]);
 
   // ===============================================
-  // ADD PRODUCT
+  // ADICIONAR PRODUTO
   // ===============================================
   const handleAddProduct = async () => {
     if (!selectedProduct || !addQuantity) return;
@@ -142,6 +160,8 @@ export default function InventoryTable() {
         setSelectedProduct(null);
         setAddQuantity("");
         setAddMinimum("");
+      } else {
+        alert("Erro ao adicionar produto");
       }
     } catch (err) {
       alert("Erro ao adicionar produto");
@@ -149,12 +169,12 @@ export default function InventoryTable() {
   };
 
   // ===============================================
-  // EDIT PRODUCT
+  // EDITAR ESTOQUE TOTAL
   // ===============================================
   const openEditModal = (item: InventoryItem) => {
     setEditingItem(item);
     setEditQuantity(String(item.quantity));
-    setEditMinimum(String(item.minimum_stock));
+    setEditMinimum(String(item.minimum_stock ? String(item.minimum_stock) : ""))
     setEditModalOpen(true);
   };
 
@@ -169,13 +189,18 @@ export default function InventoryTable() {
         body: JSON.stringify({
           inventory_id: editingItem.id,
           quantity: Number(editQuantity),
-          minimum_stock: Number(editMinimum),
+          minimum_stock: Number(editMinimum || 0),
         }),
       });
 
       if (res.ok) {
         loadData();
         setEditModalOpen(false);
+        setEditingItem(null);
+        setEditQuantity("");
+        setEditMinimum("");
+      } else {
+        alert("Erro ao salvar alterações");
       }
     } catch (err) {
       alert("Erro ao salvar");
@@ -183,30 +208,55 @@ export default function InventoryTable() {
   };
 
   // ===============================================
-  // REMOVE PRODUCT
+  // + ADICIONAR / - REMOVER UNIDADES
   // ===============================================
-  const handleRemove = async (id: string) => {
-    if (!confirm("Remover este produto do estoque?")) return;
+  const openAdjustModal = (item: InventoryItem, adding: boolean) => {
+    setAdjustItem(item);
+    setIsAdding(adding);
+    setAdjustAmount("");
+    setAdjustOpen(true);
+  };
 
-    await fetch(`/response/api/inventory/remove/${id}`, {
-      method: "DELETE",
+  const handleAdjust = async () => {
+    if (!adjustItem || !adjustAmount || Number(adjustAmount) <= 0) return;
+
+    setAdjusting(true);
+    const qty = Number(adjustAmount);
+
+    const endpoint = isAdding
+      ? `/response/api/inventory/add/${adjustItem.id}`
+      : `/response/api/inventory/remove/${adjustItem.id}`;
+
+    fetch(endpoint, {
+      method: "PATCH",
       credentials: "include",
-    });
-
-    loadData();
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quantity: qty }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          loadData();
+          setAdjustOpen(false);
+          setAdjustAmount("");
+        } else {
+          alert("Erro ao ajustar estoque");
+        }
+      })
+      .catch(() => alert("Erro de conexão"))
+      .finally(() => setAdjusting(false));
   };
 
   // ===============================================
-  // STOCK LEVEL BADGES
+  // NÍVEL DE ESTOQUE
   // ===============================================
   const getStockLevel = (quantity: number, minimum: number) => {
-    if (quantity === 0) return { label: "Baixo", variant: "destructive" };
-    if (quantity < minimum) return { label: "Médio", variant: "secondary" };
-    return { label: "Alto", variant: "default" };
+    if (quantity === 0) return { label: "Esgotado", variant: "destructive" };
+    if (quantity < minimum) return { label: "Baixo", variant: "secondary" };
+    return { label: "OK", variant: "default" };
   };
 
   // ===============================================
-  // TABLE COLUMNS
+  // COLUNAS
   // ===============================================
   const columns: ColumnDef<InventoryItem>[] = [
     {
@@ -243,9 +293,7 @@ export default function InventoryTable() {
       id: "stockLevel",
       header: "Nível",
       cell: ({ row }) => {
-        const { quantity, minimum_stock } = row.original;
-        const { label, variant } = getStockLevel(quantity, minimum_stock);
-
+        const { label, variant } = getStockLevel(row.original.quantity, row.original.minimum_stock);
         return (
           <div className="flex justify-center">
             <Badge variant={variant as any} className="w-20 justify-center">
@@ -261,36 +309,49 @@ export default function InventoryTable() {
         const item = row.original;
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.product.sku)}>
-                Copiar SKU
-              </DropdownMenuItem>
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8"
+              onClick={() => openAdjustModal(item, false)}
+              title="Remover unidades"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
 
-              <DropdownMenuItem onClick={() => openEditModal(item)}>
-                <Edit2 className="h-4 w-4 mr-2" /> Editar
-              </DropdownMenuItem>
+            <Button
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => openAdjustModal(item, true)}
+              title="Adicionar unidades"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
 
-              {/* <DropdownMenuItem className="text-red-600" onClick={() => handleRemove(item.id)}>
-                <Trash2 className="h-4 w-4 mr-2" /> Remover
-              </DropdownMenuItem> */}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.product.sku)}>
+                  Copiar SKU
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => openEditModal(item)}>
+                  <Edit2 className="h-4 w-4 mr-2" /> Editar estoque total
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
     },
   ];
 
-  // ===============================================
-  // TABLE INSTANCE + PAGINATION STATE
-  // ===============================================
   const table = useReactTable({
     data: items,
     columns,
@@ -308,9 +369,6 @@ export default function InventoryTable() {
   const currentPage = table.getState().pagination.pageIndex + 1;
   const totalPages = table.getPageCount();
 
-  // ===============================================
-  // RENDER
-  // ===============================================
   return (
     <>
       <div className="w-full space-y-6">
@@ -347,6 +405,7 @@ export default function InventoryTable() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-32 text-center">
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin" />
                     Carregando...
                   </TableCell>
                 </TableRow>
@@ -371,7 +430,6 @@ export default function InventoryTable() {
           </Table>
         </div>
 
-        {/* PAGINAÇÃO CORRIGIDA */}
         <div className="flex items-center justify-end gap-3">
           <Button
             variant="outline"
@@ -381,11 +439,9 @@ export default function InventoryTable() {
           >
             Anterior
           </Button>
-
           <span className="text-sm text-muted-foreground">
             Página {currentPage} de {totalPages}
           </span>
-
           <Button
             variant="outline"
             size="sm"
@@ -397,17 +453,15 @@ export default function InventoryTable() {
         </div>
       </div>
 
-      {/* ADD MODAL */}
+      {/* Modal Adicionar Produto */}
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Adicionar Produto ao Estoque</DialogTitle>
           </DialogHeader>
-
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label>Produto</Label>
-
               <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
                 <PopoverTrigger asChild>
                   <Button
@@ -419,16 +473,13 @@ export default function InventoryTable() {
                     {selectedProduct
                       ? `${selectedProduct.sku} - ${selectedProduct.name}`
                       : "Selecione um produto..."}
-
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-
                 <PopoverContent className="w-full p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Buscar produto..." />
                     <CommandEmpty>Nenhum produto encontrado.</CommandEmpty>
-
                     <CommandGroup className="max-h-64 overflow-auto">
                       {availableProducts.map((product) => (
                         <CommandItem
@@ -444,7 +495,6 @@ export default function InventoryTable() {
                               selectedProduct?.id === product.id ? "opacity-100" : "opacity-0"
                             )}
                           />
-
                           <span className="font-medium">{product.sku}</span> - {product.name}
                         </CommandItem>
                       ))}
@@ -465,7 +515,6 @@ export default function InventoryTable() {
                   onChange={(e) => setAddQuantity(e.target.value)}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label>Estoque Mínimo</Label>
                 <Input
@@ -483,15 +532,17 @@ export default function InventoryTable() {
             <Button variant="outline" onClick={() => setAddModalOpen(false)}>
               Cancelar
             </Button>
-
-            <Button onClick={handleAddProduct} disabled={!selectedProduct || !addQuantity}>
+            <Button
+              onClick={handleAddProduct}
+              disabled={!selectedProduct || !addQuantity}
+            >
               Adicionar ao Estoque
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* EDIT MODAL */}
+      {/* Modal Editar Estoque Total */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -514,7 +565,6 @@ export default function InventoryTable() {
                     onChange={(e) => setEditQuantity(e.target.value)}
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label>Estoque Mínimo</Label>
                   <Input
@@ -533,6 +583,69 @@ export default function InventoryTable() {
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal + Adicionar / - Remover unidades */}
+      <Dialog open={adjustOpen} onOpenChange={setAdjustOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {isAdding ? "Adicionar" : "Remover"} unidades
+            </DialogTitle>
+          </DialogHeader>
+
+          {adjustItem && (
+            <div className="space-y-5 py-4">
+              <div className="text-sm space-y-1 text-muted-foreground">
+                <div><strong>SKU:</strong> {adjustItem.product.sku}</div>
+                <div><strong>Produto:</strong> {adjustItem.product.name}</div>
+                <div><strong>Estoque atual:</strong> {adjustItem.quantity}</div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Quantidade a {isAdding ? "adicionar" : "remover"}</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={adjustAmount}
+                  onChange={(e) => setAdjustAmount(e.target.value)}
+                  placeholder="Ex: 10"
+                  autoFocus
+                />
+              </div>
+
+              <div className="text-sm font-medium">
+                Novo estoque:{" "}
+                <strong>
+                  {isAdding
+                    ? adjustItem.quantity + Number(adjustAmount || 0)
+                    : adjustItem.quantity - Number(adjustAmount || 0)}
+                </strong>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAdjustOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleAdjust}
+              disabled={adjusting || !adjustAmount || Number(adjustAmount) <= 0}
+            >
+              {adjusting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processando...
+                </>
+              ) : isAdding ? (
+                "Adicionar"
+              ) : (
+                "Remover"
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
