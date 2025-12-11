@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Building2, Mail, Phone, MapPin, Clock, Globe, Power, PowerOff } from 'lucide-react';
+import { AlertCircle, Building2, Mail, Phone, MapPin, Clock, Globe } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface OpeningHour {
@@ -65,7 +65,6 @@ export default function VisualizationModal({ open, onOpenChange, onSuccess, stor
     const [error, setError] = React.useState('');
     const [loading, setLoading] = React.useState(false);
     const [initialLoading, setInitialLoading] = React.useState(false);
-    const [toggleLoading, setToggleLoading] = React.useState(false);
 
     const isEditing = !!storeId;
     const modalTitle = isEditing ? 'Editar Filial' : 'Nova Filial';
@@ -316,36 +315,6 @@ export default function VisualizationModal({ open, onOpenChange, onSuccess, stor
         setForm((prev) => ({ ...prev, opening_hours: updated }));
     };
 
-    const handleToggleActive = async () => {
-        if (!storeId) return;
-
-        setToggleLoading(true);
-        setError('');
-
-        try {
-            const action = form.is_active ? 'deactivate' : 'activate';
-            const response = await fetch(`/response/api/store/${storeId}/${action}`, {
-                method: 'PATCH',
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                const data = await response.json().catch(() => null);
-                throw new Error(
-                    (data && (data.message || data.error)) ||
-                        `Erro ao ${action === 'activate' ? 'ativar' : 'desativar'} filial`
-                );
-            }
-
-            setForm((prev) => ({ ...prev, is_active: !prev.is_active }));
-
-            if (onSuccess) onSuccess();
-        } catch (err: any) {
-            setError(err?.message ?? 'Erro ao alterar status da filial');
-        } finally {
-            setToggleLoading(false);
-        }
-    };
 
     const handleSubmit = async () => {
         setError('');
@@ -355,8 +324,9 @@ export default function VisualizationModal({ open, onOpenChange, onSuccess, stor
             const lat = form.latitude !== '' ? Number(form.latitude) : null;
             const lon = form.longitude !== '' ? Number(form.longitude) : null;
 
+            const { is_active, ...formData } = form;
             const payload: any = {
-                ...form,
+                ...formData,
                 latitude: lat,
                 longitude: lon,
                 phone: toE164(form.phone, form.country), // ← AQUI o backend para de reclamar
@@ -707,63 +677,29 @@ export default function VisualizationModal({ open, onOpenChange, onSuccess, stor
                     </div>
                 </div>
 
-                <div className="p-2 border-t bg-muted/30 backdrop-blur-sm flex justify-between gap-3">
-                    <div>
-                        {isEditing && (
-                            <Button
-                                variant={form.is_active ? 'destructive' : 'default'}
-                                onClick={handleToggleActive}
-                                disabled={loading || initialLoading || toggleLoading}
-                                className="px-6 h-11"
-                            >
-                                {toggleLoading ? (
-                                    <span className="flex items-center gap-2">
-                                        <span className="animate-spin">⏳</span>
-                                        Processando...
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-2">
-                                        {form.is_active ? (
-                                            <>
-                                                <PowerOff className="h-4 w-4" />
-                                                Desativar
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Power className="h-4 w-4" />
-                                                Ativar
-                                            </>
-                                        )}
-                                    </span>
-                                )}
-                            </Button>
+                <div className="p-2 border-t bg-muted/30 backdrop-blur-sm flex justify-end gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => onOpenChange(false)}
+                        disabled={loading || initialLoading}
+                        className="px-8 h-11 hover:bg-background"
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={loading || initialLoading}
+                        className="px-8 h-11 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
+                    >
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span>
+                                {isEditing ? 'Salvando...' : 'Criando...'}
+                            </span>
+                        ) : (
+                            submitButtonText
                         )}
-                    </div>
-
-                    <div className="flex gap-3">
-                        <Button
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                            disabled={loading || initialLoading || toggleLoading}
-                            className="px-8 h-11 hover:bg-background"
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            disabled={loading || initialLoading || toggleLoading}
-                            className="px-8 h-11 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
-                        >
-                            {loading ? (
-                                <span className="flex items-center gap-2">
-                                    <span className="animate-spin">⏳</span>
-                                    {isEditing ? 'Salvando...' : 'Criando...'}
-                                </span>
-                            ) : (
-                                submitButtonText
-                            )}
-                        </Button>
-                    </div>
+                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

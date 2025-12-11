@@ -87,9 +87,7 @@ export function appointmentConfirmationEmailTemplate(
                                 <p style="margin: 0 0 8px 0; color: #2C5282; font-size: 14px; font-weight: 600;">
                                     Observações:
                                 </p>
-                                <p style="margin: 0; color: #2C5282; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">
-                                    ${notes}
-                                </p>
+                                <p style="margin: 0; color: #2C5282; font-size: 14px; line-height: 1.6; text-align: left;">${notes}</p>
                             </div>
                             ` : ''}
                             

@@ -18,6 +18,9 @@ export default function PaginationWithIcon({ currentPage, totalPages, onPageChan
   const end = Math.min(totalPages, currentPage + 2);
   for (let p = start; p <= end; p++) pages.push(p);
 
+  const canGoPrev = currentPage > 1;
+  const canGoNext = currentPage < totalPages;
+
   return (
     <Pagination className="py-8">
       <PaginationContent>
@@ -28,8 +31,11 @@ export default function PaginationWithIcon({ currentPage, totalPages, onPageChan
             size="icon"
             onClick={(e) => {
               e.preventDefault();
-              onPageChange(currentPage - 1);
+              if (canGoPrev) {
+                onPageChange(currentPage - 1);
+              }
             }}
+            className={!canGoPrev ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}
           >
             <ChevronsLeft className="h-4 w-4" />
           </PaginationLink>
@@ -85,8 +91,11 @@ export default function PaginationWithIcon({ currentPage, totalPages, onPageChan
             size="icon"
             onClick={(e) => {
               e.preventDefault();
-              onPageChange(currentPage + 1);
+              if (canGoNext) {
+                onPageChange(currentPage + 1);
+              }
             }}
+            className={!canGoNext ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}
           >
             <ChevronsRight className="h-4 w-4" />
           </PaginationLink>

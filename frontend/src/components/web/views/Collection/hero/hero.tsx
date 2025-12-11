@@ -33,18 +33,45 @@ export default function CollectionHero({ searchQuery, selectedCategories = [], s
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalProducts, setTotalProducts] = useState(0)
   const ITEMS_PER_PAGE = 9
+
+  // Verifica se há filtros ativos
+  const hasFilters = searchQuery.trim().length > 0 || selectedCategories.length > 0 || selectedPrices.length > 0
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch('/response/api/product/public?limit=1000')
-        const result = await response.json()
-        
-        if (result.success) {
-          setProducts(result.data.products)
+        setLoading(true)
+        setError(null)
+
+        // Se há filtros, busca todos os produtos para filtrar no cliente
+        // Caso contrário, usa paginação do servidor
+        if (hasFilters) {
+          // Busca todos os produtos quando há filtros
+          const response = await fetch('/response/api/product/public?limit=10000')
+          const result = await response.json()
+          
+          if (result.success) {
+            setProducts(result.data.products || [])
+            setTotalProducts(result.data.products?.length || 0)
+          } else {
+            setError('Falha ao carregar produtos')
+          }
         } else {
-          setError('Falha ao carregar produtos')
+          // Usa paginação do servidor quando não há filtros
+          const response = await fetch(`/response/api/product/public?limit=${ITEMS_PER_PAGE}&page=${currentPage}`)
+          const result = await response.json()
+          
+          if (result.success) {
+            setProducts(result.data.products || [])
+            const pagination = result.data.pagination || {}
+            setTotalPages(pagination.totalPages || 1)
+            setTotalProducts(pagination.total || 0)
+          } else {
+            setError('Falha ao carregar produtos')
+          }
         }
       } catch (error) {
         console.error('Erro ao buscar produtos:', error)
@@ -55,32 +82,26 @@ export default function CollectionHero({ searchQuery, selectedCategories = [], s
     }
 
     fetchProducts()
-  }, [])
+  }, [currentPage, searchQuery, selectedCategories, selectedPrices])
 
-function checkPriceRange(priceStr: string, ranges: string[]): boolean {
-  if (!ranges.length) return true
-  const price = parseInt(String(priceStr).replace(/\D/g, ""))
-  return ranges.some(range => {
-    if (/^\d+-\d+$/.test(range)) {
-      const [minStr, maxStr] = range.split("-")
-      const min = parseInt(minStr)
-      const max = parseInt(maxStr)
-      if (!isNaN(min) && !isNaN(max)) return price >= min && price <= max
-    }
-    if (range === "50.000 - 100.000") return price >= 50000 && price <= 100000
-    if (range === "100.000 - 200.000") return price >= 100000 && price <= 200000
-    if (range === "200.000 - 500.000") return price >= 200000 && price <= 500000
-    if (range === "500.000+") return price >= 500000
-    return false
-  })
-}
-
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = !searchQuery.trim() || product.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-    const matchesCategory = !selectedCategories.length || selectedCategories.some(cat => cat.toLowerCase().trim() === product.collection.name.toLowerCase().trim())
-    const matchesPrice = checkPriceRange(product.price, selectedPrices)
-    return matchesSearch && matchesCategory && matchesPrice
-  })
+  // Função para verificar se o preço está na faixa selecionada
+  const checkPriceRange = (priceStr: string, ranges: string[]): boolean => {
+    if (!ranges.length) return true
+    const price = parseInt(String(priceStr).replace(/\D/g, ""))
+    return ranges.some(range => {
+      if (/^\d+-\d+$/.test(range)) {
+        const [minStr, maxStr] = range.split("-")
+        const min = parseInt(minStr)
+        const max = parseInt(maxStr)
+        if (!isNaN(min) && !isNaN(max)) return price >= min && price <= max
+      }
+      if (range === "50.000 - 100.000") return price >= 50000 && price <= 100000
+      if (range === "100.000 - 200.000") return price >= 100000 && price <= 200000
+      if (range === "200.000 - 500.000") return price >= 200000 && price <= 500000
+      if (range === "500.000+") return price >= 500000
+      return false
+    })
+  }
 
   const categoriesKey = selectedCategories.join(',');
   const pricesKey = selectedPrices.join(',');
@@ -89,10 +110,36 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
     setCurrentPage(1)
   }, [searchQuery, categoriesKey, pricesKey])
 
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE))
-  const start = (currentPage - 1) * ITEMS_PER_PAGE
-  const end = start + ITEMS_PER_PAGE
-  const pagedProducts = filteredProducts.slice(start, end)
+  // Scroll para o topo quando a página mudar
+  useEffect(() => {
+    const filtersSection = document.getElementById('filters');
+    if (filtersSection) {
+      filtersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage])
+
+  // Aplica filtros nos produtos
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = !searchQuery.trim() || product.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+    const matchesCategory = !selectedCategories.length || selectedCategories.some(cat => cat.toLowerCase().trim() === product.collection.name.toLowerCase().trim())
+    const matchesPrice = checkPriceRange(product.price, selectedPrices)
+    return matchesSearch && matchesCategory && matchesPrice
+  })
+
+  // Calcula paginação baseada em se há filtros ou não
+  let finalTotalPages = totalPages
+  let pagedProducts = products
+
+  if (hasFilters) {
+    // Quando há filtros, pagina no cliente
+    finalTotalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE))
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    const end = start + ITEMS_PER_PAGE
+    pagedProducts = filteredProducts.slice(start, end)
+  } else {
+    // Quando não há filtros, produtos já vêm paginados do servidor
+    pagedProducts = products
+  }
 
   // Função helper para obter a imagem principal ou a primeira disponível
   const getPrimaryImage = (product: Product): string | null => {
@@ -126,9 +173,12 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
     )
   }
 
+  const displayProducts = hasFilters ? filteredProducts : products
+  const hasProducts = displayProducts.length > 0
+
   return (
     <section className="py-5 container mx-auto">
-      {filteredProducts.length === 0 ? (
+      {!hasProducts ? (
         <div className="text-center py-20 text-muted-foreground text-lg">
           {selectedCategories.length > 0
             ? "Nenhum card encontrado para a badge selecionada"
@@ -152,13 +202,13 @@ function checkPriceRange(priceStr: string, ranges: string[]): boolean {
           ))}
         </div>
       )}
-      {filteredProducts.length > 0 && (
+      {hasProducts && finalTotalPages > 1 && (
         <div className="mt-8">
           <PaginationWithIcon
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={finalTotalPages}
             onPageChange={(page) => {
-              const next = Math.min(Math.max(1, page), totalPages)
+              const next = Math.min(Math.max(1, page), finalTotalPages)
               setCurrentPage(next)
             }}
           />

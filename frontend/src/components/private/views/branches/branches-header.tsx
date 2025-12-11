@@ -20,38 +20,49 @@ type Branch = {
 };
 
 export function BranchesHeader() {
-  const [branches, setBranches] = React.useState<Branch[]>([]);
+  const [activeCount, setActiveCount] = React.useState(0);
+  const [inactiveCount, setInactiveCount] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
 
+  // Escuta eventos de atualização dos indicadores da tabela
   React.useEffect(() => {
-    async function fetchBranches() {
-      try {
-        setLoading(true);
+    const handleUpdateIndicators = (event: CustomEvent) => {
+      setActiveCount(event.detail.activeCount);
+      setInactiveCount(event.detail.inactiveCount);
+      setLoading(false);
+    };
 
+    // Escuta evento customizado com dados filtrados da tabela
+    window.addEventListener('branches:update-indicators', handleUpdateIndicators as EventListener);
+
+    // Carrega dados iniciais
+    const fetchInitialData = async () => {
+      try {
         const response = await fetch("/response/api/store", {
           method: "GET",
           credentials: "include",
         });
 
-        if (!response.ok) {
-          throw new Error(`Erro ao carregar dados: ${response.status}`);
+        if (response.ok) {
+          const { data } = await response.json();
+          const active = data?.filter((b: Branch) => b.is_active).length || 0;
+          const inactive = data?.filter((b: Branch) => !b.is_active).length || 0;
+          setActiveCount(active);
+          setInactiveCount(inactive);
         }
-
-        const { data } = await response.json();
-        setBranches(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        console.error("Erro ao carregar dados iniciais:", err);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    fetchBranches();
+    fetchInitialData();
+
+    return () => {
+      window.removeEventListener('branches:update-indicators', handleUpdateIndicators as EventListener);
+    };
   }, []);
-
-  const activeCount = branches.filter((b) => b.is_active).length;
-  const inactiveCount = branches.filter((b) => !b.is_active).length;
 
   return (
     <Card className="flex flex-col h-full w-full">
@@ -73,8 +84,6 @@ export function BranchesHeader() {
             <div className="bg-gray-200 dark:bg-gray-800 rounded-lg h-20 w-full" />
             <div className="bg-gray-200 dark:bg-gray-800 rounded-lg h-20 w-full" />
           </div>
-        ) : error ? (
-          <div className="text-red-500 text-sm">{error}</div>
         ) : (
           <div className="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-md">
             {/* Ativas */}
