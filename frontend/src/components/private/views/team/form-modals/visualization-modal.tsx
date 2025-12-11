@@ -10,13 +10,23 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertCircle,
   User,
   MapPin,
   Building2,
-  Power,
-  PowerOff,
+  CreditCard,
+  HeartHandshake,
+  Phone,
+  Mail,
 } from "lucide-react";
 
 interface EmployeeFormData {
@@ -33,7 +43,6 @@ interface EmployeeFormData {
   state: string;
   zip_code: string;
   country: string;
-  national_id: string;
   department: string;
   salary: string;
   currency: string;
@@ -72,7 +81,6 @@ export default function EmployeeModal({
     state: "",
     zip_code: "",
     country: "Brasil",
-    national_id: "",
     department: "",
     salary: "",
     currency: "BRL",
@@ -87,7 +95,67 @@ export default function EmployeeModal({
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [initialLoading, setInitialLoading] = React.useState(true);
-  const [toggleLoading, setToggleLoading] = React.useState(false);
+  const [stores, setStores] = React.useState<Array<{ id: string; code: string; name: string }>>([]);
+  const [loadingStores, setLoadingStores] = React.useState(false);
+  const [selectedBenefits, setSelectedBenefits] = React.useState<string[]>([]);
+  
+  const commonBenefits = [
+    'Vale Alimentação',
+    'Vale Refeição',
+    'Vale Transporte',
+    'Plano de Saúde',
+    'Plano Odontológico',
+    'Auxílio Creche',
+    'Gympass',
+    'Seguro de Vida',
+    'Participação nos Lucros',
+    'Auxílio Home Office',
+    'Auxílio Educação',
+    'Vale Combustível',
+    '13º Salário',
+    'Férias Remuneradas',
+    'Bônus Anual',
+    'Auxílio Estacionamento',
+    'Auxílio Internet',
+    'Auxílio Celular',
+    'Plano de Previdência',
+    'Auxílio Moradia',
+    'Ticket Cultura',
+    'Auxílio Academia',
+  ];
+
+  // Buscar lojas quando o modal abrir
+  React.useEffect(() => {
+    if (open) {
+      const fetchStores = async () => {
+        setLoadingStores(true);
+        try {
+          const response = await fetch('/response/api/store', {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (!response.ok) {
+            throw new Error('Falha ao carregar lojas');
+          }
+
+          const json = await response.json();
+          const storesData = json?.data || [];
+          setStores(storesData.map((store: any) => ({
+            id: store.id,
+            code: store.code,
+            name: store.name,
+          })));
+        } catch (err: any) {
+          setError(err.message || 'Erro ao carregar lojas');
+        } finally {
+          setLoadingStores(false);
+        }
+      };
+
+      fetchStores();
+    }
+  }, [open]);
 
   React.useEffect(() => {
     if (!open || !employeeId) {
@@ -114,25 +182,45 @@ export default function EmployeeModal({
             data.phone
               ?.replace("+55", "")
               .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") ?? "",
-          document_number: data.document_number ?? "",
+          document_number: data.document_number 
+            ? data.document_number.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+            : "",
           birth_date: data.birth_date?.split("T")[0] ?? "",
           street: data.street ?? "",
           number: data.number ?? "",
           district: data.district ?? "",
           city: data.city ?? "",
           state: data.state ?? "",
-          zip_code: data.zip_code ?? "",
+          zip_code: data.zip_code 
+            ? (data.zip_code.length > 5 ? `${data.zip_code.slice(0, 5)}-${data.zip_code.slice(5)}` : data.zip_code)
+            : "",
           country: data.country ?? "Brasil",
-          national_id: data.employee?.national_id ?? data.national_id ?? "",
           department:
             data.employee?.department ?? data.employee?.position ?? "",
-          salary: data.employee?.salary?.toString() ?? "",
+          salary: data.employee?.salary 
+            ? new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(Number(data.employee.salary))
+            : "",
           currency: data.employee?.currency ?? "BRL",
           role: data.user_roles?.[0]?.role?.name ?? "EMPLOYEE_BRANCH",
           store_code: data.store_code ,
-          benefits: Array.isArray(data.employee?.benefits)
-            ? data.employee.benefits.join(", ")
-            : data.employee?.benefits ?? "",
+          benefits: (() => {
+            const benefitsArray = Array.isArray(data.employee?.benefits)
+              ? data.employee.benefits
+              : data.employee?.benefits
+              ? [data.employee.benefits]
+              : [];
+            
+            const common = benefitsArray.filter((b: string) => commonBenefits.includes(b));
+            const custom = benefitsArray.filter((b: string) => !commonBenefits.includes(b));
+            
+            setSelectedBenefits(common);
+            return custom.join(", ");
+          })(),
           emergency_name: data.employee?.emergency_contact?.name ?? "",
           emergency_phone:
             data.employee?.emergency_contact?.phone
@@ -152,51 +240,64 @@ export default function EmployeeModal({
 
   const handleChange = (key: keyof EmployeeFormData, value: string) => {
     setError("");
+
+    // TELEFONE
     if (key === "phone" || key === "emergency_phone") {
-      let num = value.replace(/\D/g, "").slice(0, 11);
-      if (num.length > 6)
-        num = num.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-      else if (num.length > 2) num = num.replace(/(\d{2})(\d+)/, "($1) $2");
-      setForm((prev) => ({ ...prev, [key]: num }));
+      let cleaned = value.replace(/\D/g, "");
+      if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+
+      if (cleaned.length > 6) cleaned = cleaned.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+      else if (cleaned.length > 2) cleaned = cleaned.replace(/(\d{2})(\d+)/, "($1) $2");
+
+      setForm((prev) => ({ ...prev, [key]: cleaned }));
       return;
     }
+
+    // CPF
     if (key === "document_number") {
-      setForm((prev) => ({
-        ...prev,
-        [key]: value.replace(/\D/g, "").slice(0, 11),
-      }));
-      return;
-    }
-    if (key === "zip_code") {
-      const num = value.replace(/\D/g, "").slice(0, 8);
-      const formatted =
-        num.length > 5 ? `${num.slice(0, 5)}-${num.slice(5)}` : num;
+      const cleaned = value.replace(/\D/g, "").slice(0, 11);
+      let formatted = cleaned;
+      if (cleaned.length > 9) {
+        formatted = cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+      } else if (cleaned.length > 6) {
+        formatted = cleaned.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
+      } else if (cleaned.length > 3) {
+        formatted = cleaned.replace(/(\d{3})(\d+)/, "$1.$2");
+      }
       setForm((prev) => ({ ...prev, [key]: formatted }));
       return;
     }
-    if (key === "salary") {
-      setForm((prev) => ({ ...prev, [key]: value.replace(/\D/g, "") }));
+
+    // CEP
+    if (key === "zip_code") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 8);
+      const formatted = cleaned.length > 5 ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}` : cleaned;
+
+      setForm((prev) => ({ ...prev, [key]: formatted }));
       return;
     }
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
 
-  const handleToggleActive = async () => {
-    setToggleLoading(true);
-    try {
-      const action = form.is_active ? "deactivate" : "activate";
-      const res = await fetch(`/response/api/user/${action}/${employeeId}`, {
-        method: "PATCH",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error();
-      setForm((prev) => ({ ...prev, is_active: !prev.is_active }));
-      onSuccess?.();
-    } catch {
-      setError("Erro ao alterar status");
-    } finally {
-      setToggleLoading(false);
+    // SALÁRIO (máscara de dinheiro)
+    if (key === "salary") {
+      const cleaned = value.replace(/\D/g, "");
+      if (cleaned === "") {
+        setForm((prev) => ({ ...prev, [key]: "" }));
+        return;
+      }
+      // Converte para número e formata como moeda brasileira
+      // Trata como centavos (ex: 350000 = R$ 3.500,00)
+      const numValue = parseInt(cleaned, 10) / 100;
+      const formatted = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(numValue);
+      setForm((prev) => ({ ...prev, [key]: formatted }));
+      return;
     }
+
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
@@ -205,12 +306,25 @@ export default function EmployeeModal({
       setError("Nome e sobrenome são obrigatórios");
       return;
     }
+    if (!form.email.trim()) {
+      setError("Email é obrigatório");
+      return;
+    }
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) {
+      setError("Por favor, insira um email válido");
+      return;
+    }
     setLoading(true);
     try {
       const cleanedPhone = form.phone.replace(/\D/g, "");
       const cleanedEmergency = form.emergency_phone.replace(/\D/g, "");
+      // Remove R$ e espaços, substitui vírgula por ponto para conversão numérica
+      const cleanedSalary = form.salary.replace(/[^\d,]/g, "").replace(",", ".");
 
       const payload = {
+        email: form.email.trim(),
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         phone: cleanedPhone ? `+55${cleanedPhone}` : undefined,
@@ -223,14 +337,17 @@ export default function EmployeeModal({
         zip_code: form.zip_code.replace(/\D/g, "") || undefined,
         country: form.country,
         department: form.department || undefined,
-        salary: Number(form.salary) || 0,
+        salary: cleanedSalary ? Number(cleanedSalary) : 0,
         currency: form.currency,
         role: form.role,
         store_code: form.store_code,
-        benefits: form.benefits
-          .split(",")
-          .map((b) => b.trim())
-          .filter(Boolean),
+        benefits: [
+          ...selectedBenefits,
+          ...form.benefits
+            .split(",")
+            .map((b) => b.trim())
+            .filter(Boolean)
+        ].filter(Boolean),
         emergency_contact: form.emergency_name
           ? {
               name: form.emergency_name.trim(),
@@ -249,11 +366,25 @@ export default function EmployeeModal({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        // Se for erro de conflito (dados únicos já em uso), mostra mensagem genérica
+        if (res.status === 409) {
+          setError("Algum dos dados informados já está em uso. Por favor, verifique e tente novamente.");
+          setLoading(false);
+          return;
+        }
+        throw new Error(errorData.message || "Erro ao salvar as alterações");
+      }
+
       onOpenChange(false);
       onSuccess?.();
-    } catch {
-      setError("Erro ao salvar as alterações");
+    } catch (err: any) {
+      // Se o erro de conflito já foi tratado, não sobrescreve
+      if (error && error.includes("já está em uso")) {
+        return;
+      }
+      setError(err.message || "Erro ao salvar as alterações");
     } finally {
       setLoading(false);
     }
@@ -308,8 +439,15 @@ export default function EmployeeModal({
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input value={form.email} disabled className="bg-muted" />
+                  <Label className="flex items-center gap-2">
+                    <Mail className="h-3.5 w-3.5" /> Email
+                  </Label>
+                  <Input
+                    type="email"
+                    placeholder="funcionario@empresa.com"
+                    value={form.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -353,12 +491,14 @@ export default function EmployeeModal({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Documento</Label>
+                  <Label className="flex items-center gap-2">
+                    <CreditCard className="h-3.5 w-3.5" /> CPF
+                  </Label>
                   <Input
+                    placeholder="123.456.789-00"
                     value={form.document_number}
-                    onChange={(e) =>
-                      handleChange("document_number", e.target.value)
-                    }
+                    disabled
+                    className="bg-muted"
                   />
                 </div>
               </div>
@@ -422,6 +562,7 @@ export default function EmployeeModal({
                 <div className="space-y-2">
                   <Label>CEP</Label>
                   <Input
+                    placeholder="09010-000"
                     value={form.zip_code}
                     onChange={(e) =>
                       handleChange("zip_code", e.target.value)
@@ -440,32 +581,51 @@ export default function EmployeeModal({
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Salário (R$)</Label>
+                  <Label>Salário</Label>
                   <Input
+                    placeholder="R$ 3.500,00"
                     value={form.salary}
                     onChange={(e) => handleChange("salary", e.target.value)}
-                    placeholder="1890"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Código da Loja</Label>
-                  <Input
+                  <Label>Código da Loja *</Label>
+                  <Select
                     value={form.store_code}
-                    onChange={(e) =>
-                      handleChange("store_code", e.target.value)
-                    }
-                    placeholder="BRA001"
-                    className="font-mono text-lg font-semibold"
-                  />
+                    onValueChange={(value) => handleChange("store_code", value)}
+                    disabled={loadingStores || loading}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={loadingStores ? "Carregando..." : "Selecione uma loja"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {stores.map((store) => (
+                        <SelectItem key={store.id} value={store.code}>
+                          {store.code} - {store.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
+                  <Label>Departamento</Label>
+                  <Input
+                    placeholder="Vendas"
+                    value={form.department}
+                    onChange={(e) =>
+                      handleChange("department", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Função</Label>
                   <select
-                    className="w-full h-10 px-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     value={form.role}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, role: e.target.value }))
@@ -476,13 +636,79 @@ export default function EmployeeModal({
                     <option value="MANAGER_BRANCH">Gerente de Filial</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Benefícios</Label>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-3 p-3 border rounded-md bg-muted/30">
+                    {commonBenefits.map((benefit) => (
+                      <div key={benefit} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`benefit-edit-${benefit}`}
+                          checked={selectedBenefits.includes(benefit)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedBenefits([...selectedBenefits, benefit]);
+                            } else {
+                              setSelectedBenefits(selectedBenefits.filter((b) => b !== benefit));
+                            }
+                          }}
+                        />
+                        <Label
+                          htmlFor={`benefit-edit-${benefit}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {benefit}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">
+                      Outros benefícios (separados por vírgula)
+                    </Label>
+                    <Input
+                      placeholder="Ex: Bônus, Férias flexíveis"
+                      value={form.benefits}
+                      onChange={(e) =>
+                        handleChange("benefits", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* --- EMERGENCIA --- */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <HeartHandshake className="h-4 w-4" />
+                <span>Contato de Emergência</span>
+                <div className="h-px flex-1 bg-border/50" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Nome</Label>
+                  <Input
+                    placeholder="Maria Souza"
+                    value={form.emergency_name}
+                    onChange={(e) =>
+                      handleChange("emergency_name", e.target.value)
+                    }
+                  />
+                </div>
 
                 <div className="space-y-2">
-                  <Label>Benefícios (separados por vírgula)</Label>
+                  <Label className="flex items-center gap-2">
+                    <Phone className="h-3.5 w-3.5" /> Telefone
+                  </Label>
                   <Input
-                    value={form.benefits}
+                    placeholder="(11) 99876-5432"
+                    value={form.emergency_phone}
                     onChange={(e) =>
-                      handleChange("benefits", e.target.value)
+                      handleChange("emergency_phone", e.target.value)
                     }
                   />
                 </div>
@@ -491,36 +717,17 @@ export default function EmployeeModal({
           </div>
         </div>
 
-        <div className="p-3 border-t bg-muted/30 flex justify-between items-center">
+        <div className="p-3 border-t bg-muted/30 flex justify-end gap-3">
           <Button
-            variant={form.is_active ? "destructive" : "default"}
-            onClick={handleToggleActive}
-            disabled={toggleLoading || loading}
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
-            {toggleLoading
-              ? "Processando..."
-              : form.is_active
-              ? "Desativar"
-              : "Ativar"}
-            {form.is_active ? (
-              <PowerOff className="ml-2 h-4 w-4" />
-            ) : (
-              <Power className="ml-2 h-4 w-4" />
-            )}
+            Cancelar
           </Button>
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? "Salvando..." : "Salvar Alterações"}
-            </Button>
-          </div>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? "Salvando..." : "Salvar Alterações"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -67,10 +67,17 @@ export class EmployeeController {
 				skip: number;
 				take: number;
 			} & EmployeeQuerystring;
+			const { storeId, roles } = request.user as IJwtAuthPayload;
+			
+			// Se não for ADMIN, filtra apenas pela loja do usuário
+			const isAdmin = roles?.includes('ADMIN');
+			const userStoreId = isAdmin ? undefined : storeId;
+			
 			const response = await this.employeeService.getEmployees(
                 filters as EmployeeQuerystring,
 				skip,
 				take,
+				userStoreId,
 			);
 
 			return response;

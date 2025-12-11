@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
     SelectContent,
@@ -69,6 +70,32 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
     const [showPassword, setShowPassword] = React.useState(false);
     const [stores, setStores] = React.useState<Array<{ id: string; code: string; name: string }>>([]);
     const [loadingStores, setLoadingStores] = React.useState(false);
+    const [selectedBenefits, setSelectedBenefits] = React.useState<string[]>([]);
+    
+    const commonBenefits = [
+        'Vale Alimentação',
+        'Vale Refeição',
+        'Vale Transporte',
+        'Plano de Saúde',
+        'Plano Odontológico',
+        'Auxílio Creche',
+        'Gympass',
+        'Seguro de Vida',
+        'Participação nos Lucros',
+        'Auxílio Home Office',
+        'Auxílio Educação',
+        'Vale Combustível',
+        '13º Salário',
+        'Férias Remuneradas',
+        'Bônus Anual',
+        'Auxílio Estacionamento',
+        'Auxílio Internet',
+        'Auxílio Celular',
+        'Plano de Previdência',
+        'Auxílio Moradia',
+        'Ticket Cultura',
+        'Auxílio Academia',
+    ];
 
     // Buscar lojas quando o modal abrir
     React.useEffect(() => {
@@ -254,10 +281,13 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                     currency: form.currency,
                     role: form.role || 'EMPLOYEE_BRANCH',
                     store_code: form.store_code || null,
-                    benefits: form.benefits
-                        .split(',')
-                        .map((b) => b.trim())
-                        .filter(Boolean),
+                    benefits: [
+                        ...selectedBenefits,
+                        ...form.benefits
+                            .split(',')
+                            .map((b) => b.trim())
+                            .filter(Boolean)
+                    ].filter(Boolean),
                     emergency_contact: form.emergency_name
                         ? {
                               name: form.emergency_name.trim(),
@@ -268,7 +298,15 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
             });
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.message || data.error);
+            if (!response.ok) {
+                // Se for erro de conflito (dados únicos já em uso), mostra mensagem genérica
+                if (response.status === 409) {
+                    setError('Algum dos dados informados já está em uso. Por favor, verifique e tente novamente.');
+                    setLoading(false);
+                    return;
+                }
+                throw new Error(data.message || data.error);
+            }
 
             setForm({
                 email: '',
@@ -295,10 +333,15 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                 emergency_name: '',
                 emergency_phone: '',
             });
+            setSelectedBenefits([]);
 
             onOpenChange(false);
             onCreated?.();
         } catch (err: any) {
+            // Se o erro de conflito já foi tratado, não sobrescreve
+            if (error && error.includes('já está em uso')) {
+                return;
+            }
             setError(err.message || 'Falha ao criar funcionário. Tente novamente.');
         } finally {
             setLoading(false);
@@ -554,15 +597,6 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
 
                             <div className="grid grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <Label>Departamento</Label>
-                                    <Input
-                                        placeholder="Vendas"
-                                        value={form.department}
-                                        onChange={(e) => handleChange('department', e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
                                     <Label className="flex items-center gap-2">
                                         <DollarSign className="h-3.5 w-3.5" /> Salário
                                     </Label>
@@ -596,25 +630,64 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label>Função (Role)</Label>
+                                    <Label>Departamento</Label>
+                                    <Input
+                                        placeholder="Vendas"
+                                        value={form.department}
+                                        onChange={(e) => handleChange('department', e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Função</Label>
                                     <select
                                         className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                                         value={form.role}
                                         onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
                                     >
-                                        <option value="EMPLOYEE_HQ">EMPLOYEE_HQ</option>
-                                        <option value="EMPLOYEE_BRANCH">EMPLOYEE_BRANCH</option>
-                                        <option value="MANAGER_BRANCH">MANAGER_BRANCH</option>
+                                        <option value="EMPLOYEE_HQ">Funcionário Matriz</option>
+                                        <option value="EMPLOYEE_BRANCH">Funcionário Filial</option>
+                                        <option value="MANAGER_BRANCH">Gerente de Filial</option>
                                     </select>
                                 </div>
+                            </div>
 
-                                <div className="space-y-2">
-                                    <Label>Benefícios (separados por vírgula)</Label>
-                                    <Input
-                                        placeholder="Vale Alimentação, Plano de Saúde"
-                                        value={form.benefits}
-                                        onChange={(e) => handleChange('benefits', e.target.value)}
-                                    />
+                            <div className="space-y-2">
+                                <Label>Benefícios</Label>
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-3 gap-3 p-3 border rounded-md bg-muted/30">
+                                        {commonBenefits.map((benefit) => (
+                                            <div key={benefit} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`benefit-${benefit}`}
+                                                    checked={selectedBenefits.includes(benefit)}
+                                                    onCheckedChange={(checked) => {
+                                                        if (checked) {
+                                                            setSelectedBenefits([...selectedBenefits, benefit]);
+                                                        } else {
+                                                            setSelectedBenefits(selectedBenefits.filter((b) => b !== benefit));
+                                                        }
+                                                    }}
+                                                />
+                                                <Label
+                                                    htmlFor={`benefit-${benefit}`}
+                                                    className="text-sm font-normal cursor-pointer"
+                                                >
+                                                    {benefit}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs text-muted-foreground">
+                                            Outros benefícios (separados por vírgula)
+                                        </Label>
+                                        <Input
+                                            placeholder="Ex: Bônus, Férias flexíveis"
+                                            value={form.benefits}
+                                            onChange={(e) => handleChange('benefits', e.target.value)}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </section>

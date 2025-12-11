@@ -9,7 +9,7 @@ export const AppointmentUuidSchema = UuidSchema.extend({
 export const AppointmentSchema = z.object({
 	id: z.uuid(),
 	store_id: z.uuid(),
-	customer_id: z.uuid(),
+	customer_id: z.uuid().nullable(),
 	customer_name: z.string(),
 	customer_email: z.email(),
 	customer_phone: z.string(),

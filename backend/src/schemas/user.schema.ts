@@ -87,3 +87,11 @@ export const ConflictStatusResponseSchema = ConflictResponseSchema.extend({
 		.string()
 		.meta({ examples: ['Informações do usuário conflitantes'] }),
 });
+
+export const deleteUserResponseSchema = ApiResponseSchema.extend({
+	success: z.literal(true),
+	message: z.string().meta({ examples: ['Usuário deletado com sucesso'] }),
+	data: z.object({
+		message: z.string().meta({ examples: ['Usuário deletado com sucesso'] }),
+	}),
+});

@@ -41,12 +41,18 @@ export class UserService {
 	) {
 		try {
 			if (filters.user_type === 'EMPLOYEE') {
+				const whereClause: any = { ...filters };
+				// Se storeId for fornecido, filtra por loja; caso contrário, não filtra
+				if (storeId !== undefined) {
+					whereClause.store_id = storeId;
+				}
+				
 				const response = await this.database.user.findMany({
 					cursor: id ? { id } : undefined,
 					take: Number(take),
 					skip: Number(skip),
 					orderBy: { created_at: 'desc' },
-					where: { store_id: storeId, ...filters },
+					where: whereClause,
 					select: {
 						id: true,
 						email: true,
@@ -84,12 +90,18 @@ export class UserService {
 				});
 				return response;
 			}
+			const whereClause: any = { ...filters };
+			// Se storeId for fornecido, filtra por loja; caso contrário, não filtra
+			if (storeId !== undefined) {
+				whereClause.store_id = storeId;
+			}
+			
 			const response = await this.database.user.findMany({
 				cursor: id ? { id } : undefined,
 				take: Number(take),
 				skip: Number(skip),
 				orderBy: { created_at: 'desc' },
-				where: { store_id: storeId, ...filters },
+				where: whereClause,
 				select: {
 					id: true,
 					email: true,
@@ -325,6 +337,68 @@ export class UserService {
 		} catch (error) {
 			throw new AppError({
 				message: error.message,
+				errorCode: 'INTERNAL_SERVER_ERROR',
+			});
+		}
+	}
+
+	async deleteUser(id: string) {
+		try {
+			const userExist = await this.database.user.findUnique({
+				where: { id },
+				include: {
+					employee: true,
+					user_roles: true,
+				},
+			});
+
+			if (!userExist) {
+				throw new AppError({
+					message: 'Usuário não encontrado',
+					errorCode: 'USER_NOT_FOUND',
+				});
+			}
+
+			// Se for funcionário, deleta também o registro de employee e user_roles
+			if (userExist.user_type === 'EMPLOYEE') {
+				await this.database.$transaction(async (tx) => {
+					// Deleta user_roles primeiro (foreign key constraint)
+					await tx.userRole.deleteMany({
+						where: { user_id: id },
+					});
+
+					// Deleta employee
+					await tx.employee.deleteMany({
+						where: { user_id: id },
+					});
+
+					// Deleta user
+					await tx.user.delete({
+						where: { id },
+					});
+				});
+			} else {
+				// Para outros tipos de usuário (CUSTOMER, etc)
+				await this.database.$transaction(async (tx) => {
+					// Deleta user_roles primeiro
+					await tx.userRole.deleteMany({
+						where: { user_id: id },
+					});
+
+					// Deleta user
+					await tx.user.delete({
+						where: { id },
+					});
+				});
+			}
+
+			return { message: 'Usuário deletado com sucesso' };
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw error;
+			}
+			throw new AppError({
+				message: error.message || 'Erro ao deletar usuário',
 				errorCode: 'INTERNAL_SERVER_ERROR',
 			});
 		}
