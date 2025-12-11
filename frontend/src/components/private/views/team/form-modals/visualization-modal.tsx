@@ -67,6 +67,10 @@ export default function EmployeeModal({
   onSuccess,
   employeeId,
 }: EmployeeModalProps) {
+  // Estado para armazenar os dados originais
+  const [originalForm, setOriginalForm] = React.useState<EmployeeFormData | null>(null);
+  const [originalSelectedBenefits, setOriginalSelectedBenefits] = React.useState<string[]>([]);
+  
   const [form, setForm] = React.useState<EmployeeFormData>({
     email: "",
     first_name: "",
@@ -174,7 +178,7 @@ export default function EmployeeModal({
         const json = await res.json();
         const data = json?.data ?? json;
 
-        setForm({
+        const formData = {
           email: data.email ?? "",
           first_name: data.first_name ?? "",
           last_name: data.last_name ?? "",
@@ -207,7 +211,7 @@ export default function EmployeeModal({
             : "",
           currency: data.employee?.currency ?? "BRL",
           role: data.user_roles?.[0]?.role?.name ?? "EMPLOYEE_BRANCH",
-          store_code: data.store_code ,
+          store_code: data.store?.code ?? data.store_code ?? "",
           benefits: (() => {
             const benefitsArray = Array.isArray(data.employee?.benefits)
               ? data.employee.benefits
@@ -219,6 +223,7 @@ export default function EmployeeModal({
             const custom = benefitsArray.filter((b: string) => !commonBenefits.includes(b));
             
             setSelectedBenefits(common);
+            setOriginalSelectedBenefits(common);
             return custom.join(", ");
           })(),
           emergency_name: data.employee?.emergency_contact?.name ?? "",
@@ -227,7 +232,10 @@ export default function EmployeeModal({
               ?.replace("+55", "")
               .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") ?? "",
           is_active: data.is_active ?? true,
-        });
+        };
+        
+        setForm(formData);
+        setOriginalForm(formData);
       } catch {
         setError("Falha ao carregar dados do funcionário");
       } finally {
@@ -318,44 +326,126 @@ export default function EmployeeModal({
     }
     setLoading(true);
     try {
+      if (!originalForm) {
+        setError("Erro: dados originais não carregados");
+        setLoading(false);
+        return;
+      }
+
       const cleanedPhone = form.phone.replace(/\D/g, "");
       const cleanedEmergency = form.emergency_phone.replace(/\D/g, "");
       // Remove R$ e espaços, substitui vírgula por ponto para conversão numérica
       const cleanedSalary = form.salary.replace(/[^\d,]/g, "").replace(",", ".");
 
-      const payload = {
-        email: form.email.trim(),
-        first_name: form.first_name.trim(),
-        last_name: form.last_name.trim(),
-        phone: cleanedPhone ? `+55${cleanedPhone}` : undefined,
-        birth_date: form.birth_date || undefined,
-        street: form.street || undefined,
-        number: form.number || undefined,
-        district: form.district || undefined,
-        city: form.city || undefined,
-        state: form.state || undefined,
-        zip_code: form.zip_code.replace(/\D/g, "") || undefined,
-        country: form.country,
-        department: form.department || undefined,
-        salary: cleanedSalary ? Number(cleanedSalary) : 0,
-        currency: form.currency,
-        role: form.role,
-        store_code: form.store_code,
-        benefits: [
-          ...selectedBenefits,
-          ...form.benefits
-            .split(",")
-            .map((b) => b.trim())
-            .filter(Boolean)
-        ].filter(Boolean),
-        emergency_contact: form.emergency_name
-          ? {
-              name: form.emergency_name.trim(),
-              phone: cleanedEmergency ? `+55${cleanedEmergency}` : undefined,
-            }
-          : undefined,
-        is_active: form.is_active,
-      };
+      // Compara valores e só inclui campos que mudaram
+      const payload: any = {};
+
+      // Nome e sobrenome - sempre envia (obrigatórios)
+      payload.first_name = form.first_name.trim();
+      payload.last_name = form.last_name.trim();
+
+      // Email - só envia se mudou
+      const normalizedEmail = form.email.trim().toLowerCase();
+      const originalEmail = originalForm.email.trim().toLowerCase();
+      if (normalizedEmail !== originalEmail) {
+        payload.email = normalizedEmail;
+      }
+
+      // Telefone - só envia se mudou
+      const newPhone = cleanedPhone ? `+55${cleanedPhone}` : undefined;
+      const originalPhoneCleaned = originalForm.phone.replace(/\D/g, "");
+      const originalPhone = originalPhoneCleaned ? `+55${originalPhoneCleaned}` : undefined;
+      if (newPhone !== originalPhone) {
+        payload.phone = newPhone;
+      }
+
+      // Data de nascimento - só envia se mudou
+      if (form.birth_date !== originalForm.birth_date) {
+        payload.birth_date = form.birth_date || undefined;
+      }
+
+      // Endereço - só envia campos que mudaram
+      if (form.street !== originalForm.street) payload.street = form.street || undefined;
+      if (form.number !== originalForm.number) payload.number = form.number || undefined;
+      if (form.district !== originalForm.district) payload.district = form.district || undefined;
+      if (form.city !== originalForm.city) payload.city = form.city || undefined;
+      if (form.state !== originalForm.state) payload.state = form.state || undefined;
+      const newZipCode = form.zip_code.replace(/\D/g, "") || undefined;
+      const originalZipCode = originalForm.zip_code.replace(/\D/g, "") || undefined;
+      if (newZipCode !== originalZipCode) {
+        payload.zip_code = newZipCode;
+      }
+      if (form.country !== originalForm.country) {
+        payload.country = form.country;
+      }
+
+      // Informações profissionais - só envia se mudaram
+      if (form.department !== originalForm.department) {
+        payload.department = form.department || undefined;
+      }
+      
+      const newSalary = cleanedSalary ? Number(cleanedSalary) : 0;
+      const originalSalaryCleaned = originalForm.salary.replace(/[^\d,]/g, "").replace(",", ".");
+      const originalSalary = originalSalaryCleaned ? Number(originalSalaryCleaned) : 0;
+      if (newSalary !== originalSalary) {
+        payload.salary = newSalary;
+      }
+      
+      if (form.currency !== originalForm.currency) {
+        payload.currency = form.currency;
+      }
+      
+      if (form.role !== originalForm.role) {
+        payload.role = form.role;
+      }
+      
+      if (form.store_code !== originalForm.store_code) {
+        payload.store_code = form.store_code;
+      }
+
+      // Benefícios - só envia se mudaram
+      const newBenefits = [
+        ...selectedBenefits,
+        ...form.benefits
+          .split(",")
+          .map((b) => b.trim())
+          .filter(Boolean)
+      ].filter(Boolean);
+      const originalBenefitsStr = originalForm.benefits || "";
+      const originalCustomBenefits = originalBenefitsStr
+        ? originalBenefitsStr.split(",").map((b: string) => b.trim()).filter(Boolean)
+        : [];
+      const originalBenefits = [...originalSelectedBenefits, ...originalCustomBenefits].filter(Boolean);
+      
+      if (JSON.stringify(newBenefits.sort()) !== JSON.stringify(originalBenefits.sort())) {
+        payload.benefits = newBenefits;
+      }
+
+      // Contato de emergência - só envia se mudou
+      const newEmergencyContact = form.emergency_name
+        ? {
+            name: form.emergency_name.trim(),
+            phone: cleanedEmergency ? `+55${cleanedEmergency}` : undefined,
+          }
+        : undefined;
+      const originalEmergencyName = originalForm.emergency_name?.trim() || "";
+      const originalEmergencyPhoneCleaned = originalForm.emergency_phone.replace(/\D/g, "");
+      const originalEmergencyPhone = originalEmergencyPhoneCleaned ? `+55${originalEmergencyPhoneCleaned}` : undefined;
+      const originalEmergencyContact = originalEmergencyName
+        ? {
+            name: originalEmergencyName,
+            phone: originalEmergencyPhone,
+          }
+        : undefined;
+      
+      if (JSON.stringify(newEmergencyContact) !== JSON.stringify(originalEmergencyContact)) {
+        payload.emergency_contact = newEmergencyContact;
+      }
+
+      // Status - só envia se mudou
+      if (form.is_active !== originalForm.is_active) {
+        payload.is_active = form.is_active;
+      }
 
       console.log(payload)
 

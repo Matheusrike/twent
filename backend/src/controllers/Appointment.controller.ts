@@ -2,6 +2,7 @@ import { CreateAppointment } from '@/schemas/appointment.schema';
 import { AppointmentService } from '@/services/Appointment.service';
 import { AppError, HttpError } from '@/utils/errors.util';
 import { FastifyRequest } from 'fastify';
+import { IJwtAuthPayload } from '@/types/authorization.types';
 
 export class AppointmentController {
 	constructor(private appointmentService: AppointmentService) {}
@@ -37,10 +38,16 @@ export class AppointmentController {
 		}
 	}
 
-	async get() {
+	async get(request: FastifyRequest) {
 		try {
-			const appointments = await this.appointmentService.get();
-			return appointments;
+			const { storeId, roles } = request.user as IJwtAuthPayload;
+			
+			// Se não for ADMIN, filtra apenas pela loja do usuário
+			const isAdmin = roles?.includes('ADMIN');
+			const userStoreId = isAdmin ? undefined : storeId;
+			
+			const appointments = await this.appointmentService.get(userStoreId);
+			return appointments || [];
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw new HttpError({
@@ -49,13 +56,21 @@ export class AppointmentController {
 					errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 				});
 			}
+			// Se não for AppError, relança o erro
+			throw error;
 		}
 	}
 
 	async cancelAppointment(request: FastifyRequest) {
 		try {
 			const { id } = request.params as { id: string };
-			const appointment = await this.appointmentService.cancelAppointment(id);
+			const { storeId, roles } = request.user as IJwtAuthPayload;
+			
+			// Se não for ADMIN, filtra apenas pela loja do usuário
+			const isAdmin = roles?.includes('ADMIN');
+			const userStoreId = isAdmin ? undefined : storeId;
+			
+			const appointment = await this.appointmentService.cancelAppointment(id, userStoreId);
 			return appointment;
 		} catch (error) {
 			if (error instanceof AppError) {
@@ -80,7 +95,13 @@ export class AppointmentController {
 	async confirmAppointment(request: FastifyRequest) {
 		try {
 			const { id } = request.params as { id: string };
-			const appointment = await this.appointmentService.confirmAppointment(id);
+			const { storeId, roles } = request.user as IJwtAuthPayload;
+			
+			// Se não for ADMIN, filtra apenas pela loja do usuário
+			const isAdmin = roles?.includes('ADMIN');
+			const userStoreId = isAdmin ? undefined : storeId;
+			
+			const appointment = await this.appointmentService.confirmAppointment(id, userStoreId);
 			return appointment;
 		} catch (error) {
 			if (error instanceof AppError) {
@@ -105,7 +126,13 @@ export class AppointmentController {
 	async completeAppointment(request: FastifyRequest) {
 		try {
 			const { id } = request.params as { id: string };
-			const appointment = await this.appointmentService.completeAppointment(id);
+			const { storeId, roles } = request.user as IJwtAuthPayload;
+			
+			// Se não for ADMIN, filtra apenas pela loja do usuário
+			const isAdmin = roles?.includes('ADMIN');
+			const userStoreId = isAdmin ? undefined : storeId;
+			
+			const appointment = await this.appointmentService.completeAppointment(id, userStoreId);
 			return appointment;
 		} catch (error) {
 			if (error instanceof AppError) {

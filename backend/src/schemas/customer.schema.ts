@@ -137,8 +137,11 @@ export const createCustomerSchema = z.object({
 		}),
 	birth_date: z
 		.preprocess(
-			(val) => (val ? new Date(val as string) : undefined),
-			z.date(),
+			(val) => {
+				if (!val || val === null || val === '') return undefined;
+				return new Date(val as string);
+			},
+			z.date().optional(),
 		)
 		.optional()
 		.meta({

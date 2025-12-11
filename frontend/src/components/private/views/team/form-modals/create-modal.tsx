@@ -259,14 +259,14 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
-                    email: form.email.trim(),
+                    email: form.email.trim().toLowerCase(),
                     password_hash: form.password_hash,
                     first_name: form.first_name.trim(),
                     last_name: form.last_name.trim(),
                     phone: cleanedPhone ? `+55${cleanedPhone}` : null,
                     user_type: 'EMPLOYEE',
                     document_number: form.document_number.replace(/\D/g, '') || null,
-                    birth_date: form.birth_date || null,
+                    ...(form.birth_date ? { birth_date: form.birth_date } : {}),
                     street: form.street || null,
                     number: form.number || null,
                     district: form.district || null,
@@ -639,7 +639,7 @@ export default function CreateEmployeeModal({ open, onOpenChange, onCreated }: C
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Função</Label>
+                                    <Label>Função *</Label>
                                     <select
                                         className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                                         value={form.role}

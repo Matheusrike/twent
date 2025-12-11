@@ -115,6 +115,9 @@ export function TeamTable() {
   const [currentUser, setCurrentUser] = React.useState<{ id: string; role: string } | null>(null);
   const [adminCount, setAdminCount] = React.useState(0);
 
+  // Estados para contagem total de funcionários
+  const [allEmployees, setAllEmployees] = React.useState<Employee[]>([]);
+
   // Busca informações do usuário logado
   React.useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -152,18 +155,30 @@ export function TeamTable() {
       const employeesData = json.data || [];
       setEmployees(employeesData);
 
-      // Busca todos os funcionários para contar admins (não apenas os da página atual)
+      // Busca todos os funcionários para contar admins e atualizar indicadores
       try {
         const allRes = await fetch(`/response/api/employee/all?skip=0&take=1000`, {
           credentials: "include",
         });
         if (allRes.ok) {
           const allJson = await allRes.json();
-          const allEmployees = allJson.data || [];
-          const admins = allEmployees.filter(
+          const allEmployeesData = allJson.data || [];
+          setAllEmployees(allEmployeesData);
+          
+          // Conta admins
+          const admins = allEmployeesData.filter(
             (emp: Employee) => emp.user_roles?.[0]?.role?.name === "ADMIN"
           );
           setAdminCount(admins.length);
+
+          // Conta ativos e inativos de TODOS os funcionários
+          const totalActive = allEmployeesData.filter((emp: Employee) => emp.is_active).length;
+          const totalInactive = allEmployeesData.filter((emp: Employee) => !emp.is_active).length;
+
+          // Dispara evento com os números reais
+          window.dispatchEvent(new CustomEvent('team:update-indicators', {
+            detail: { activeCount: totalActive, inactiveCount: totalInactive }
+          }));
         }
       } catch (err) {
         // Se falhar, conta apenas os da página atual como fallback
@@ -171,6 +186,13 @@ export function TeamTable() {
           (emp: Employee) => emp.user_roles?.[0]?.role?.name === "ADMIN"
         );
         setAdminCount(admins.length);
+        
+        // Fallback para contadores
+        const totalActive = employeesData.filter((emp: Employee) => emp.is_active).length;
+        const totalInactive = employeesData.filter((emp: Employee) => !emp.is_active).length;
+        window.dispatchEvent(new CustomEvent('team:update-indicators', {
+          detail: { activeCount: totalActive, inactiveCount: totalInactive }
+        }));
       }
     } catch (err: any) {
       setError("Falha ao carregar os funcionários");
@@ -185,9 +207,9 @@ export function TeamTable() {
   }, [fetchEmployees]);
 
   // Atualiza lista após criar funcionário
-  const handleEmployeeCreated = () => {
+  const handleEmployeeCreated = async () => {
     setSkip(0);
-    fetchEmployees();
+    await fetchEmployees();
     // Dispara evento para atualizar o header
     window.dispatchEvent(new CustomEvent('team:refresh'));
   };
@@ -218,7 +240,7 @@ export function TeamTable() {
 
       setIsDeactivateDialogOpen(false);
       setEmployeeToToggle(null);
-      fetchEmployees();
+      await fetchEmployees();
       // Dispara evento para atualizar o header
       window.dispatchEvent(new CustomEvent('team:refresh'));
     } catch (err: any) {
@@ -256,7 +278,7 @@ export function TeamTable() {
 
       setIsDeleteDialogOpen(false);
       setEmployeeToDelete(null);
-      fetchEmployees();
+      await fetchEmployees();
       // Dispara evento para atualizar o header
       window.dispatchEvent(new CustomEvent('team:refresh'));
     } catch (err: any) {
@@ -501,15 +523,17 @@ export function TeamTable() {
     },
   });
 
-  // Atualiza os indicadores do header com os dados filtrados da tabela
+  // Atualiza indicadores quando allEmployees muda (não filteredEmployees)
   React.useEffect(() => {
-    const activeCount = filteredEmployees.filter((e) => e.is_active).length;
-    const inactiveCount = filteredEmployees.filter((e) => !e.is_active).length;
-    
-    window.dispatchEvent(new CustomEvent('team:update-indicators', {
-      detail: { activeCount, inactiveCount }
-    }));
-  }, [filteredEmployees]);
+    if (allEmployees.length > 0) {
+      const activeCount = allEmployees.filter((e) => e.is_active).length;
+      const inactiveCount = allEmployees.filter((e) => !e.is_active).length;
+
+      window.dispatchEvent(new CustomEvent('team:update-indicators', {
+        detail: { activeCount, inactiveCount }
+      }));
+    }
+  }, [allEmployees]);
 
   return (
     <div className="w-full space-y-4">

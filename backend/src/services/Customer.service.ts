@@ -21,8 +21,16 @@ export class CustomerService extends UserService {
 			data.birth_date = new Date(data.birth_date!);
 		}
 		
+		// Normaliza email para lowercase
+		const normalizedData = {
+			...data,
+			email: data.email.toLowerCase().trim(),
+			is_active: true,
+			user_type: 'CUSTOMER' as const,
+		};
+		
 		const user = await this.database.user.create({
-			data: { ...data, is_active: true, user_type: 'CUSTOMER' },
+			data: normalizedData,
             omit: { password_hash: true },
 		});
 		return user;
@@ -68,9 +76,15 @@ export class CustomerService extends UserService {
 			data.birth_date = new Date(data.birth_date);
 		}
 
+		// Normaliza email para lowercase se fornecido
+		const updateData: any = { ...data, user_type: 'CUSTOMER' };
+		if (data.email) {
+			updateData.email = data.email.toLowerCase().trim();
+		}
+
 		return await this.database.user.update({
 			where: { id },
-			data: { ...data, user_type: 'CUSTOMER' },
+			data: updateData,
 		});
 	}
 }

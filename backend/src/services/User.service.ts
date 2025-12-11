@@ -6,10 +6,16 @@ import { EmployeeQuerystring } from '@/schemas/employee.schema';
 export class UserService {
 	constructor(protected database: PrismaClient) {}
 
-	async validateUser(email?: string, document_number?: string) {
+	async validateUser(email?: string, document_number?: string, excludeUserId?: string) {
 		if (email !== undefined) {
-			const usedEmail = await this.database.user.findUnique({
-				where: { email },
+			const whereClause: any = { email };
+			// Se excludeUserId fornecido, exclui esse usuário da verificação
+			if (excludeUserId) {
+				whereClause.id = { not: excludeUserId };
+			}
+			
+			const usedEmail = await this.database.user.findFirst({
+				where: whereClause,
 			});
 
 			if (usedEmail) {
@@ -20,8 +26,15 @@ export class UserService {
 			}
 		}
 		if (document_number === undefined) return true;
-		const usedDocument = await this.database.user.findUnique({
-			where: { document_number },
+		
+		const whereClause: any = { document_number };
+		// Se excludeUserId fornecido, exclui esse usuário da verificação
+		if (excludeUserId) {
+			whereClause.id = { not: excludeUserId };
+		}
+		
+		const usedDocument = await this.database.user.findFirst({
+			where: whereClause,
 		});
 		if (usedDocument) {
 			throw new AppError({
@@ -190,6 +203,7 @@ export class UserService {
 						store: {
 							select: {
 								name: true,
+								code: true,
 							},
 						},
 					},

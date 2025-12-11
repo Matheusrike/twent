@@ -66,12 +66,12 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 		},
 		async (request, reply) => {
 			try {
-				const appointments = await appointmentController.get();
+				const appointments = await appointmentController.get(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
 					message: 'Agendamentos encontrados',
-					data: appointments,
+					data: appointments || [],
 				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({

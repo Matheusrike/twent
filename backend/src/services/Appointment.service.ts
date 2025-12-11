@@ -127,9 +127,30 @@ export class AppointmentService {
 		}
 	}
 
-	async get() {
+	async get(storeId?: string) {
 		try {
-			const appointments = await this.database.appointment.findMany();
+			const whereClause: any = {};
+			// Se storeId for fornecido, filtra por loja; caso contrário, retorna todos
+			if (storeId !== undefined) {
+				whereClause.store_id = storeId;
+			}
+			
+			const appointments = await this.database.appointment.findMany({
+				where: whereClause,
+				orderBy: { appointment_date: 'desc' },
+				select: {
+					id: true,
+					store_id: true,
+					customer_id: true,
+					customer_name: true,
+					customer_email: true,
+					customer_phone: true,
+					appointment_date: true,
+					notes: true,
+					status: true,
+					created_at: true,
+				},
+			});
 			return appointments;
 		} catch (error) {
 			throw new AppError({
@@ -139,8 +160,33 @@ export class AppointmentService {
 		}
 	}
 
-	async cancelAppointment(id: string) {
+	async cancelAppointment(id: string, storeId?: string) {
 		try {
+			// Verifica se o agendamento existe e se pertence à loja do usuário (se storeId fornecido)
+			const whereClause: any = { id };
+			if (storeId !== undefined) {
+				whereClause.store_id = storeId;
+			}
+			
+			const existingAppointment = await this.database.appointment.findUnique({
+				where: { id },
+			});
+			
+			if (!existingAppointment) {
+				throw new AppError({
+					message: 'Agendamento não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			
+			// Se storeId fornecido, verifica se pertence à loja
+			if (storeId !== undefined && existingAppointment.store_id !== storeId) {
+				throw new AppError({
+					message: 'Agendamento não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			
 			const appointment = await this.database.appointment.update({
 				where: { id },
 				data: { status: 'CANCELLED' },
@@ -181,8 +227,28 @@ export class AppointmentService {
 		}
 	}
 
-	async confirmAppointment(id: string) {
+	async confirmAppointment(id: string, storeId?: string) {
 		try {
+			// Verifica se o agendamento existe e se pertence à loja do usuário (se storeId fornecido)
+			const existingAppointment = await this.database.appointment.findUnique({
+				where: { id },
+			});
+			
+			if (!existingAppointment) {
+				throw new AppError({
+					message: 'Agendamento não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			
+			// Se storeId fornecido, verifica se pertence à loja
+			if (storeId !== undefined && existingAppointment.store_id !== storeId) {
+				throw new AppError({
+					message: 'Agendamento não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			
 			const appointment = await this.database.appointment.update({
 				where: { id },
 				data: { status: 'CONFIRMED' },
@@ -223,8 +289,28 @@ export class AppointmentService {
 		}
 	}
 
-	async completeAppointment(id: string) {
+	async completeAppointment(id: string, storeId?: string) {
 		try {
+			// Verifica se o agendamento existe e se pertence à loja do usuário (se storeId fornecido)
+			const existingAppointment = await this.database.appointment.findUnique({
+				where: { id },
+			});
+			
+			if (!existingAppointment) {
+				throw new AppError({
+					message: 'Agendamento não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			
+			// Se storeId fornecido, verifica se pertence à loja
+			if (storeId !== undefined && existingAppointment.store_id !== storeId) {
+				throw new AppError({
+					message: 'Agendamento não encontrado',
+					errorCode: 'NOT_FOUND',
+				});
+			}
+			
 			const appointment = await this.database.appointment.update({
 				where: { id },
 				data: { status: 'COMPLETED' },
