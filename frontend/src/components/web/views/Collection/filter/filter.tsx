@@ -87,10 +87,11 @@ export default function FiltersSection() {
             <DropdownMenuWithCheckboxes
               label="Faixa de preço"
               options={[
-                "50.000 - 100.000",
-                "100.000 - 200.000",
-                "200.000 - 500.000",
-                "500.000+",
+                "R$ 0 - R$ 50.000",
+                "R$ 50.000 - R$ 100.000",
+                "R$ 100.000 - R$ 200.000",
+                "R$ 200.000 - R$ 500.000",
+                "R$ 500.000+",
               ]}
               selected={prices}
               onChange={handleChange(setPrices)}
