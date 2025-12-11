@@ -87,18 +87,54 @@ export default function CollectionHero({ searchQuery, selectedCategories = [], s
   // Função para verificar se o preço está na faixa selecionada
   const checkPriceRange = (priceStr: string, ranges: string[]): boolean => {
     if (!ranges.length) return true
-    const price = parseInt(String(priceStr).replace(/\D/g, ""))
+    
+    // Converte o preço para número (remove formatação e converte)
+    // O preço pode vir como "20000" ou "20000.00" do backend
+    const price = parseFloat(String(priceStr).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0
+    
+    // Função helper para converter string de número com separador de milhares para número
+    const parsePriceValue = (value: string): number => {
+      // Remove R$, espaços e mantém apenas números, pontos e vírgulas
+      const cleaned = value.replace(/R\$\s*/g, "").trim()
+      // Remove pontos (separadores de milhares) e converte vírgula para ponto (decimal)
+      const numericStr = cleaned.replace(/\./g, "").replace(",", ".")
+      return parseFloat(numericStr) || 0
+    }
+    
     return ranges.some(range => {
-      if (/^\d+-\d+$/.test(range)) {
-        const [minStr, maxStr] = range.split("-")
-        const min = parseInt(minStr)
-        const max = parseInt(maxStr)
+      // Remove R$ e espaços, mantém apenas números e separadores
+      const cleanRange = range.replace(/R\$\s*/g, "").trim()
+      
+      // Verifica faixa "0 - 50.000"
+      if (cleanRange === "0 - 50.000") return price >= 0 && price <= 50000
+      
+      // Verifica faixa "50.000 - 100.000"
+      if (cleanRange === "50.000 - 100.000") return price >= 50000 && price <= 100000
+      
+      // Verifica faixa "100.000 - 200.000"
+      if (cleanRange === "100.000 - 200.000") return price >= 100000 && price <= 200000
+      
+      // Verifica faixa "200.000 - 500.000"
+      if (cleanRange === "200.000 - 500.000") return price >= 200000 && price <= 500000
+      
+      // Verifica faixa "500.000+"
+      if (cleanRange === "500.000+") return price >= 500000
+      
+      // Fallback para formato genérico "min - max" (ex: "0 - 50.000")
+      const rangeMatch = cleanRange.match(/^(.+?)\s*-\s*(.+)$/)
+      if (rangeMatch) {
+        const min = parsePriceValue(rangeMatch[1])
+        const max = parsePriceValue(rangeMatch[2])
         if (!isNaN(min) && !isNaN(max)) return price >= min && price <= max
       }
-      if (range === "50.000 - 100.000") return price >= 50000 && price <= 100000
-      if (range === "100.000 - 200.000") return price >= 100000 && price <= 200000
-      if (range === "200.000 - 500.000") return price >= 200000 && price <= 500000
-      if (range === "500.000+") return price >= 500000
+      
+      // Fallback para formato "+" (maior que, ex: "500.000+")
+      const plusMatch = cleanRange.match(/^(.+?)\+$/)
+      if (plusMatch) {
+        const min = parsePriceValue(plusMatch[1])
+        if (!isNaN(min)) return price >= min
+      }
+      
       return false
     })
   }
