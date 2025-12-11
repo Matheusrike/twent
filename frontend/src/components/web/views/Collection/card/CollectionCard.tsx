@@ -50,23 +50,22 @@ export default function CollectionCard({
           />
         </div>
 
-        <Card className="border-none min-h-60 max-h-60 bg-white dark:bg-black">
-          <CardHeader className="px-6 pt-4">
-            <div className="block md:flex items-center justify-between gap-2">
-              <CardTitle className="text-2xl font-bold text-primary dark:text-primary">
-                {title}
-              </CardTitle>
-
+        <Card className="border-none h-75 bg-white dark:bg-black flex flex-col">
+          <CardHeader className="px-6 pt-6 pb-3">
+            <div className="flex flex-col gap-3">
               {badge && (
-                <Badge className="bg-primary text-white px-3 py-1 text-sm font-semibold uppercase">
+                <Badge className="bg-primary text-white px-3 py-1 text-sm font-semibold uppercase w-fit">
                   {badge}
                 </Badge>
               )}
+              <CardTitle className="text-2xl font-bold text-primary dark:text-primary leading-tight">
+                {title}
+              </CardTitle>
             </div>
           </CardHeader>
 
-          <CardContent className="px-6 pt-2 pb-4">
-            <p className="text-gray-600 dark:text-gray-300 font-semibold">
+          <CardContent className="px-6 flex-1">
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
               {description}
             </p>
           </CardContent>

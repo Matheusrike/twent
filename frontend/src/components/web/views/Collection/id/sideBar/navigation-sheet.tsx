@@ -63,7 +63,7 @@ export default function CollectionIdSideBar({ sku }: { sku: string }) {
         <div className="flex flex-col justify-center items-center w-full h-full">
             <Sheet onOpenChange={handleOpenChange}>
                 <SheetTrigger asChild>
-                    <Button size="standartButton" variant="standartButton" className="w-full! h-12 ">
+                    <Button size="standartButton" variant="standartButton" className="w-full! h-12 md:mt-15! text-sm  ">
                         Contactar Uma Boutique
                     </Button>
                 </SheetTrigger>

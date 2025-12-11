@@ -1,6 +1,7 @@
 import { Button } from '@/components/web/Global/ui/button';
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { ArrowLeft } from 'lucide-react';
 
 interface Store {
     id: string;
@@ -300,16 +301,20 @@ const ContactForm: React.FC<ContactFormProps> = ({ onBack, store }) => {
     };
 
     return (
-        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6">
+        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 h-full overflow-y-auto">
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Botão Voltar */}
-                <button
-                    type="button"
-                    onClick={onBack}
-                    className="text-sm text-primary hover:underline flex items-center gap-1"
-                >
-                    ← Voltar
-                </button>
+                <div className="hidden lg:flex w-full mb-8 justify-end">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={onBack}
+                        className="flex items-center text-muted-foreground hover:text-foreground"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4 text-[#DE1A26]" />
+                        Voltar à página anterior
+                    </Button>
+                </div>
 
                 {/* Título da loja */}
                 <div className="space-y-1">
