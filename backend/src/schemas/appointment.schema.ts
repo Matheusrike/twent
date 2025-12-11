@@ -7,16 +7,16 @@ export const AppointmentUuidSchema = UuidSchema.extend({
     id: z.uuid(),
 })
 export const AppointmentSchema = z.object({
-	id: z.uuid(),
-	store_id: z.uuid(),
-	customer_id: z.uuid(),
+	id: z.string(),
+	store_id: z.string(),
+	customer_id: z.union([z.string(), z.null()]),
 	customer_name: z.string(),
-	customer_email: z.email(),
+	customer_email: z.string(),
 	customer_phone: z.string(),
 	appointment_date: z.coerce.date(),
-	notes: z.string().nullable(),
-	status: z.enum(AppointmentStatus),
-	created_at: z.date(),
+	notes: z.union([z.string(), z.null()]),
+	status: z.nativeEnum(AppointmentStatus),
+	created_at: z.coerce.date(),
 });
 
 export const AppointmentResponseSchema= ApiResponseSchema.extend({

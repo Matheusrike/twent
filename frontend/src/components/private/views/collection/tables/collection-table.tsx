@@ -82,6 +82,37 @@ export default function CollectionsTable() {
   const [formMin, setFormMin] = React.useState("");
   const [formMax, setFormMax] = React.useState("");
 
+  // Funções para formatação de preço em Real
+  const handlePriceChange = (key: "min" | "max", value: string) => {
+    // Remove tudo que não é número
+    const cleaned = value.replace(/\D/g, "");
+    // Se estiver vazio, limpa o campo
+    if (!cleaned) {
+      if (key === "min") {
+        setFormMin("");
+      } else {
+        setFormMax("");
+      }
+      return;
+    }
+    // Converte para número (centavos) e depois divide por 100 para ter o valor real
+    const num = parseFloat(cleaned) / 100;
+    if (key === "min") {
+      setFormMin(num.toString());
+    } else {
+      setFormMax(num.toString());
+    }
+  };
+
+  const formatPrice = (value: string | number) => {
+    const num = typeof value === "string" ? parseFloat(value) : value;
+    if (isNaN(num) || num === 0) return "";
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(num);
+  };
+
   const LIMIT = 10;
   const [pageIndex, setPageIndex] = React.useState(0);
   const [hasNextPage, setHasNextPage] = React.useState(false);
@@ -155,8 +186,9 @@ export default function CollectionsTable() {
       setFormDescription(editing.description || "");
       setFormYear(String(editing.launch_year));
       setFormGender(editing.target_gender);
-      setFormMin(String(editing.price_range_min));
-      setFormMax(String(editing.price_range_max));
+      // Mantém os valores numéricos para envio, mas formatamos na exibição
+      setFormMin(editing.price_range_min ? String(editing.price_range_min) : "");
+      setFormMax(editing.price_range_max ? String(editing.price_range_max) : "");
     }
   }, [editing]);
 
@@ -174,15 +206,21 @@ export default function CollectionsTable() {
     setErrorAdd("");
     if (!formName.trim()) { setErrorAdd("Nome é obrigatório"); return; }
 
-    const body = {
+    const body: any = {
       name: formName.trim(),
-      description: formDescription.trim(),
-      launch_year: Number(formYear),
+      description: formDescription.trim() || undefined,
+      launch_year: formYear ? Number(formYear) : undefined,
       target_gender: formGender,
-      price_range_min: Number(formMin),
-      price_range_max: Number(formMax),
       is_active: true,
     };
+
+    // Adiciona preços apenas se preenchidos
+    if (formMin && !isNaN(Number(formMin)) && Number(formMin) > 0) {
+      body.price_range_min = Number(formMin);
+    }
+    if (formMax && !isNaN(Number(formMax)) && Number(formMax) > 0) {
+      body.price_range_max = Number(formMax);
+    }
 
     const res = await fetch("/response/api/collection", {
       method: "POST",
@@ -206,16 +244,29 @@ export default function CollectionsTable() {
     if (!editing) return;
     setErrorEdit("");
     if (!formName.trim()) { setErrorEdit("Nome é obrigatório"); return; }
-    if (Number(formMin) > Number(formMax)) { setErrorEdit("Preço mínimo não pode ser maior que o máximo"); return; }
+    
+    const minValue = formMin && !isNaN(Number(formMin)) && Number(formMin) > 0 ? Number(formMin) : null;
+    const maxValue = formMax && !isNaN(Number(formMax)) && Number(formMax) > 0 ? Number(formMax) : null;
+    
+    if (minValue && maxValue && minValue > maxValue) {
+      setErrorEdit("Preço mínimo não pode ser maior que o máximo");
+      return;
+    }
 
-    const body = {
+    const body: any = {
       name: formName.trim(),
-      description: formDescription.trim(),
-      launch_year: Number(formYear),
+      description: formDescription.trim() || undefined,
+      launch_year: formYear ? Number(formYear) : undefined,
       target_gender: formGender,
-      price_range_min: Number(formMin),
-      price_range_max: Number(formMax),
     };
+
+    // Adiciona preços apenas se preenchidos
+    if (minValue) {
+      body.price_range_min = minValue;
+    }
+    if (maxValue) {
+      body.price_range_max = maxValue;
+    }
 
     try {
       const res = await fetch(`/response/api/collection/${editing.id}`, {
@@ -473,11 +524,19 @@ export default function CollectionsTable() {
               <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label>Preço mínimo</Label>
-                  <Input type="number" value={formMin} onChange={(e) => setFormMin(e.target.value)} placeholder="0" />
+                  <Input
+                    placeholder="R$ 0,00"
+                    value={formMin ? formatPrice(formMin) : ""}
+                    onChange={(e) => handlePriceChange("min", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Preço máximo</Label>
-                  <Input type="number" value={formMax} onChange={(e) => setFormMax(e.target.value)} placeholder="0" />
+                  <Input
+                    placeholder="R$ 0,00"
+                    value={formMax ? formatPrice(formMax) : ""}
+                    onChange={(e) => handlePriceChange("max", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Gênero</Label>
@@ -551,11 +610,19 @@ export default function CollectionsTable() {
               <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label>Preço mínimo</Label>
-                  <Input type="number" value={formMin} onChange={(e) => setFormMin(e.target.value)} />
+                  <Input
+                    placeholder="R$ 0,00"
+                    value={formMin ? formatPrice(formMin) : ""}
+                    onChange={(e) => handlePriceChange("min", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Preço máximo</Label>
-                  <Input type="number" value={formMax} onChange={(e) => setFormMax(e.target.value)} />
+                  <Input
+                    placeholder="R$ 0,00"
+                    value={formMax ? formatPrice(formMax) : ""}
+                    onChange={(e) => handlePriceChange("max", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Gênero</Label>

@@ -17,38 +17,49 @@ type Employee = {
 };
 
 export function TeamHeader() {
-  const [employees, setEmployees] = React.useState<Employee[]>([]);
+  const [activeCount, setActiveCount] = React.useState(0);
+  const [inactiveCount, setInactiveCount] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
 
+  // Escuta eventos de atualização dos indicadores da tabela
   React.useEffect(() => {
-    async function fetchEmployees() {
-      try {
-        setLoading(true);
+    const handleUpdateIndicators = (event: CustomEvent) => {
+      setActiveCount(event.detail.activeCount);
+      setInactiveCount(event.detail.inactiveCount);
+      setLoading(false);
+    };
 
+    // Escuta evento customizado com dados filtrados da tabela
+    window.addEventListener('team:update-indicators', handleUpdateIndicators as EventListener);
+
+    // Carrega dados iniciais
+    const fetchInitialData = async () => {
+      try {
         const response = await fetch("/response/api/employee", {
           method: "GET",
           credentials: "include",
         });
 
-        if (!response.ok) {
-          throw new Error(`Erro ao carregar dados: ${response.status}`);
+        if (response.ok) {
+          const { data } = await response.json();
+          const active = data?.filter((e: Employee) => e.is_active).length || 0;
+          const inactive = data?.filter((e: Employee) => !e.is_active).length || 0;
+          setActiveCount(active);
+          setInactiveCount(inactive);
         }
-
-        const { data } = await response.json();
-        setEmployees(data || []);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        console.error("Erro ao carregar dados iniciais:", err);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    fetchEmployees();
+    fetchInitialData();
+
+    return () => {
+      window.removeEventListener('team:update-indicators', handleUpdateIndicators as EventListener);
+    };
   }, []);
-
-  const activeCount = employees.filter((e) => e.is_active).length;
-  const inactiveCount = employees.filter((e) => !e.is_active).length;
 
   return (
     <Card className="flex flex-col h-full w-full">
@@ -70,8 +81,6 @@ export function TeamHeader() {
             <div className="bg-gray-200 dark:bg-gray-800 rounded-lg h-20 w-full" />
             <div className="bg-gray-200 dark:bg-gray-800 rounded-lg h-20 w-full" />
           </div>
-        ) : error ? (
-          <div className="text-red-500 text-sm">{error}</div>
         ) : (
           <div className="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-md">
 

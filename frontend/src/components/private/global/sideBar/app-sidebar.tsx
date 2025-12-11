@@ -8,6 +8,7 @@ import {
     IconHelp,
     IconShoppingCart,
     IconDeviceWatch,
+    IconCalendar,
 } from '@tabler/icons-react';
 import { Container } from 'lucide-react';
 import { NavUser } from '@/components/private/global/sideBar/nav-user';
@@ -67,6 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             icon: IconDeviceWatch,
                         },
                         { title: 'Colaboradores', url: '/private/team', icon: IconUsers },
+                        { title: 'Agendamentos', url: '/private/appointments', icon: IconCalendar },
                     ];
                     setHeaderTitle('Matriz');
                 } else if (role === 'MANAGER_BRANCH') {
@@ -78,6 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         },
                         { title: 'Estoque', url: '/private/inventory', icon: Container },
                         { title: 'Colaboradores', url: '/private/team', icon: IconUsers },
+                        { title: 'Agendamentos', url: '/private/appointments', icon: IconCalendar },
                     ];
                     setHeaderTitle(storeName);
                 } else {
@@ -171,8 +174,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenu className="gap-1">
                             <SidebarMenuItem>
                                 <a
-                                    href="mailto:noreply.twent@gmail.com"
-                                    className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
+                                    href="mailto:noreply.twent@gmail.com?subject=Ajuda%20com...&body=Estou%20precisando%20de%20ajuda%20com..."
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        window.open(
+                                            "mailto:noreply.twent@gmail.com?subject=Ajuda%20com...&body=Estou%20precisando%20de%20ajuda%20com...",
+                                            "_blank"
+                                        );
+                                    }}
+                                    className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                                 >
                                     <IconHelp className="h-5 w-5 shrink-0" />
                                     <span className="flex-1 font-medium text-sm">Ajuda</span>

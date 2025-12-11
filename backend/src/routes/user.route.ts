@@ -4,6 +4,7 @@ import { UserService } from '@/services/User.service';
 import {
 	changeStatusResponseSchema,
 	getUserInfoResponse,
+	deleteUserResponseSchema,
 } from '@/schemas/user.schema';
 import { UserNotFoundResponseSchema } from '@/schemas/auth.schema';
 import { ApiGenericErrorSchema } from '@/schemas/api-response.schema';
@@ -146,6 +147,41 @@ export function userRoute(app: fastifyTypedInstance) {
 					statusCode: error.statusCode,
 					message: error.message,
 					errorCode: error.errorCode,
+				}).send(reply);
+			}
+		},
+	);
+
+	app.delete(
+		'/:id',
+		{
+			schema: {
+				tags: ['User'],
+				summary: 'Deleta um usuário permanentemente',
+				description: 'Remove um usuário do sistema. Esta ação é irreversível.',
+				response: {
+					200: deleteUserResponseSchema,
+					404: UserNotFoundResponseSchema,
+					500: ApiGenericErrorSchema,
+				},
+			},
+			preHandler: app.authorization(),
+		},
+		async (request: FastifyRequest, reply: FastifyReply) => {
+			try {
+				const response = await userController.deleteUser(request);
+				return new ApiResponse({
+					statusCode: 200,
+					success: true,
+					message: 'Usuário deletado com sucesso',
+					data: response,
+				}).send(reply);
+			} catch (error) {
+				return new ApiResponse({
+					success: false,
+					statusCode: error.statusCode || 500,
+					message: error.message || 'Erro ao deletar usuário',
+					errorCode: error.errorCode || 'INTERNAL_SERVER_ERROR',
 				}).send(reply);
 			}
 		},

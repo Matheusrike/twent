@@ -8,7 +8,7 @@ import {
 	AppointmentUuidSchema,
 	CreateAppointmentSchema,
 } from '@/schemas/appointment.schema';
-import { AppointmentService } from '@/services/Appoiment.service';
+import { AppointmentService } from '@/services/Appointment.service';
 import { fastifyTypedInstance } from '@/types/types';
 import { ApiResponse } from '@/utils/api-response.util';
 import prisma from '@prisma/client';
@@ -66,12 +66,12 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 		},
 		async (request, reply) => {
 			try {
-				const appointments = await appointmentController.get();
+				const appointments = await appointmentController.get(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
 					message: 'Agendamentos encontrados',
-					data: appointments,
+					data: appointments || [],
 				}).send(reply);
 			} catch (error) {
 				return new ApiResponse({
@@ -102,7 +102,7 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 		async (request, reply) => {
 			try {
 				const appointment =
-					await appointmentController.cancelAppoiment(request);
+					await appointmentController.cancelAppointment(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
@@ -138,7 +138,7 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 		async (request, reply) => {
 			try {
 				const appointment =
-					await appointmentController.confirmAppoiment(request);
+					await appointmentController.confirmAppointment(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,
@@ -174,7 +174,7 @@ export async function appointmentRoutes(app: fastifyTypedInstance) {
 		async (request, reply) => {
 			try {
 				const appointment =
-					await appointmentController.completeAppoiment(request);
+					await appointmentController.completeAppointment(request);
 				return new ApiResponse({
 					statusCode: 200,
 					success: true,

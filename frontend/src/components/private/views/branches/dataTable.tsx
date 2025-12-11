@@ -23,6 +23,8 @@ import {
   Eye,
   Plus,
   ChevronDown,
+  Power,
+  PowerOff,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -71,6 +73,7 @@ export function BranchesTable() {
   const [editingStoreId, setEditingStoreId] = useState<string | undefined>(
     undefined
   );
+  const [toggleLoading, setToggleLoading] = useState<string | null>(null);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -79,6 +82,7 @@ export function BranchesTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [globalFilter, setGlobalFilter] = React.useState("");
 
   const [skip, setSkip] = React.useState(0);
   const [take, setTake] = React.useState(10);
@@ -102,6 +106,38 @@ export function BranchesTable() {
 
       const { data } = await response.json();
       setBranches(data);
+
+      // Busca todas as filiais para contar ativas/inativas corretamente
+      try {
+        const allResponse = await fetch(
+          `/response/api/store?skip=0&take=1000`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (allResponse.ok) {
+          const allJson = await allResponse.json();
+          const allBranches = allJson.data || [];
+          
+          // Conta ativas e inativas de TODAS as filiais
+          const totalActive = allBranches.filter((b: Branch) => b.is_active).length;
+          const totalInactive = allBranches.filter((b: Branch) => !b.is_active).length;
+
+          // Dispara evento com os números reais
+          window.dispatchEvent(new CustomEvent('branches:update-indicators', {
+            detail: { activeCount: totalActive, inactiveCount: totalInactive }
+          }));
+        }
+      } catch (err) {
+        // Se falhar, conta apenas os da página atual como fallback
+        const totalActive = data.filter((b: Branch) => b.is_active).length;
+        const totalInactive = data.filter((b: Branch) => !b.is_active).length;
+        window.dispatchEvent(new CustomEvent('branches:update-indicators', {
+          detail: { activeCount: totalActive, inactiveCount: totalInactive }
+        }));
+      }
     } catch (error: any) {
       console.error("Erro ao buscar filiais:", error);
       setError(error.message);
@@ -128,6 +164,33 @@ export function BranchesTable() {
     setIsCreateModalOpen(false);
     handleCloseVisualizationModal();
     fetchBranches();
+  };
+
+  const handleToggleActive = async (branch: Branch) => {
+    setToggleLoading(branch.id);
+    try {
+      const action = branch.is_active ? 'deactivate' : 'activate';
+      const response = await fetch(`/response/api/store/${branch.id}/${action}`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(
+          (data && (data.message || data.error)) ||
+            `Erro ao ${action === 'activate' ? 'ativar' : 'desativar'} filial`
+        );
+      }
+
+      // Atualiza a lista de filiais
+      await fetchBranches();
+    } catch (err: any) {
+      console.error('Erro ao alterar status da filial:', err);
+      setError(err?.message ?? 'Erro ao alterar status da filial');
+    } finally {
+      setToggleLoading(null);
+    }
   };
 
   const columns: ColumnDef<Branch>[] = [
@@ -243,6 +306,29 @@ export function BranchesTable() {
               >
                 <Eye className="h-4 w-4" /> Visualizar / Editar
               </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => handleToggleActive(filial)}
+                disabled={toggleLoading === filial.id}
+              >
+                {toggleLoading === filial.id ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    Processando...
+                  </>
+                ) : filial.is_active ? (
+                  <>
+                    <PowerOff className="h-4 w-4" /> Desativar
+                  </>
+                ) : (
+                  <>
+                    <Power className="h-4 w-4" /> Ativar
+                  </>
+                )}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -250,11 +336,10 @@ export function BranchesTable() {
     },
   ];
 
-  const filterValue =
-    (columnFilters.find((f) => f.id === "name")?.value as string) ?? "";
-
   const filteredData = React.useMemo(() => {
-    const term = filterValue.toLowerCase();
+    const term = globalFilter.toLowerCase();
+
+    if (!term) return branches;
 
     return branches.filter(
       (branch) =>
@@ -263,7 +348,7 @@ export function BranchesTable() {
         branch.zip_code.toLowerCase().includes(term) ||
         branch.email.toLowerCase().includes(term)
     );
-  }, [filterValue, branches]);
+  }, [globalFilter, branches]);
 
   const table = useReactTable({
     data: filteredData,
@@ -276,12 +361,15 @@ export function BranchesTable() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    globalFilterFn: "includesString",
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   return (
@@ -295,10 +383,8 @@ export function BranchesTable() {
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Buscar por nome ou código..."
-          value={filterValue}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
 

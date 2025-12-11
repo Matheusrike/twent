@@ -68,7 +68,7 @@ export class EmployeeService extends UserService {
 					}
 					const user = await tx.user.create({
 						data: {
-							email: data.email,
+							email: data.email.toLowerCase().trim(),
 							document_number: data.document_number,
 							password_hash: data.password_hash,
 							first_name: data.first_name,
@@ -152,7 +152,13 @@ export class EmployeeService extends UserService {
 				});
 			}
 
-			await this.validateUser(data?.email, data?.document_number);
+			// Só valida email/documento se foram fornecidos e são diferentes dos atuais
+			if (data?.email && data.email.toLowerCase().trim() !== user.email.toLowerCase().trim()) {
+				await this.validateUser(data.email.toLowerCase().trim(), undefined, id);
+			}
+			if (data?.document_number && data.document_number !== user.document_number) {
+				await this.validateUser(undefined, data.document_number, id);
+			}
 
 			if (data?.password_hash) {
 				data.password_hash = await validatePassword(data.password_hash);
@@ -195,7 +201,7 @@ export class EmployeeService extends UserService {
 					const updatedUser = await tx.user.update({
 						where: { id },
 						data: {
-							email: data?.email,
+							email: data?.email ? data.email.toLowerCase().trim() : undefined,
 							document_number: data?.document_number,
 							password_hash: data?.password_hash,
 							first_name: data?.first_name,
