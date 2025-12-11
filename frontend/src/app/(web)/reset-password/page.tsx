@@ -20,7 +20,14 @@ import { Logo } from "@/components/web/views/Companies/login/logo";
 
 const resetSchema = z
   .object({
-    password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres"),
+    password: z
+      .string()
+      .min(8, "A senha deve ter no mínimo 8 caracteres")
+      .max(100, "A senha deve ter no máximo 100 caracteres")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+        "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial"
+      ),
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {
@@ -42,6 +49,7 @@ export default function ResetPasswordPage() {
   const [tokenValid, setTokenValid] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const resetForm = useForm<ResetData>({
     resolver: zodResolver(resetSchema),
@@ -85,6 +93,8 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
     setError(null);
+    setValidationError(null);
+    resetForm.clearErrors("root");
 
     try {
       const res = await fetch("/response/api/password-recovery/reset", {
@@ -104,11 +114,24 @@ export default function ResetPasswordPage() {
         }, 2000);
       } else {
         const err = await res.json().catch(() => ({}));
-        setError(err.message || "Erro ao redefinir senha");
-        resetForm.setError("root", { message: err.message || "Erro ao redefinir senha" });
+        const errorMessage = err.message || "Erro ao redefinir senha";
+        
+        // Se for erro 400 (validação), mantém na página e mostra o erro
+        if (res.status === 400) {
+          setValidationError(errorMessage);
+          resetForm.setError("root", { message: errorMessage });
+          // Se o erro for sobre senha, também seta no campo password
+          if (errorMessage.includes("senha") || errorMessage.includes("password")) {
+            resetForm.setError("password", { message: errorMessage });
+          }
+        } else {
+          // Para outros erros (como token inválido), seta o erro geral
+          setError(errorMessage);
+          resetForm.setError("root", { message: errorMessage });
+        }
       }
     } catch {
-      setError("Erro de conexão");
+      setValidationError("Erro de conexão");
       resetForm.setError("root", { message: "Erro de conexão" });
     } finally {
       setIsLoading(false);
@@ -126,7 +149,8 @@ export default function ResetPasswordPage() {
     );
   }
 
-  if (!tokenValid || error) {
+  // Só mostra tela de token inválido se o token realmente for inválido (não se for erro de validação)
+  if (!tokenValid && !isValidating) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 px-4">
         <div className="w-full max-w-md bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-8 text-center">
@@ -202,7 +226,7 @@ export default function ResetPasswordPage() {
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Mínimo 8 caracteres"
+                        placeholder="Mínimo 8 caracteres (maiúscula, minúscula, número e especial)"
                         className="pl-12 pr-12"
                         disabled={isLoading}
                         {...field}
@@ -251,15 +275,9 @@ export default function ResetPasswordPage() {
               )}
             />
 
-            {resetForm.formState.errors.root && (
+            {(resetForm.formState.errors.root || validationError) && (
               <p className="text-center text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                {resetForm.formState.errors.root.message}
-            </p>
-            )}
-
-            {error && (
-              <p className="text-center text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                {error}
+                {validationError || resetForm.formState.errors.root?.message}
               </p>
             )}
 

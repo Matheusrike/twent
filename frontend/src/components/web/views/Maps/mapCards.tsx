@@ -5,11 +5,11 @@ import React, { useEffect, useState } from 'react';
 interface StoresListProps {
   data: any[];
   onStoreClick?: (store: any) => void;
+  onCardClick?: () => void;
 }
 
-export default function StoresList({ data, onStoreClick }: StoresListProps) {
+export default function StoresList({ data, onStoreClick, onCardClick }: StoresListProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
 
   useEffect(() => {
     if (data && data.length > 0) {
@@ -18,9 +18,11 @@ export default function StoresList({ data, onStoreClick }: StoresListProps) {
     }
   }, [data, onStoreClick]);
 
-  const handleCardClick = (store: any) => {
+  const handleCardClick = (e: React.MouseEvent, store: any) => {
+    e.stopPropagation(); // Impede a propagação do evento
     setSelectedId(store.id);
     if (onStoreClick) onStoreClick(store);
+    if (onCardClick) onCardClick();
   };
 
   if (!data || !Array.isArray(data)) return null;
@@ -33,10 +35,10 @@ export default function StoresList({ data, onStoreClick }: StoresListProps) {
         return (
           <Card
             key={store.id}
-            onClick={() => handleCardClick(store)}
+            onClick={(e) => handleCardClick(e, store)}
             className={`relative w-full cursor-pointer border transition-all
               bg-gray-100 dark:bg-zinc-900 shadow-sm hover:shadow-md
-              hover:border-border
+              hover:border-border rounded-none!
               ${
                 isSelected
                   ? 'border-primary shadow-md dark:border-primary'

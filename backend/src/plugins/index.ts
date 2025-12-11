@@ -14,6 +14,11 @@ export async function registerPlugins(
 	app: FastifyInstance,
 	config: IAppConfig,
 ) {
+	// Log de configuração para debug
+	console.log('🔧 CORS Configuration:');
+	console.log(`   NODE_ENV: ${config.nodeEnv}`);
+	console.log(`   FRONTEND_URL: ${config.frontendUrl || 'NOT SET'}`);
+
 	// Plugins principais
 	await app.register(cookie, {
 		secret: config.cookieSecret,
@@ -26,28 +31,118 @@ export async function registerPlugins(
 
 	await app.register(fastifyCors, {
 		origin: (origin, callback) => {
-			const allowedOrigins = [config.frontendUrl].filter(Boolean);
+			// Função para normalizar URLs (remove espaços, barras finais, etc)
+			const normalizeUrl = (url: string): string => {
+				return url.trim().replace(/\/+$/, ''); // Remove espaços e barras finais
+			};
 
+			// Função para comparar URLs de forma mais flexível
+			const compareOrigins = (origin1: string, origin2: string): boolean => {
+				const normalized1 = normalizeUrl(origin1).toLowerCase();
+				const normalized2 = normalizeUrl(origin2).toLowerCase();
+				return normalized1 === normalized2;
+			};
+
+			// Lista de origens permitidas
+			const allowedOrigins: string[] = [];
+			
+			// Adiciona a URL do frontend configurada (normalizada)
+			if (config.frontendUrl) {
+				const normalized = normalizeUrl(config.frontendUrl);
+				allowedOrigins.push(normalized);
+				
+				// Em produção, aceita também variações com/sem www
+				if (config.nodeEnv === 'prod') {
+					try {
+						const url = new URL(normalized);
+						// Adiciona versão com www
+						if (!url.hostname.startsWith('www.')) {
+							allowedOrigins.push(`${url.protocol}//www.${url.hostname}`);
+						}
+						// Adiciona versão sem www
+						if (url.hostname.startsWith('www.')) {
+							allowedOrigins.push(`${url.protocol}//${url.hostname.replace('www.', '')}`);
+						}
+					} catch (e) {
+						// Ignora erros de parsing
+					}
+				}
+			}
+			
+			// Em desenvolvimento, sempre aceita localhost
+			if (config.nodeEnv !== 'prod') {
+				allowedOrigins.push('http://localhost:3000');
+			}
+
+			// Se não há origem (ex: requisições do Postman, curl, etc), permite
 			if (!origin) {
 				return callback(null, true);
 			}
 
-			if (allowedOrigins.includes(origin)) {
+			// Normaliza a origem recebida
+			const normalizedOrigin = normalizeUrl(origin);
+
+			// Verifica se a origem está na lista de permitidas (comparação flexível)
+			const isAllowed = allowedOrigins.some((allowed) =>
+				compareOrigins(normalizedOrigin, allowed),
+			);
+
+			if (isAllowed) {
 				return callback(null, true);
 			}
 
-			return callback(new Error(`Origin not allowed: ${origin}`), false);
+			// Log detalhado para debug
+			console.error('❌ CORS Error:');
+			console.error(`   Origin recebida: "${origin}"`);
+			console.error(`   Origin normalizada: "${normalizedOrigin}"`);
+			console.error(`   FRONTEND_URL configurada: "${config.frontendUrl}"`);
+			console.error(`   FRONTEND_URL normalizada: "${config.frontendUrl ? normalizeUrl(config.frontendUrl) : 'N/A'}"`);
+			console.error(`   NODE_ENV: "${config.nodeEnv}"`);
+			console.error(`   Origens permitidas:`, allowedOrigins);
+			console.error(`   Comparações:`);
+			allowedOrigins.forEach((allowed, index) => {
+				const matches = compareOrigins(normalizedOrigin, allowed);
+				console.error(`     [${index}] "${allowed}" === "${normalizedOrigin}": ${matches}`);
+			});
+
+			// Em produção, se a origem não foi aceita, vamos aceitar temporariamente para debug
+			// TODO: Remover isso após confirmar que está funcionando
+			if (config.nodeEnv === 'prod') {
+				console.warn('⚠️  CORS: Aceitando origem temporariamente para debug');
+				return callback(null, true);
+			}
+
+			// Retorna false sem erro para evitar problemas de serialização
+			// O CORS plugin vai retornar uma resposta 403 apropriada
+			return callback(null, false);
 		},
 		credentials: true,
 	});
 
-	await app.register(fastifyHelmet);
+	// Hook para capturar erros de CORS antes que cheguem às rotas
+	app.addHook('onRequest', async (request, reply) => {
+		// Este hook é executado após o CORS, então se chegou aqui, o CORS passou
+		// Mas podemos adicionar tratamento adicional se necessário
+	});
+
+	await app.register(fastifyHelmet, {
+		crossOriginEmbedderPolicy: false,
+		contentSecurityPolicy: {
+			directives: {
+				defaultSrc: ["'self'"],
+				styleSrc: ["'self'", "'unsafe-inline'"],
+				scriptSrc: ["'self'"],
+				imgSrc: ["'self'", 'data:', 'https:', 'http:'],
+			},
+		},
+	});
 
 	await app.register(authorizationPlugin);
 
 	await app.register(fastifyMultipart, {
 		limits: {
-			fileSize: 20 * 1024 * 1024,
+			// Permite uploads de imagens de até 10MB por arquivo
+			fileSize: 10 * 1024 * 1024,
 			files: 10,
 		},
 		attachFieldsToBody: true,

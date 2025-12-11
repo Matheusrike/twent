@@ -197,7 +197,7 @@ export class ProductController {
 		try {
 			const { sku } = request.params as SkuType;
 			const files = await request.saveRequestFiles({
-				limits: { fileSize: 5 * 1024 * 1024 },
+				limits: { fileSize: 10 * 1024 * 1024 },
 			});
 
 			const filepaths = files.map((file) => {

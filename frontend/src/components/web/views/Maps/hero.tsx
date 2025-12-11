@@ -40,55 +40,56 @@ export default function MapsHero() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleStoreClick = (store: any) => {
-    if (showCards) {
-      setShowCards(false);
-    }
-    if (mapRef.current && mapRef.current.focusOnStore) {
-      mapRef.current.focusOnStore(store);
-    }
-  };
+const handleStoreClick = (store: any) => {
+  if (mapRef.current && mapRef.current.focusOnStore) {
+    mapRef.current.focusOnStore(store);
+  }
+};
 
   return (
-    <div className="w-full h-screen flex md:fixed relative">
-      <div className="w-full lg:w-1/5 z-20 lg:flex flex-col hidden bg-background overflow-auto">
-        <div className="gap-5 flex justify-center items-center bg-gray-100 dark:bg-zinc-900 text-xl py-4 px-2 shrink-0">
-          <FaStore size={25} className="text-primary dark:text-white" />
-          <h1 className="font-semibold text-black  dark:text-white">
-           Boutiques
-          </h1>
-        </div>
-        <div className="flex-1 overflow-y-auto  pb-15 pt-5 scroll-smooth">
-          <TestimonialCard data={stores} onStoreClick={handleStoreClick} />
-        </div>
+  <div className="w-full h-screen flex md:fixed relative">
+    <div className="w-full lg:w-1/5 z-20 lg:flex flex-col hidden bg-background overflow-auto">
+      <div className="gap-5 flex justify-center items-center bg-gray-100 dark:bg-zinc-900 text-xl py-4 px-2 shrink-0">
+        <FaStore size={25} className="text-primary dark:text-white" />
+        <h1 className="font-semibold text-black dark:text-white">
+          Boutiques
+        </h1>
       </div>
-
-      <div className="relative w-full lg:w-4/5 h-full flex items-center justify-center bg-transparent">
-        {loading ? (
-          <MapsLoader />
-        ) : (
-          <MapView stores={stores} ref={mapRef} />
-        )}
-
-        {showCards && (
-          <div className="fixed inset-0 z-30 bg-white dark:bg-zinc-900 flex flex-col animate-fadeIn">
-           
-
-            <div className="flex-1 overflow-y-auto scroll-smooth">
-              <TestimonialCard data={stores} onStoreClick={handleStoreClick} />
-            </div>
-          </div>
-        )}
-
-        <Button
-          variant="standartButton"
-          size="mapButton"
-          onClick={() => setShowCards((prev) => !prev)}
-          className="md:hidden fixed bottom-15 left-1/2 -translate-x-1/2 z-40"
-        >
-          {showCards ? "Fechar" : "Lista"}
-        </Button>
+      <div className="flex-1 overflow-y-auto pt-3 pb-20 scroll-smooth">
+        <TestimonialCard data={stores} onStoreClick={handleStoreClick} />
       </div>
     </div>
-  );
+
+    <div className="relative w-full lg:w-4/5 h-full flex items-center justify-center bg-transparent">
+      {loading ? <MapsLoader /> : <MapView stores={stores} ref={mapRef} />}
+
+      {showCards && (
+        <div className="fixed inset-0 z-30 bg-white dark:bg-zinc-900 flex flex-col">
+          {/* Header */}
+          <div className="gap-5 flex justify-center items-center bg-gray-100 dark:bg-zinc-900 text-xl py-4 px-2 shrink-0">
+            <FaStore size={25} className="text-primary dark:text-white" />
+            <h1 className="font-semibold text-black dark:text-white">
+              Boutiques
+            </h1>
+          </div>
+
+     
+          <div className="flex-1 overflow-y-auto pb-28 p-2 scroll-smooth">
+            <TestimonialCard data={stores} onStoreClick={handleStoreClick} />
+          </div>
+        </div>
+      )}
+
+    
+      <Button
+        variant="standartButton"
+        size="mapButton"
+        onClick={() => setShowCards((prev) => !prev)}
+        className="md:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 shadow-lg"
+      >
+        {showCards ? "Fechar" : "Lista"}
+      </Button>
+    </div>
+  </div>
+);
 }
